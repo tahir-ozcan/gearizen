@@ -44,23 +44,34 @@ npm run build
 ### Ads & Analytics
 
 Google AdSense and Google Analytics are injected into the `<head>` of every
-page through `app/components/AnalyticsLoader.tsx`.  The loader renders the
-following snippets exactly as provided by Google using Next.js `Script`
-components:
+page through `app/components/AnalyticsLoader.tsx`. The loader uses Next.js
+`Script` components so external assets load without CORS or CSP issues:
 
-```html
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-V74SWZ9H8B"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-V74SWZ9H8B');
-</script>
+```tsx
+<Script
+  async
+  src="https://www.googletagmanager.com/gtag/js?id=G-V74SWZ9H8B"
+  strategy="afterInteractive"
+  crossOrigin="anonymous"
+/>
+<Script id="gtag-init" strategy="afterInteractive">
+  {`
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-V74SWZ9H8B', {
+      cookie_expires: 63072000,
+      cookie_flags: 'SameSite=None;Secure'
+    });
+  `}
+</Script>
 
-<script async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2108375251131552"
-        crossorigin="anonymous"></script>
+<Script
+  async
+  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2108375251131552"
+  strategy="afterInteractive"
+  crossOrigin="anonymous"
+/>
 ```
 
 To disable analytics or ads, remove `AnalyticsLoader` from `app/layout.tsx`.

@@ -13,7 +13,7 @@ test('analytics and ads load', async ({ page, context }) => {
   await page.goto('/');
   await page.waitForLoadState('networkidle');
 
-  const gtagDefined = await page.evaluate(() => typeof window.gtag === 'function');
+  const gtagDefined = await page.evaluate(() => typeof (window as any).gtag === 'function');
   expect(gtagDefined).toBeTruthy();
 
   const adsResponse = await page.request.get(

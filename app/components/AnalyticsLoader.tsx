@@ -17,7 +17,9 @@ export default function AnalyticsLoader() {
           gtag('js', new Date());
           gtag('config', 'G-V74SWZ9H8B', {
             // two year cookie lifetime
-            cookie_expires: 63072000
+            cookie_expires: 63072000,
+            // set cross-site cookie flags for analytics
+            cookie_flags: 'SameSite=None;Secure'
           });
         `}
       </Script>
