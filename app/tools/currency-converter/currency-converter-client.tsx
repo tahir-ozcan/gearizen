@@ -58,7 +58,7 @@ export default function CurrencyConverterClient() {
     }
 
     loadRates();
-  }, [base, target]);
+  }, [base]);
 
   const handleAmount = (e: ChangeEvent<HTMLInputElement>) =>
     setAmount(Number(e.target.value));
