@@ -21,7 +21,25 @@ npm run dev
 
 ## Usage
 
-Open http://localhost:3000 in your browser.
+After installation run `npm run dev` and open <http://localhost:3000> in your browser.
+
+### Metadata Guidelines
+
+Each page exports a `metadata` object to define `<title>`, description and social tags. Use semantic headings (H1 → H2…) and keep URLs canonical via the `alternates` field.
+
+### Testing
+
+Unit tests are written with [uvu](https://github.com/lukeed/uvu). Execute all tests with:
+
+```bash
+npm test
+```
+
+Run the production build to ensure pages compile correctly:
+
+```bash
+npm run build
+```
 
 ## Project Structure
 

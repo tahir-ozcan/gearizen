@@ -1,20 +1,20 @@
 "use client";
 
 import { useState, ChangeEvent } from "react";
-
-function generateParagraphs(count: number): string {
-  const text =
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-  return Array.from({ length: count }, () => text).join("\n\n");
-}
+import { generateLorem, LoremMode } from "./lorem-utils";
 
 export default function LoremIpsumGeneratorClient() {
   const [count, setCount] = useState(3);
-  const [output, setOutput] = useState(generateParagraphs(3));
+  const [mode, setMode] = useState<LoremMode>("paragraphs");
+  const [output, setOutput] = useState(generateLorem(3, "paragraphs"));
 
-  const handleGenerate = () => setOutput(generateParagraphs(count));
+  const handleGenerate = () => setOutput(generateLorem(count, mode));
 
-  const handleCount = (e: ChangeEvent<HTMLInputElement>) => setCount(Number(e.target.value));
+  const handleCount = (e: ChangeEvent<HTMLInputElement>) =>
+    setCount(Number(e.target.value));
+
+  const handleMode = (e: ChangeEvent<HTMLSelectElement>) =>
+    setMode(e.target.value as LoremMode);
 
   const copy = async () => {
     if (!output) return;
@@ -30,23 +30,38 @@ export default function LoremIpsumGeneratorClient() {
     <section className="space-y-6 max-w-xl mx-auto">
       <h1 className="text-4xl font-extrabold text-center mb-6">Lorem Ipsum Generator</h1>
       <p className="text-center text-gray-600">Generate filler text for your designs and drafts.</p>
-      <label className="block mb-4">
-        <span className="mr-2 font-medium">Paragraphs: {count}</span>
-        <input
-          type="range"
-          min={1}
-          max={10}
-          value={count}
-          onChange={handleCount}
-        />
-      </label>
-      <button
-        type="button"
-        onClick={handleGenerate}
-        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      >
-        Generate
-      </button>
+      <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+        <label className="flex-1 block">
+          <span className="mr-2 font-medium">Amount: {count}</span>
+          <input
+            type="range"
+            min={1}
+            max={10}
+            value={count}
+            onChange={handleCount}
+            className="w-full"
+          />
+        </label>
+        <label className="flex-1 block">
+          <span className="mr-2 font-medium">Mode:</span>
+          <select
+            value={mode}
+            onChange={handleMode}
+            className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="paragraphs">Paragraphs</option>
+            <option value="sentences">Sentences</option>
+            <option value="words">Words</option>
+          </select>
+        </label>
+        <button
+          type="button"
+          onClick={handleGenerate}
+          className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          Generate
+        </button>
+      </div>
       <textarea
         readOnly
         value={output}
