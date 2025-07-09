@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
+// Content Security Policy allowing Google Analytics and AdSense assets
 const ContentSecurityPolicy =
   "default-src 'self'; " +
   "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://pagead2.googlesyndication.com; " +
@@ -10,15 +11,16 @@ const ContentSecurityPolicy =
 
 const nextConfig: NextConfig = {
   async headers() {
+    const securityHeaders = [
+      {
+        key: 'Content-Security-Policy',
+        value: ContentSecurityPolicy.replace(/\n/g, ' '),
+      },
+    ];
     return [
       {
         source: '/:path*',
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: ContentSecurityPolicy.replace(/\n/g, ' '),
-          },
-        ],
+        headers: securityHeaders,
       },
     ];
   },

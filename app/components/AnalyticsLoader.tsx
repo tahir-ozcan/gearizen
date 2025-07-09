@@ -16,7 +16,7 @@ export default function AnalyticsLoader() {
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', 'G-V74SWZ9H8B', {
-            cookie_flags: 'SameSite=None;Secure',
+            // two year cookie lifetime
             cookie_expires: 63072000
           });
         `}
