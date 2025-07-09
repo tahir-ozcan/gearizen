@@ -14,14 +14,15 @@ export default function AnalyticsLoader() {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', 'G-V74SWZ9H8B');
+          gtag('config', 'G-V74SWZ9H8B', {
+            cookie_flags: 'SameSite=None;Secure'
+          });
         `}
       </Script>
 
       <Script
         async
         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2108375251131552"
-        crossOrigin="anonymous"
         strategy="afterInteractive"
       />
     </>
