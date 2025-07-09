@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useRef, FormEvent } from "react";
+import { useState, useRef, FormEvent, useEffect } from "react";
 import QRCode from "qrcode";
 
 export default function QrCodeGeneratorClient() {
@@ -24,15 +24,19 @@ export default function QrCodeGeneratorClient() {
       const opts = { width: size, margin: 1 };
       const dataUrl = await QRCode.toDataURL(text, opts);
       setQrUrl(dataUrl);
-      // also draw on canvas for download
-      const canvas = canvasRef.current;
-      if (canvas) {
-        await QRCode.toCanvas(canvas, text, opts);
-      }
     } catch {
       setError("Failed to generate QR code. Try different input.");
     }
   };
+
+  // Draw to canvas whenever qrUrl updates
+  useEffect(() => {
+    if (!qrUrl || !canvasRef.current) return;
+    const opts = { width: size, margin: 1 };
+    QRCode.toCanvas(canvasRef.current, text, opts).catch(() => {
+      setError("Failed to render QR code");
+    });
+  }, [qrUrl, size, text]);
 
   const copyQr = async () => {
     if (!qrUrl) return;

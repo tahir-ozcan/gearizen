@@ -32,13 +32,16 @@ export default function CurrencyConverterClient() {
 
         const json = await res.json();
 
-        // API şekli: { motd: {...}, success: true, base: "...", date: "...", rates: { USD: 1, ... } }
-        if (
-          typeof json !== "object" ||
-          json === null ||
-          typeof json.rates !== "object" ||
-          json.rates === null
-        ) {
+        // API shape: { success: boolean, rates: { USD: 1, ... } }
+        if (!json || typeof json !== "object") {
+          throw new Error("Invalid response format");
+        }
+
+        if (json.success === false) {
+          throw new Error("API error");
+        }
+
+        if (typeof json.rates !== "object" || json.rates === null) {
           throw new Error("Invalid response format");
         }
 
