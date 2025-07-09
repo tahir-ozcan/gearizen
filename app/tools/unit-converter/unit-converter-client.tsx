@@ -68,7 +68,7 @@ const factors: Record<Exclude<CategoryKey, "temperature">, Record<string, number
   },
 };
 
-function convert(
+export function convert(
   category: CategoryKey,
   from: string,
   to: string,
