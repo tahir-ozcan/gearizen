@@ -27,7 +27,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-pdf-to-word.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen PDF to Word Converter",
@@ -40,10 +40,9 @@ export const metadata = {
     description:
       "Use Gearizen’s free client-side PDF to Word Converter to turn your PDFs into editable Word documents instantly—no signup needed.",
     creator: "@gearizen",
-    images: ["/og-pdf-to-word.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function PdfToWordPage() {
-  return <PdfToWordClient />;
-}
+  return <PdfToWordClient />;}

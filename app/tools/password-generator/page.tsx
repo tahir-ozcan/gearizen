@@ -28,7 +28,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-password-generator.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Strong Password Generator",
@@ -41,10 +41,9 @@ export const metadata = {
     description:
       "Use Gearizen’s client-side Password Generator to create strong, secure passwords instantly. No account needed, privacy-focused.",
     creator: "@gearizen",
-    images: ["/og-password-generator.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function PasswordGeneratorPage() {
-  return <PasswordGeneratorClient />;
-}
+  return <PasswordGeneratorClient />;}

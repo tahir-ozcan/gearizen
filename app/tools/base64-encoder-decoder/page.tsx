@@ -29,7 +29,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-base64.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Base64 Encoder / Decoder",
@@ -42,10 +42,9 @@ export const metadata = {
     description:
       "Use Gearizen’s client-side Base64 tool to encode text to Base64 or decode Base64 strings instantly. No login required.",
     creator: "@gearizen",
-    images: ["/og-base64.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function Base64EncoderDecoderPage() {
-  return <Base64EncoderDecoderClient />;
-}
+  return <Base64EncoderDecoderClient />;}

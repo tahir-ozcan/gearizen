@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-json-formatter.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen JSON Formatter & Validator",
@@ -43,9 +43,8 @@ export const metadata: Metadata = {
       "Use Gearizen’s client-side JSON Formatter to prettify or minify JSON. No login. No tracking. Copy or download instantly.",
     site: "@gearizen",
     creator: "@gearizen",
-    images: ["/og-json-formatter.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
-export default function JsonFormatterPage() {
-  return <JsonFormatterClient />;}
+export default function JsonFormatterPage() {  return <JsonFormatterClient />;}

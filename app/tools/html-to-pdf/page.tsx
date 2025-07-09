@@ -29,7 +29,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-html-to-pdf.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "HTML to PDF Converter – Gearizen",
@@ -42,10 +42,9 @@ export const metadata = {
     description:
       "Instantly generate PDFs from HTML with Gearizen’s client-side HTML to PDF Converter—fast, private, and free. No login required.",
     creator: "@gearizen",
-    images: ["/og-html-to-pdf.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function HtmlToPdfPage() {
-  return <HtmlToPdfClient />;
-}
+  return <HtmlToPdfClient />;}

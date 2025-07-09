@@ -29,7 +29,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-html-formatter.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen HTML Formatter & Minifier",
@@ -42,10 +42,9 @@ export const metadata = {
     description:
       "Transform your HTML with Gearizen’s free client-side HTML Formatter & Minifier—beautify or minify code instantly, no backend needed.",
     creator: "@gearizen",
-    images: ["/og-html-formatter.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function HtmlFormatterPage() {
-  return <HtmlFormatterClient />;
-}
+  return <HtmlFormatterClient />;}

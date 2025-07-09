@@ -28,7 +28,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-csv-to-json.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen CSV to JSON Converter",
@@ -41,10 +41,9 @@ export const metadata = {
     description:
       "Instantly convert CSV to JSON in your browser with Gearizen’s client-side CSV to JSON Converter. Fast, private, and free—no login needed.",
     creator: "@gearizen",
-    images: ["/og-csv-to-json.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function CsvToJsonPage() {
-  return <CsvToJsonClient />;
-}
+  return <CsvToJsonClient />;}

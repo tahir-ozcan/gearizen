@@ -38,7 +38,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen – Free Client-Side Digital Tools",
@@ -51,7 +51,7 @@ export const metadata = {
     description:
       "Fast, private tools for developers and creators. 100% client-side. No account needed.",
     creator: "@gearizen",
-    images: ["/og-image.png"],
+    images: ["/og-placeholder.svg"],
   },
   icons: {
     icon: [

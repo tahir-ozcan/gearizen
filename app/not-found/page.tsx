@@ -27,7 +27,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-404.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "404 – Page Not Found | Gearizen",
@@ -40,10 +40,9 @@ export const metadata = {
     description:
       "Oops! That page isn’t here. Check out Gearizen’s free, client-side web tools with no signup required.",
     creator: "@gearizen",
-    images: ["/og-404.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function NotFoundPage() {
-  return <NotFoundClient />;
-}
+  return <NotFoundClient />;}

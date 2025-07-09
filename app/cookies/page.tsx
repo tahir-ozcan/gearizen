@@ -29,7 +29,7 @@ export const metadata = {
     type: "article",
     images: [
       {
-        url: "/og-cookies.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Cookie Policy",
@@ -42,10 +42,9 @@ export const metadata = {
     description:
       "Understand Gearizen’s cookie policy: no first-party cookies, and third-party ad and analytics cookies may apply. Manage cookies anytime.",
     creator: "@gearizen",
-    images: ["/og-cookies.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function CookiePage() {
-  return <CookiesClient />;
-}
+  return <CookiesClient />;}

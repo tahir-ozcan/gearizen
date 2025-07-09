@@ -28,7 +28,7 @@ export const metadata = {
     type: "article",
     images: [
       {
-        url: "/og-privacy.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Privacy Policy",
@@ -41,10 +41,9 @@ export const metadata = {
     description:
       "Gearizen’s privacy policy: 100% client-side tools, no data collection or tracking. Your privacy, our priority.",
     creator: "@gearizen",
-    images: ["/og-privacy.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function PrivacyPage() {
-  return <PrivacyClient />;
-}
+  return <PrivacyClient />;}

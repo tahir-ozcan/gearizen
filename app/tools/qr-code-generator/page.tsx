@@ -28,7 +28,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-qr-code-generator.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen QR Code Generator",
@@ -41,10 +41,9 @@ export const metadata = {
     description:
       "Use Gearizen’s client-side QR Code Generator to create custom QR codes for text, URLs, and more. Download PNG or copy URL instantly.",
     creator: "@gearizen",
-    images: ["/og-qr-code-generator.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function QrCodeGeneratorPage() {
-  return <QrCodeGeneratorClient />;
-}
+  return <QrCodeGeneratorClient />;}

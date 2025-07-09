@@ -27,7 +27,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-markdown-to-html.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Markdown to HTML Converter",
@@ -40,10 +40,9 @@ export const metadata = {
     description:
       "Use Gearizen’s client-side Markdown→HTML tool to transform your Markdown into clean, ready-to-use HTML. Copy or download instantly.",
     creator: "@gearizen",
-    images: ["/og-markdown-to-html.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function MarkdownToHtmlPage() {
-  return <MarkdownToHtmlClient />;
-}
+  return <MarkdownToHtmlClient />;}

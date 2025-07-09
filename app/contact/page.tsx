@@ -27,7 +27,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-contact.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Contact Gearizen – Free Client-Side Tools",
@@ -40,7 +40,7 @@ export const metadata = {
     description:
       "Reach out to Gearizen for support, feedback, or feature requests. 100% client-side, privacy-focused web tools.",
     creator: "@gearizen",
-    images: ["/og-contact.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 

@@ -28,7 +28,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-regex-tester.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Regex Tester",
@@ -41,10 +41,9 @@ export const metadata = {
     description:
       "Debug your regular expressions online with Gearizen’s free Regex Tester. Instant matches, no backend—just paste, test, and copy results.",
     creator: "@gearizen",
-    images: ["/og-regex-tester.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function RegexTesterPage() {
-  return <RegexTesterClient />;
-}
+  return <RegexTesterClient />;}

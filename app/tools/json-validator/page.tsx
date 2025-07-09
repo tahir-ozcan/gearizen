@@ -28,7 +28,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-json-validator.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen JSON Validator & Linter",
@@ -41,10 +41,9 @@ export const metadata = {
     description:
       "Instantly validate, lint, and format your JSON with Gearizen’s client-side JSON Validator & Linter. No signup, no tracking.",
     creator: "@gearizen",
-    images: ["/og-json-validator.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function JsonValidatorPage() {
-  return <JsonValidatorClient />;
-}
+  return <JsonValidatorClient />;}

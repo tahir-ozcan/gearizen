@@ -29,7 +29,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-contrast-checker.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Color Contrast Checker",
@@ -42,10 +42,9 @@ export const metadata = {
     description:
       "Use Gearizen’s client-side Contrast Checker to verify WCAG contrast ratios between text and background colors. No signup required.",
     creator: "@gearizen",
-    images: ["/og-contrast-checker.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function ColorContrastCheckerPage() {
-  return <ColorContrastCheckerClient />;
-}
+  return <ColorContrastCheckerClient />;}

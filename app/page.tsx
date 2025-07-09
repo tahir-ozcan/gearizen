@@ -22,7 +22,7 @@ export const metadata = {
     url: "https://gearizen.com",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Home",

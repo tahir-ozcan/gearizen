@@ -29,7 +29,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-text-diff.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Text Diff Checker",
@@ -42,10 +42,9 @@ export const metadata = {
     description:
       "Instantly compare two texts and highlight changes with Gearizen’s client-side Text Diff Checker. Additions green, deletions red—no login needed.",
     creator: "@gearizen",
-    images: ["/og-text-diff.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function TextDiffPage() {
-  return <TextDiffClient />;
-}
+  return <TextDiffClient />;}

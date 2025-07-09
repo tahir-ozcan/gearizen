@@ -29,7 +29,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-currency-converter.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Currency Converter",
@@ -42,10 +42,9 @@ export const metadata = {
     description:
       "Instantly convert currencies with live rates using Gearizen’s free client-side Currency Converter. No account needed, privacy-focused.",
     creator: "@gearizen",
-    images: ["/og-currency-converter.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function CurrencyConverterPage() {
-  return <CurrencyConverterClient />;
-}
+  return <CurrencyConverterClient />;}

@@ -27,7 +27,7 @@ export const metadata = {
     type: "article",
     images: [
       {
-        url: "/og-terms.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Terms of Use | Gearizen",
@@ -40,10 +40,9 @@ export const metadata = {
     description:
       "Review Gearizen’s Terms of Use: guidelines for using our free, client-side digital tools. No signup required.",
     creator: "@gearizen",
-    images: ["/og-terms.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function TermsPage() {
-  return <TermsClient />;
-}
+  return <TermsClient />;}

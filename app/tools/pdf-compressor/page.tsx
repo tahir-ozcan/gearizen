@@ -27,7 +27,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-pdf-compressor.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "PDF Compressor | Gearizen",
@@ -40,10 +40,9 @@ export const metadata = {
     description:
       "Compress and optimize your PDF files in your browser with Gearizen’s client-side PDF Compressor. Fast, private, no signup.",
     creator: "@gearizen",
-    images: ["/og-pdf-compressor.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function PdfCompressorPage() {
-  return <PdfCompressorClient />;
-}
+  return <PdfCompressorClient />;}

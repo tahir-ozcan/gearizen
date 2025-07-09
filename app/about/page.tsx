@@ -30,7 +30,7 @@ export const metadata = {
     type: "article",
     images: [
       {
-        url: "/og-about.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "About Gearizen – Free Client-Side Digital Tools",
@@ -43,10 +43,9 @@ export const metadata = {
     description:
       "Get to know Gearizen—your go-to platform for free, client-side web tools. Fast, private, and signup-free.",
     creator: "@gearizen",
-    images: ["/og-about.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function AboutPage() {
-  return <AboutClient />;
-}
+  return <AboutClient />;}

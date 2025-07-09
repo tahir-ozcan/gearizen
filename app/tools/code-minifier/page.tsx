@@ -29,7 +29,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-code-minifier.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Code Minifier",
@@ -42,10 +42,9 @@ export const metadata = {
     description:
       "Compress your JavaScript, CSS, or HTML code in the browser with Gearizen’s client-side Code Minifier. No account needed.",
     creator: "@gearizen",
-    images: ["/og-code-minifier.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function CodeMinifierPage() {
-  return <CodeMinifierClient />;
-}
+  return <CodeMinifierClient />;}

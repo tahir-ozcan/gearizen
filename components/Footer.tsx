@@ -47,7 +47,7 @@ export default function Footer() {
 
   const socialLinks: SocialLink[] = [
     {
-      href: "https://github.com/your-repo",
+      href: "https://github.com/tahir-ozcan/gearizen",
       label: "Gearizen GitHub",
       icon: <FaGithub className="w-6 h-6" aria-hidden="true" />,
     },
