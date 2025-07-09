@@ -36,7 +36,7 @@ gearizen/
 │  └─ …
 ├─ components/
 ├─ public/
-├─ styles/
+├─ types/
 ├─ README.md
 ├─ LICENSE
 └─ package.json
@@ -47,5 +47,4 @@ gearizen/
 MIT — see LICENSE
 
 ## Contact
-
 tahir59201@gmail.com
