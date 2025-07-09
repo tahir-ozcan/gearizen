@@ -17,6 +17,7 @@ git clone https://github.com/tahir-ozcan/gearizen.git
 cd gearizen
 npm install
 npm run dev
+```
 
 ## Usage
 
