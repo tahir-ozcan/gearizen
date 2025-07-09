@@ -1,7 +1,8 @@
 // app/tools/json-formatter/page.tsx
+import type { Metadata } from "next";
 import JsonFormatterClient from "./json-formatter-client";
 
-export const metadata = {
+export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "Free JSON Formatter & Validator",
   description:
@@ -40,11 +41,11 @@ export const metadata = {
     title: "JSON Formatter & Validator | Gearizen",
     description:
       "Use Gearizen’s client-side JSON Formatter to prettify or minify JSON. No login. No tracking. Copy or download instantly.",
+    site: "@gearizen",
     creator: "@gearizen",
     images: ["/og-json-formatter.png"],
   },
 };
 
 export default function JsonFormatterPage() {
-  return <JsonFormatterClient />;
-}
+  return <JsonFormatterClient />;}
