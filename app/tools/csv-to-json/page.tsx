@@ -1,6 +1,7 @@
 // app/tools/csv-to-json/page.tsx
 
 import CsvToJsonClient from "./csv-to-json-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -45,5 +46,10 @@ export const metadata = {
   },
 };
 
-export default function CsvToJsonPage() {
-  return <CsvToJsonClient />;}
+export default function CsvToJsonPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="CSV to JSON Converter" pageUrl="https://gearizen.com/tools/csv-to-json" />
+      <CsvToJsonClient />
+    </>
+  );
+}

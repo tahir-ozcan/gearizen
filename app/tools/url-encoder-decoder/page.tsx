@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import UrlEncoderDecoderClient from "./url-encoder-decoder-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -31,5 +32,10 @@ export const metadata: Metadata = {
 };
 
 export default function UrlEncoderDecoderPage() {
-  return <UrlEncoderDecoderClient />;
+  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="URL Encoder/Decoder" pageUrl="https://gearizen.com/tools/url-encoder-decoder" />
+      <UrlEncoderDecoderClient />
+    </>
+  );
 }

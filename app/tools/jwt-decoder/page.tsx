@@ -1,5 +1,6 @@
 // app/tools/jwt-decoder/page.tsx
 import JwtDecoderClient from "./jwt-decoder-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -44,5 +45,10 @@ export const metadata = {
   },
 };
 
-export default function JwtDecoderPage() {
-  return <JwtDecoderClient />;}
+export default function JwtDecoderPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="JWT Decoder" pageUrl="https://gearizen.com/tools/jwt-decoder" />
+      <JwtDecoderClient />
+    </>
+  );
+}

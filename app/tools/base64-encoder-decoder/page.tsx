@@ -1,6 +1,7 @@
 // app/tools/base64-encoder-decoder/page.tsx
 
 import Base64EncoderDecoderClient from "./base64-encoder-decoder-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -46,5 +47,10 @@ export const metadata = {
   },
 };
 
-export default function Base64EncoderDecoderPage() {
-  return <Base64EncoderDecoderClient />;}
+export default function Base64EncoderDecoderPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Base64 Encoder / Decoder" pageUrl="https://gearizen.com/tools/base64-encoder-decoder" />
+      <Base64EncoderDecoderClient />
+    </>
+  );
+}

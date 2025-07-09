@@ -1,6 +1,7 @@
 // app/tools/code-minifier/page.tsx
 
 import CodeMinifierClient from "./code-minifier-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -46,5 +47,10 @@ export const metadata = {
   },
 };
 
-export default function CodeMinifierPage() {
-  return <CodeMinifierClient />;}
+export default function CodeMinifierPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Code Minifier" pageUrl="https://gearizen.com/tools/code-minifier" />
+      <CodeMinifierClient />
+    </>
+  );
+}

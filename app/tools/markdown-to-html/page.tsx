@@ -1,6 +1,7 @@
 // app/tools/markdown-to-html/page.tsx
 
 import MarkdownToHtmlClient from "./markdown-to-html-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -44,5 +45,10 @@ export const metadata = {
   },
 };
 
-export default function MarkdownToHtmlPage() {
-  return <MarkdownToHtmlClient />;}
+export default function MarkdownToHtmlPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Markdown → HTML Converter" pageUrl="https://gearizen.com/tools/markdown-to-html" />
+      <MarkdownToHtmlClient />
+    </>
+  );
+}

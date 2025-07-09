@@ -1,6 +1,7 @@
 // app/tools/password-generator/page.tsx
 
 import PasswordGeneratorClient from "./password-generator-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -45,5 +46,10 @@ export const metadata = {
   },
 };
 
-export default function PasswordGeneratorPage() {
-  return <PasswordGeneratorClient />;}
+export default function PasswordGeneratorPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Strong Password Generator" pageUrl="https://gearizen.com/tools/password-generator" />
+      <PasswordGeneratorClient />
+    </>
+  );
+}

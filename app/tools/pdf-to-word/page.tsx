@@ -1,5 +1,6 @@
 // app/tools/pdf-to-word/page.tsx
 import PdfToWordClient from "./pdf-to-word-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -44,5 +45,10 @@ export const metadata = {
   },
 };
 
-export default function PdfToWordPage() {
-  return <PdfToWordClient />;}
+export default function PdfToWordPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="PDF to Word Converter" pageUrl="https://gearizen.com/tools/pdf-to-word" />
+      <PdfToWordClient />
+    </>
+  );
+}

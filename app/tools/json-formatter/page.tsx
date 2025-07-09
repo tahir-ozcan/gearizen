@@ -1,6 +1,7 @@
 // app/tools/json-formatter/page.tsx
 import type { Metadata } from "next";
 import JsonFormatterClient from "./json-formatter-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -46,5 +47,11 @@ export const metadata: Metadata = {
     images: ["/og-placeholder.svg"],
   },
 };
-
-export default function JsonFormatterPage() {  return <JsonFormatterClient />;}
+export default function JsonFormatterPage() {
+  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Free JSON Formatter & Validator" pageUrl="https://gearizen.com/tools/json-formatter" />
+      <JsonFormatterClient />
+    </>
+  );
+}

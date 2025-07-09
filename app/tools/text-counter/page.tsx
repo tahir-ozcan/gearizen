@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import TextCounterClient from "./text-counter-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -43,5 +44,10 @@ export const metadata: Metadata = {
 };
 
 export default function TextCounterPage() {
-  return <TextCounterClient />;
+  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Word & Character Counter" pageUrl="https://gearizen.com/tools/text-counter" />
+      <TextCounterClient />
+    </>
+  );
 }

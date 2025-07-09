@@ -10,6 +10,7 @@ import {
   ImageIcon,
   HelpCircle,
 } from "lucide-react";
+import JsonLd from "./components/JsonLd";
 
 export const metadata = {
   title: "Home | Gearizen – Free Client-Side Digital Tools",
@@ -28,6 +29,18 @@ export const metadata = {
         alt: "Gearizen Home",
       },
     ],
+  },
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  url: "https://gearizen.com/",
+  name: "Gearizen",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://gearizen.com/search?q={search_term_string}",
+    "query-input": "required name=search_term_string",
   },
 };
 
@@ -80,6 +93,7 @@ const popularTools = [
 export default function HomePage() {
   return (
     <div className="bg-white text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900">
+      <JsonLd data={websiteJsonLd} />
       {/* Hero */}
       <section
         aria-labelledby="hero-heading"

@@ -1,6 +1,7 @@
 // app/tools/text-diff/page.tsx
 
 import TextDiffClient from "./text-diff-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -46,5 +47,10 @@ export const metadata = {
   },
 };
 
-export default function TextDiffPage() {
-  return <TextDiffClient />;}
+export default function TextDiffPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Text Diff Checker" pageUrl="https://gearizen.com/tools/text-diff" />
+      <TextDiffClient />
+    </>
+  );
+}

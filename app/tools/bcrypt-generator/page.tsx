@@ -1,6 +1,7 @@
 // app/tools/bcrypt-generator/page.tsx
 
 import BcryptGeneratorClient from "./bcrypt-generator-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -45,5 +46,10 @@ export const metadata = {
   },
 };
 
-export default function BcryptGeneratorPage() {
-  return <BcryptGeneratorClient />;}
+export default function BcryptGeneratorPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Bcrypt Hash Generator" pageUrl="https://gearizen.com/tools/bcrypt-generator" />
+      <BcryptGeneratorClient />
+    </>
+  );
+}

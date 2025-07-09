@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MarkdownPreviewerClient from "./markdown-previewer-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -38,5 +39,10 @@ export const metadata: Metadata = {
 };
 
 export default function MarkdownPreviewerPage() {
-  return <MarkdownPreviewerClient />;
+  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Live Markdown Previewer" pageUrl="https://gearizen.com/tools/markdown-previewer" />
+      <MarkdownPreviewerClient />
+    </>
+  );
 }

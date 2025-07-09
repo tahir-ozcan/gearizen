@@ -1,5 +1,6 @@
 // app/tools/regex-tester/page.tsx
 import RegexTesterClient from "./regex-tester-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -45,5 +46,10 @@ export const metadata = {
   },
 };
 
-export default function RegexTesterPage() {
-  return <RegexTesterClient />;}
+export default function RegexTesterPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Regex Tester" pageUrl="https://gearizen.com/tools/regex-tester" />
+      <RegexTesterClient />
+    </>
+  );
+}

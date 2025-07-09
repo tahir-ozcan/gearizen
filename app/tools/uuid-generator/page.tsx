@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import UuidGeneratorClient from "./uuid-generator-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -31,5 +32,10 @@ export const metadata: Metadata = {
 };
 
 export default function UuidGeneratorPage() {
-  return <UuidGeneratorClient />;
+  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="UUID Generator" pageUrl="https://gearizen.com/tools/uuid-generator" />
+      <UuidGeneratorClient />
+    </>
+  );
 }

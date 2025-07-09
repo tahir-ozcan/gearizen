@@ -1,5 +1,6 @@
 // app/tools/pdf-compressor/page.tsx
 import PdfCompressorClient from "./pdf-compressor-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -44,5 +45,10 @@ export const metadata = {
   },
 };
 
-export default function PdfCompressorPage() {
-  return <PdfCompressorClient />;}
+export default function PdfCompressorPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="PDF Compressor" pageUrl="https://gearizen.com/tools/pdf-compressor" />
+      <PdfCompressorClient />
+    </>
+  );
+}

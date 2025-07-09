@@ -1,5 +1,6 @@
 // app/tools/json-validator/page.tsx
 import JsonValidatorClient from "./json-validator-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -45,5 +46,10 @@ export const metadata = {
   },
 };
 
-export default function JsonValidatorPage() {
-  return <JsonValidatorClient />;}
+export default function JsonValidatorPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="JSON Validator & Linter" pageUrl="https://gearizen.com/tools/json-validator" />
+      <JsonValidatorClient />
+    </>
+  );
+}

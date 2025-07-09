@@ -1,6 +1,7 @@
 // app/tools/image-compressor/page.tsx
 
 import ImageCompressorClient from "./image-compressor-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -45,5 +46,10 @@ export const metadata = {
   },
 };
 
-export default function ImageCompressorPage() {
-  return <ImageCompressorClient />;}
+export default function ImageCompressorPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Image Compressor" pageUrl="https://gearizen.com/tools/image-compressor" />
+      <ImageCompressorClient />
+    </>
+  );
+}

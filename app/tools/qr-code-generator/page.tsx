@@ -1,6 +1,7 @@
 // app/tools/qr-code-generator/page.tsx
 
 import QrCodeGeneratorClient from "./qr-code-generator-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -45,5 +46,10 @@ export const metadata = {
   },
 };
 
-export default function QrCodeGeneratorPage() {
-  return <QrCodeGeneratorClient />;}
+export default function QrCodeGeneratorPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="QR Code Generator" pageUrl="https://gearizen.com/tools/qr-code-generator" />
+      <QrCodeGeneratorClient />
+    </>
+  );
+}

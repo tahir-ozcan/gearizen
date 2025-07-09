@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LoremIpsumGeneratorClient from "./lorem-ipsum-generator-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -31,5 +32,10 @@ export const metadata: Metadata = {
 };
 
 export default function LoremIpsumGeneratorPage() {
-  return <LoremIpsumGeneratorClient />;
+  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Lorem Ipsum Generator" pageUrl="https://gearizen.com/tools/lorem-ipsum-generator" />
+      <LoremIpsumGeneratorClient />
+    </>
+  );
 }

@@ -1,6 +1,7 @@
 // app/tools/unit-converter/page.tsx
 
 import UnitConverterClient from "./unit-converter-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -48,5 +49,10 @@ export const metadata = {
   },
 };
 
-export default function UnitConverterPage() {
-  return <UnitConverterClient />;}
+export default function UnitConverterPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Unit Converter" pageUrl="https://gearizen.com/tools/unit-converter" />
+      <UnitConverterClient />
+    </>
+  );
+}
