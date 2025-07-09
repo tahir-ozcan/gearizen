@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 // Content Security Policy allowing Google Analytics and AdSense assets
 const ContentSecurityPolicy =
   "default-src 'self'; " +
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://pagead2.googlesyndication.com; " +
+  "script-src 'self' https://pagead2.googlesyndication.com https://www.googletagmanager.com; " +
   "img-src 'self' data: https://www.google-analytics.com https://pagead2.googlesyndication.com; " +
   "style-src 'self' 'unsafe-inline'; " +
   "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://pagead2.googlesyndication.com; " +

@@ -24,7 +24,8 @@ export default function AnalyticsLoader() {
 
       <Script
         async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2108375251131552"
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+        data-ad-client="ca-pub-2108375251131552"
         strategy="afterInteractive"
         crossOrigin="anonymous"
       />
