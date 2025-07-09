@@ -28,7 +28,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image-resizer.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Image Resizer"
@@ -41,10 +41,9 @@ export const metadata = {
     description:
       "Quickly resize any image client-side with Gearizen’s Image Resizer. Upload, adjust dimensions, preview and download—100% free, no login.",
     creator: "@gearizen",
-    images: ["/og-image-resizer.png"]
+    images: ["/og-placeholder.svg"]
   }
 };
 
 export default function ImageResizerPage() {
-  return <ImageResizerClient />;
-}
+  return <ImageResizerClient />;}

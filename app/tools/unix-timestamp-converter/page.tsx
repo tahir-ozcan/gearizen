@@ -30,7 +30,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-timestamp-converter.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Timestamp Converter",
@@ -43,10 +43,9 @@ export const metadata = {
     description:
       "Instantly convert between UNIX timestamps and human-readable dates with Gearizen’s client-side Timestamp Converter. Fast, private, and free.",
     creator: "@gearizen",
-    images: ["/og-timestamp-converter.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function TimestampConverterPage() {
-  return <UnixTimestampConverterClient />;
-}
+  return <UnixTimestampConverterClient />;}

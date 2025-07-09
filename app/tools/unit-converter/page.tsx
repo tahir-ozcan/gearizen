@@ -31,7 +31,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-unit-converter.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Unit Converter",
@@ -44,10 +44,9 @@ export const metadata = {
     description:
       "Instantly convert length, weight, temperature & volume units with Gearizen’s client-side Unit Converter. Fast, private, and no login.",
     creator: "@gearizen",
-    images: ["/og-unit-converter.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function UnitConverterPage() {
-  return <UnitConverterClient />;
-}
+  return <UnitConverterClient />;}

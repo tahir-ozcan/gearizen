@@ -28,7 +28,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-bcrypt-generator.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Bcrypt Hash Generator",
@@ -41,10 +41,9 @@ export const metadata = {
     description:
       "Instantly create bcrypt password hashes in your browser with Gearizen’s client-side Bcrypt Generator. Fast, private, and free.",
     creator: "@gearizen",
-    images: ["/og-bcrypt-generator.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function BcryptGeneratorPage() {
-  return <BcryptGeneratorClient />;
-}
+  return <BcryptGeneratorClient />;}

@@ -27,6 +27,12 @@ import {
   Tag,
   Globe,
   Shield,
+  CalendarDays,
+  ImagePlus,
+  BookOpen,
+  Fingerprint,
+  AlignLeft,
+  Link as LinkIcon,
 } from "lucide-react";
 
 interface Tool {
@@ -61,6 +67,12 @@ const tools: Tool[] = [
   { href: "/tools/open-graph-preview", Icon: Shield, title: "Open Graph Preview", description: "See how links appear on social platforms via OG metadata preview." },
   { href: "/tools/jwt-decoder", Icon: Shield, title: "JWT Decoder", description: "Decode and inspect JWT header, payload & signature client-side." },
   { href: "/tools/bcrypt-generator", Icon: FileKey, title: "bcrypt Hash Generator", description: "Generate bcrypt hashes for passwords with adjustable salt rounds." },
+  { href: "/tools/iso-date-converter", Icon: CalendarDays, title: "ISO Date Converter", description: "Convert ISO 8601 dates and UNIX timestamps." },
+  { href: "/tools/image-to-base64", Icon: ImagePlus, title: "Image → Base64", description: "Turn images into Base64 data URIs in-browser." },
+  { href: "/tools/markdown-previewer", Icon: BookOpen, title: "Markdown Previewer", description: "Live-preview Markdown as formatted HTML." },
+  { href: "/tools/uuid-generator", Icon: Fingerprint, title: "UUID Generator", description: "Create RFC4122 UUIDs instantly." },
+  { href: "/tools/lorem-ipsum-generator", Icon: AlignLeft, title: "Lorem Ipsum Generator", description: "Generate placeholder text paragraphs." },
+  { href: "/tools/url-encoder-decoder", Icon: LinkIcon, title: "URL Encoder/Decoder", description: "Encode or decode URLs and query strings." },
 ];
 
 export default function ToolsClient() {

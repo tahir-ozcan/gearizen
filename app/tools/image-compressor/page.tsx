@@ -28,7 +28,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image-compressor.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen Image Compressor",
@@ -41,10 +41,9 @@ export const metadata = {
     description:
       "Use Gearizen’s client-side Image Compressor to reduce file sizes while retaining quality. No account needed, 100% in your browser.",
     creator: "@gearizen",
-    images: ["/og-image-compressor.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function ImageCompressorPage() {
-  return <ImageCompressorClient />;
-}
+  return <ImageCompressorClient />;}

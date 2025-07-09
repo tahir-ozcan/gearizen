@@ -27,7 +27,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-open-graph-preview.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Open Graph Preview | Gearizen",
@@ -40,10 +40,9 @@ export const metadata = {
     description:
       "Client-side Open Graph metadata preview for any URL—see title, description, image and site name in a card. Free, no signup.",
     creator: "@gearizen",
-    images: ["/og-open-graph-preview.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function OpenGraphPreviewPage() {
-  return <OpenGraphPreviewClient />;
-}
+  return <OpenGraphPreviewClient />;}

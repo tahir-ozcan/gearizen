@@ -26,7 +26,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-seo-meta-tag-generator.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "SEO Meta Tag Generator | Gearizen",
@@ -39,10 +39,9 @@ export const metadata = {
     description:
       "Generate SEO-friendly meta tags for title, description, Open Graph, and Twitter Cards—all client-side and free.",
     creator: "@gearizen",
-    images: ["/og-seo-meta-tag-generator.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function SeoMetaTagGeneratorPage() {
-  return <SeoMetaTagGeneratorClient />;
-}
+  return <SeoMetaTagGeneratorClient />;}

@@ -46,7 +46,7 @@ export const metadata = {
     siteName: "Gearizen",
     locale: "en_US",
     type: "website",
-    images: [{ url: "/og-tools.png", width: 1200, height: 630, alt: "Gearizen – Free Online Tools" }],
+    images: [{ url: "/og-placeholder.svg", width: 1200, height: 630, alt: "Gearizen – Free Online Tools" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -54,10 +54,9 @@ export const metadata = {
     description:
       "Discover Gearizen’s all-in-one client-side toolbox: generators, converters, compressors, formatters, validators, and more—100% free with no signup.",
     creator: "@gearizen",
-    images: ["/og-tools.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function ToolsPage() {
-  return <ToolsClient />;
-}
+  return <ToolsClient />;}

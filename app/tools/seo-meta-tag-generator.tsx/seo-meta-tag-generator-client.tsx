@@ -119,7 +119,7 @@ export default function SeoMetaTagGeneratorClient() {
             type="url"
             value={image}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setImage(e.target.value)}
-            placeholder="https://gearizen.com/og-image.png"
+            placeholder="https://gearizen.com/og-placeholder.svg"
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
           />
         </div>

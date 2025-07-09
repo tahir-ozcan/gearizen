@@ -27,7 +27,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-jwt-decoder.png",
+        url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
         alt: "Gearizen JWT Decoder",
@@ -40,10 +40,9 @@ export const metadata = {
     description:
       "Decode your JSON Web Tokens client-side with Gearizen’s free JWT Decoder. View header, payload, and signature instantly. No tracking.",
     creator: "@gearizen",
-    images: ["/og-jwt-decoder.png"],
+    images: ["/og-placeholder.svg"],
   },
 };
 
 export default function JwtDecoderPage() {
-  return <JwtDecoderClient />;
-}
+  return <JwtDecoderClient />;}

@@ -1,5 +1,6 @@
 // app/tools/currency-converter/currency-converter-client.tsx
 "use client";
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useState, useEffect, ChangeEvent } from "react";
 
