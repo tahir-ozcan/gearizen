@@ -4,7 +4,7 @@
 
 import { useState, ChangeEvent } from "react";
 import { marked } from "marked";
-import DOMPurify from "dompurify";
+import DOMPurify from "isomorphic-dompurify";
 
 export default function MarkdownToHtmlClient() {
   const [markdown, setMarkdown] = useState("");

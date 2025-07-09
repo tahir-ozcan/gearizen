@@ -19,6 +19,7 @@
     "dompurify": "^3.2.6",
     "framer-motion": "^12.23.0",
     "html2pdf.js": "^0.10.3",
+    "isomorphic-dompurify": "^2.26.0",
     "js-beautify": "^1.15.4",
     "jsonlint-mod": "^1.7.6",
     "lucide-react": "^0.525.0",
@@ -51,8 +52,8 @@
     "lint-staged": "^16.1.2",
     "prettier": "^3.0.0",
     "tailwindcss": "^4.0.1",
-    "typescript": "^5.8.3",
     "tsx": "^4.7.0",
+    "typescript": "^5.8.3",
     "uvu": "^0.5.6"
   },
   "lint-staged": {
@@ -62,6 +63,6 @@
     ]
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18 <21"
   }
 }
