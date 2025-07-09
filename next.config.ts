@@ -3,10 +3,10 @@ import type { NextConfig } from "next";
 // Content Security Policy allowing Google Analytics and AdSense assets
 const ContentSecurityPolicy =
   "default-src 'self'; " +
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://pagead2.googlesyndication.com; " +
-  "img-src 'self' data: https://www.google-analytics.com https://pagead2.googlesyndication.com; " +
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://pagead2.googlesyndication.com https://securepubads.g.doubleclick.net; " +
+  "img-src 'self' data: https://www.google-analytics.com https://pagead2.googlesyndication.com https://securepubads.g.doubleclick.net; " +
   "style-src 'self' 'unsafe-inline'; " +
-  "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://pagead2.googlesyndication.com; " +
+  "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://securepubads.g.doubleclick.net; " +
   "frame-src https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com;";
 
 const nextConfig: NextConfig = {
