@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect, ChangeEvent } from "react";
-import NextImage from "next/image";  // Next.js Image bileşeni
+import NextImage from "next/image"; // Next.js Image bileşeni
 
 export default function ImageCompressorClient() {
   const [file, setFile] = useState<File | null>(null);
@@ -34,47 +34,38 @@ export default function ImageCompressorClient() {
     setFile(e.target.files?.[0] ?? null);
   };
 
-  const compressImage = () => {
-    if (!file || !originalUrl) return;
+  const compressImage = async () => {
+    if (!file) return;
     setProcessing(true);
     setError(null);
 
-    // Tarayıcıdaki DOM Image konstrüktörü
-    const img = new window.Image();
-    img.src = originalUrl;
+    try {
+      const bitmap = await createImageBitmap(file);
+      const canvas = document.createElement("canvas");
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Canvas not supported");
+      ctx.drawImage(bitmap, 0, 0);
 
-    img.onload = () => {
-      try {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        const ctx = canvas.getContext("2d")!;
-        ctx.drawImage(img, 0, 0);
-
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              const url = URL.createObjectURL(blob);
-              setCompressedUrl(url);
-              setCompressedSize(blob.size);
-            } else {
-              setError("Compression failed.");
-            }
-            setProcessing(false);
-          },
-          file.type || "image/jpeg",
-          quality
-        );
-      } catch {
-        setError("An error occurred during compression.");
-        setProcessing(false);
-      }
-    };
-
-    img.onerror = () => {
-      setError("Failed to load image for compression.");
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            setCompressedUrl(url);
+            setCompressedSize(blob.size);
+          } else {
+            setError("Compression failed.");
+          }
+          setProcessing(false);
+        },
+        file.type || "image/jpeg",
+        quality,
+      );
+    } catch {
+      setError("An error occurred during compression.");
       setProcessing(false);
-    };
+    }
   };
 
   const downloadCompressed = () => {
@@ -211,5 +202,4 @@ export default function ImageCompressorClient() {
         </>
       )}
     </section>
-  );
-}
+  );}

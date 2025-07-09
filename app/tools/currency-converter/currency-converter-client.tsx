@@ -3,10 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useState, useEffect, ChangeEvent } from "react";
-
-interface Rates {
-  [currency: string]: number;
-}
+import { fetchRates, calcResult, Rates } from "./currency-utils";
 
 export default function CurrencyConverterClient() {
   const [amount, setAmount] = useState<number>(1);
@@ -17,38 +14,13 @@ export default function CurrencyConverterClient() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // her base değiştiğinde run async loader
     async function loadRates() {
       setLoading(true);
       setError(null);
 
       try {
-        const res = await fetch(
-          `https://api.exchangerate.host/latest?base=${encodeURIComponent(base)}`
-        );
-        if (!res.ok) {
-          throw new Error(`HTTP Error ${res.status}`);
-        }
-
-        const json = await res.json();
-
-        // API shape: { success: boolean, rates: { USD: 1, ... } }
-        if (!json || typeof json !== "object") {
-          throw new Error("Invalid response format");
-        }
-
-        if (json.success === false) {
-          throw new Error("API error");
-        }
-
-        if (typeof json.rates !== "object" || json.rates === null) {
-          throw new Error("Invalid response format");
-        }
-
-        const newRates = json.rates as Rates;
+        const newRates = await fetchRates(base);
         setRates(newRates);
-
-        // target kodumuz yeni gelen listede yoksa ilkini seç
         const codes = Object.keys(newRates).sort();
         if (!codes.includes(target)) {
           setTarget(codes[0]);
@@ -73,9 +45,7 @@ export default function CurrencyConverterClient() {
 
   const rate = rates[target];
   const result =
-    typeof rate === "number" && !isNaN(rate)
-      ? (amount * rate).toFixed(4)
-      : "";
+    typeof rate === "number" && !isNaN(rate) ? calcResult(amount, rate) : "";
 
   const copyResult = async () => {
     if (!result) return;
@@ -102,8 +72,8 @@ export default function CurrencyConverterClient() {
         Currency Converter
       </h1>
       <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-        Convert between world currencies in real time. Rates fetched live from
-        a free API; 100% client-side, no signup required.
+        Convert between world currencies in real time. Rates fetched live from a
+        free API; 100% client-side, no signup required.
       </p>
 
       {loading && (
@@ -219,5 +189,4 @@ export default function CurrencyConverterClient() {
         </form>
       )}
     </section>
-  );
-}
+  );}
