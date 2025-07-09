@@ -2,11 +2,8 @@
 
 import "./globals.css";
 import { ReactNode } from "react";
-import { Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-
-const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -73,7 +70,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${inter.className} bg-white text-gray-900 antialiased scroll-smooth`}
+      className="bg-white text-gray-900 antialiased scroll-smooth"
       suppressHydrationWarning
     >
       <body className="flex min-h-screen flex-col">
@@ -103,5 +100,4 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Footer />
       </body>
     </html>
-  );
-}
+  );}

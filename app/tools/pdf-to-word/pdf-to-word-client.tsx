@@ -10,7 +10,6 @@ import {
   TextContent,
   TextItem,
 } from "pdfjs-dist/legacy/build/pdf";
-import "pdfjs-dist/legacy/build/pdf.worker.entry";
 
 // use the exported version on GlobalWorkerOptions
 GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${GlobalWorkerOptions.version}/pdf.worker.min.js`;
