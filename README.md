@@ -25,6 +25,7 @@ Open http://localhost:3000 in your browser.
 
 ## Project Structure
 
+```bash
 gearizen/
 ├─ app/
 │  ├─ layout.tsx
@@ -39,6 +40,7 @@ gearizen/
 ├─ README.md
 ├─ LICENSE
 └─ package.json
+```
 
 ## License
 
