@@ -30,6 +30,15 @@ export default function ImageCompressorClient() {
     };
   }, [file]);
 
+  // Compressed blob URL cleanup
+  useEffect(() => {
+    return () => {
+      if (compressedUrl) {
+        URL.revokeObjectURL(compressedUrl);
+      }
+    };
+  }, [compressedUrl]);
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFile(e.target.files?.[0] ?? null);
   };
@@ -41,8 +50,6 @@ export default function ImageCompressorClient() {
 
     // Tarayıcıdaki DOM Image konstrüktörü
     const img = new window.Image();
-    img.src = originalUrl;
-
     img.onload = () => {
       try {
         const canvas = document.createElement("canvas");
@@ -75,6 +82,9 @@ export default function ImageCompressorClient() {
       setError("Failed to load image for compression.");
       setProcessing(false);
     };
+
+    // src at the end so onload is always triggered
+    img.src = originalUrl;
   };
 
   const downloadCompressed = () => {

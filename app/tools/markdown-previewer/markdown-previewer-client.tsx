@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, ChangeEvent } from "react";
-import { marked } from "marked";
-import DOMPurify from "isomorphic-dompurify";
+import { useState, useEffect, ChangeEvent } from "react";
+import { markdownToHtml } from "./markdown-utils";
 
 export default function MarkdownPreviewerClient() {
   const [markdown, setMarkdown] = useState("# Hello World\n");
+  const [html, setHtml] = useState(markdownToHtml(markdown));
+
+  // Re-render HTML preview whenever the Markdown input changes
+  useEffect(() => {
+    setHtml(markdownToHtml(markdown));
+  }, [markdown]);
 
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setMarkdown(e.target.value);
@@ -23,7 +28,8 @@ export default function MarkdownPreviewerClient() {
         />
         <div
           className="prose max-w-none p-4 border border-gray-300 rounded-lg bg-gray-50 overflow-auto"
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(markdown) as string) }}
+          // html preview is pre-sanitized in state
+          dangerouslySetInnerHTML={{ __html: html }}
         />
       </div>
     </section>
