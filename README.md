@@ -41,6 +41,13 @@ Run the production build to ensure pages compile correctly:
 npm run build
 ```
 
+### Ads & Analytics
+
+Google AdSense and Google Analytics are loaded globally via the `next/script`
+component inside `app/layout.tsx`. Scripts are injected with the
+`afterInteractive` strategy so they execute client-side without causing CORS or
+content security errors.
+
 ## Project Structure
 
 ```bash
