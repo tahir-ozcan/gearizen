@@ -7,8 +7,9 @@ export default function AnalyticsLoader() {
       <Script
         async
         src="https://www.googletagmanager.com/gtag/js?id=G-V74SWZ9H8B"
+        strategy="afterInteractive"
       />
-      <Script id="gtag-init">
+      <Script id="gtag-init" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
@@ -21,6 +22,7 @@ export default function AnalyticsLoader() {
         async
         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2108375251131552"
         crossOrigin="anonymous"
+        strategy="afterInteractive"
       />
     </>
   );
