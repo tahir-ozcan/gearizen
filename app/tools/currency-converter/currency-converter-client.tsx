@@ -3,6 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useState, useEffect, ChangeEvent } from "react";
+import { calculateConversion } from "./currency-utils";
 
 interface Rates {
   [currency: string]: number;
@@ -17,7 +18,7 @@ export default function CurrencyConverterClient() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // her base değiştiğinde run async loader
+    // Load rates whenever the base currency changes
     async function loadRates() {
       setLoading(true);
       setError(null);
@@ -54,6 +55,7 @@ export default function CurrencyConverterClient() {
           setTarget(codes[0]);
         }
       } catch (e: unknown) {
+        // Capture network or parsing errors and surface a friendly message
         setError(e instanceof Error ? e.message : "Failed to load rates");
         setRates({});
       } finally {
@@ -72,10 +74,7 @@ export default function CurrencyConverterClient() {
     setTarget(e.target.value);
 
   const rate = rates[target];
-  const result =
-    typeof rate === "number" && !isNaN(rate)
-      ? (amount * rate).toFixed(4)
-      : "";
+  const result = typeof rate === "number" ? calculateConversion(amount, rate) : "";
 
   const copyResult = async () => {
     if (!result) return;

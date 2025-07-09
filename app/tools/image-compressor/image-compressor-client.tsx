@@ -16,19 +16,22 @@ export default function ImageCompressorClient() {
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
-  // Dosya seçildiğinde orijinal preview ayarla
+  // When a file is selected update the preview and reset previous results
   useEffect(() => {
     if (!file) return;
     const url = URL.createObjectURL(file);
     setOriginalUrl(url);
     setOriginalSize(file.size);
+    if (compressedUrl) {
+      URL.revokeObjectURL(compressedUrl);
+    }
     setCompressedUrl(null);
     setCompressedSize(null);
     setError(null);
     return () => {
       URL.revokeObjectURL(url);
     };
-  }, [file]);
+  }, [file, compressedUrl]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFile(e.target.files?.[0] ?? null);
@@ -39,8 +42,9 @@ export default function ImageCompressorClient() {
     setProcessing(true);
     setError(null);
 
-    // Tarayıcıdaki DOM Image konstrüktörü
+    // Load the image from the selected file
     const img = new window.Image();
+    img.crossOrigin = 'anonymous';
     img.src = originalUrl;
 
     img.onload = () => {
@@ -54,6 +58,10 @@ export default function ImageCompressorClient() {
         canvas.toBlob(
           (blob) => {
             if (blob) {
+              // Revoke any previous compressed preview to avoid memory leaks
+              if (compressedUrl) {
+                URL.revokeObjectURL(compressedUrl);
+              }
               const url = URL.createObjectURL(blob);
               setCompressedUrl(url);
               setCompressedSize(blob.size);

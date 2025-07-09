@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, ChangeEvent } from "react";
-import { marked } from "marked";
-import DOMPurify from "isomorphic-dompurify";
+import { useState, ChangeEvent, useMemo } from "react";
+import { renderMarkdown } from "./render-markdown";
 
 export default function MarkdownPreviewerClient() {
   const [markdown, setMarkdown] = useState("# Hello World\n");
+
+  // Memoize the rendered HTML so the preview updates efficiently as the user
+  // types. This prevents unnecessary DOMPurify executions on every render.
+  const html = useMemo(() => renderMarkdown(markdown), [markdown]);
 
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setMarkdown(e.target.value);
@@ -23,7 +26,10 @@ export default function MarkdownPreviewerClient() {
         />
         <div
           className="prose max-w-none p-4 border border-gray-300 rounded-lg bg-gray-50 overflow-auto"
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(markdown) as string) }}
+          // aria-live ensures screen readers announce changes when the user
+          // edits the markdown input.
+          aria-live="polite"
+          dangerouslySetInnerHTML={{ __html: html }}
         />
       </div>
     </section>
