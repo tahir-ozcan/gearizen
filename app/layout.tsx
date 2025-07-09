@@ -2,6 +2,7 @@
 
 import "./globals.css";
 import { ReactNode } from "react";
+import Script from "next/script";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -73,6 +74,21 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className="bg-white text-gray-900 antialiased scroll-smooth"
       suppressHydrationWarning
     >
+      <head>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2108375251131552"
+          crossOrigin="anonymous"
+        />
+        {/* Google tag (gtag.js) */}
+        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-V74SWZ9H8B" />
+        <Script
+          id="ga-inline"
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-V74SWZ9H8B');`,
+          }}
+        />
+      </head>
       <body className="flex min-h-screen flex-col">
         {/* Accessible skip link */}
         <a
