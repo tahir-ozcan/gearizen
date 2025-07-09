@@ -1,6 +1,7 @@
 // app/tools/currency-converter/page.tsx
 
 import CurrencyConverterClient from "./currency-converter-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -46,5 +47,10 @@ export const metadata = {
   },
 };
 
-export default function CurrencyConverterPage() {
-  return <CurrencyConverterClient />;}
+export default function CurrencyConverterPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Currency Converter" pageUrl="https://gearizen.com/tools/currency-converter" />
+      <CurrencyConverterClient />
+    </>
+  );
+}

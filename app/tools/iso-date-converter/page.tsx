@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import IsoDateConverterClient from "./iso-date-converter-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -39,5 +40,10 @@ export const metadata: Metadata = {
 };
 
 export default function IsoDateConverterPage() {
-  return <IsoDateConverterClient />;
+  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="ISO Date Converter" pageUrl="https://gearizen.com/tools/iso-date-converter" />
+      <IsoDateConverterClient />
+    </>
+  );
 }

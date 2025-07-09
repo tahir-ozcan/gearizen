@@ -1,6 +1,7 @@
 // app/tools/unix-timestamp-converter/page.tsx
 
 import UnixTimestampConverterClient from "./unix-timestamp-converter-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -47,5 +48,10 @@ export const metadata = {
   },
 };
 
-export default function TimestampConverterPage() {
-  return <UnixTimestampConverterClient />;}
+export default function TimestampConverterPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Timestamp Converter" pageUrl="https://gearizen.com/tools/unix-timestamp-converter" />
+      <UnixTimestampConverterClient />
+    </>
+  );
+}

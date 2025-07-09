@@ -1,6 +1,7 @@
 // app/tools/color-contrast-checker/page.tsx
 
 import ColorContrastCheckerClient from "./color-contrast-checker-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -46,5 +47,10 @@ export const metadata = {
   },
 };
 
-export default function ColorContrastCheckerPage() {
-  return <ColorContrastCheckerClient />;}
+export default function ColorContrastCheckerPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Contrast Checker" pageUrl="https://gearizen.com/tools/color-contrast-checker" />
+      <ColorContrastCheckerClient />
+    </>
+  );
+}

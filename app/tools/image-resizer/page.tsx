@@ -1,6 +1,7 @@
 // app/tools/image-resizer/page.tsx
 
 import ImageResizerClient from "./image-resizer-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -45,5 +46,10 @@ export const metadata = {
   }
 };
 
-export default function ImageResizerPage() {
-  return <ImageResizerClient />;}
+export default function ImageResizerPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Image Resizer" pageUrl="https://gearizen.com/tools/image-resizer" />
+      <ImageResizerClient />
+    </>
+  );
+}

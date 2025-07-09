@@ -1,6 +1,7 @@
 // app/tools/html-to-pdf/page.tsx
 
 import HtmlToPdfClient from "./html-to-pdf-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -46,5 +47,10 @@ export const metadata = {
   },
 };
 
-export default function HtmlToPdfPage() {
-  return <HtmlToPdfClient />;}
+export default function HtmlToPdfPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="HTML to PDF" pageUrl="https://gearizen.com/tools/html-to-pdf" />
+      <HtmlToPdfClient />
+    </>
+  );
+}

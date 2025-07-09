@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ImageToBase64Client from "./image-to-base64-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -38,5 +39,10 @@ export const metadata: Metadata = {
 };
 
 export default function ImageToBase64Page() {
-  return <ImageToBase64Client />;
+  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Image to Base64 Encoder" pageUrl="https://gearizen.com/tools/image-to-base64" />
+      <ImageToBase64Client />
+    </>
+  );
 }

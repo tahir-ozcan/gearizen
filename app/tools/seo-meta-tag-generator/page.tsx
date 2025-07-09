@@ -1,5 +1,6 @@
 // app/tools/seo-meta-tag-generator/page.tsx
 import SeoMetaTagGeneratorClient from "./seo-meta-tag-generator-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -43,5 +44,10 @@ export const metadata = {
   },
 };
 
-export default function SeoMetaTagGeneratorPage() {
-  return <SeoMetaTagGeneratorClient />;}
+export default function SeoMetaTagGeneratorPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="SEO Meta Tag Generator" pageUrl="https://gearizen.com/tools/seo-meta-tag-generator" />
+      <SeoMetaTagGeneratorClient />
+    </>
+  );
+}

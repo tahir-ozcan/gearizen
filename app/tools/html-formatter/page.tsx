@@ -1,6 +1,7 @@
 // app/tools/html-formatter/page.tsx
 
 import HtmlFormatterClient from "./html-formatter-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -46,5 +47,10 @@ export const metadata = {
   },
 };
 
-export default function HtmlFormatterPage() {
-  return <HtmlFormatterClient />;}
+export default function HtmlFormatterPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="HTML Formatter & Minifier" pageUrl="https://gearizen.com/tools/html-formatter" />
+      <HtmlFormatterClient />
+    </>
+  );
+}

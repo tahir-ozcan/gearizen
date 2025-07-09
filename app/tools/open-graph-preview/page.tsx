@@ -1,5 +1,6 @@
 // app/tools/open-graph-preview/page.tsx
 import OpenGraphPreviewClient from "./open-graph-preview-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -44,5 +45,10 @@ export const metadata = {
   },
 };
 
-export default function OpenGraphPreviewPage() {
-  return <OpenGraphPreviewClient />;}
+export default function OpenGraphPreviewPage() {  return (
+    <>
+      <BreadcrumbJsonLd pageTitle="Open Graph Preview" pageUrl="https://gearizen.com/tools/open-graph-preview" />
+      <OpenGraphPreviewClient />
+    </>
+  );
+}
