@@ -9,7 +9,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
-    "test": "tsx node_modules/uvu/bin.js app/tools/unit-converter convert.test.ts",
+    "test": "tsx node_modules/uvu/bin.js app/tools '\\.test\\.ts$'",
     "prepare": "husky install"
   },
   "dependencies": {

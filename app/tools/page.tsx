@@ -34,6 +34,8 @@ export const metadata = {
     "SEO meta tag generator",
     "Open Graph preview",
     "JWT decoder",
+    "word counter",
+    "character counter",
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
   robots: { index: true, follow: true },
@@ -46,7 +48,14 @@ export const metadata = {
     siteName: "Gearizen",
     locale: "en_US",
     type: "website",
-    images: [{ url: "/og-placeholder.svg", width: 1200, height: 630, alt: "Gearizen – Free Online Tools" }],
+    images: [
+      {
+        url: "/og-placeholder.svg",
+        width: 1200,
+        height: 630,
+        alt: "Gearizen – Free Online Tools",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -58,5 +67,5 @@ export const metadata = {
   },
 };
 
-export default function ToolsPage() {
-  return <ToolsClient />;}
+export default function ToolsPage() {  return <ToolsClient />;
+}

@@ -32,6 +32,7 @@ import {
   BookOpen,
   Fingerprint,
   AlignLeft,
+  Type,
   Link as LinkIcon,
 } from "lucide-react";
 
@@ -43,36 +44,208 @@ interface Tool {
 }
 
 const tools: Tool[] = [
-  { href: "/tools/password-generator", Icon: Key, title: "Password Generator", description: "Generate strong, secure passwords with customizable length and character sets." },
-  { href: "/tools/json-formatter", Icon: Code, title: "JSON Formatter", description: "Validate, beautify, or minify JSON entirely in your browser." },
-  { href: "/tools/qr-code-generator", Icon: QrCode, title: "QR Code Generator", description: "Produce QR codes for URLs, text, contacts, and more." },
-  { href: "/tools/unit-converter", Icon: ArrowRightLeft, title: "Unit Converter", description: "Convert between metric and imperial units: length, weight, volume, and more." },
-  { href: "/tools/currency-converter", Icon: DollarSign, title: "Currency Converter", description: "Fetch live exchange rates and convert between world currencies client-side." },
-  { href: "/tools/image-compressor", Icon: ImageIcon, title: "Image Compressor", description: "Reduce JPEG or PNG file sizes while preserving visual quality." },
-  { href: "/tools/color-contrast-checker", Icon: Eye, title: "Contrast Checker", description: "Ensure your text meets WCAG accessibility contrast ratios." },
-  { href: "/tools/base64-encoder-decoder", Icon: Paperclip, title: "Base64 Encoder/Decoder", description: "Encode or decode text and files to Base64 format rapidly." },
-  { href: "/tools/code-minifier", Icon: Cpu, title: "Code Minifier", description: "Minify HTML, CSS, and JavaScript to boost page load speeds." },
-  { href: "/tools/markdown-to-html", Icon: FileCode, title: "Markdown → HTML", description: "Convert Markdown into clean, semantic HTML markup in an instant." },
-  { href: "/tools/regex-tester", Icon: Scissors, title: "Regex Tester", description: "Build and debug regular expressions with real-time match highlighting." },
-  { href: "/tools/text-diff", Icon: FileText, title: "Text Diff Checker", description: "Compare two blocks of text and highlight additions, deletions, and changes." },
-  { href: "/tools/unix-timestamp-converter", Icon: CalendarCheck2, title: "Timestamp Converter", description: "Convert UNIX timestamps to human-readable dates and back." },
-  { href: "/tools/pdf-compressor", Icon: FileArchive, title: "PDF Compressor", description: "Compress PDFs client-side to reduce file size without losing clarity." },
-  { href: "/tools/pdf-to-word", Icon: FilePlus, title: "PDF → Word Converter", description: "Extract text from PDFs and download as Word-compatible DOC files." },
-  { href: "/tools/image-resizer", Icon: FileDown, title: "Image Resizer", description: "Resize images, maintain or override aspect ratio, then download." },
-  { href: "/tools/csv-to-json", Icon: File, title: "CSV → JSON Converter", description: "Transform CSV data into JSON arrays quickly, entirely in-browser." },
-  { href: "/tools/json-validator", Icon: FileClock, title: "JSON Validator", description: "Validate JSON syntax instantly and spot errors in real-time." },
-  { href: "/tools/html-to-pdf", Icon: Globe, title: "HTML → PDF Converter", description: "Render HTML pages as PDFs completely client-side, no server needed." },
-  { href: "/tools/html-formatter", Icon: MessageSquare, title: "HTML Formatter", description: "Beautify or minify HTML code for readability or compactness." },
-  { href: "/tools/seo-meta-tag-generator", Icon: Tag, title: "SEO Meta Tag Generator", description: "Generate optimized `<title>`, `<meta>` and social tags for any page." },
-  { href: "/tools/open-graph-preview", Icon: Shield, title: "Open Graph Preview", description: "See how links appear on social platforms via OG metadata preview." },
-  { href: "/tools/jwt-decoder", Icon: Shield, title: "JWT Decoder", description: "Decode and inspect JWT header, payload & signature client-side." },
-  { href: "/tools/bcrypt-generator", Icon: FileKey, title: "bcrypt Hash Generator", description: "Generate bcrypt hashes for passwords with adjustable salt rounds." },
-  { href: "/tools/iso-date-converter", Icon: CalendarDays, title: "ISO Date Converter", description: "Convert ISO 8601 dates and UNIX timestamps." },
-  { href: "/tools/image-to-base64", Icon: ImagePlus, title: "Image → Base64", description: "Turn images into Base64 data URIs in-browser." },
-  { href: "/tools/markdown-previewer", Icon: BookOpen, title: "Markdown Previewer", description: "Live-preview Markdown as formatted HTML." },
-  { href: "/tools/uuid-generator", Icon: Fingerprint, title: "UUID Generator", description: "Create RFC4122 UUIDs instantly." },
-  { href: "/tools/lorem-ipsum-generator", Icon: AlignLeft, title: "Lorem Ipsum Generator", description: "Generate placeholder text paragraphs." },
-  { href: "/tools/url-encoder-decoder", Icon: LinkIcon, title: "URL Encoder/Decoder", description: "Encode or decode URLs and query strings." },
+  {
+    href: "/tools/password-generator",
+    Icon: Key,
+    title: "Password Generator",
+    description:
+      "Generate strong, secure passwords with customizable length and character sets.",
+  },
+  {
+    href: "/tools/json-formatter",
+    Icon: Code,
+    title: "JSON Formatter",
+    description: "Validate, beautify, or minify JSON entirely in your browser.",
+  },
+  {
+    href: "/tools/qr-code-generator",
+    Icon: QrCode,
+    title: "QR Code Generator",
+    description: "Produce QR codes for URLs, text, contacts, and more.",
+  },
+  {
+    href: "/tools/unit-converter",
+    Icon: ArrowRightLeft,
+    title: "Unit Converter",
+    description:
+      "Convert between metric and imperial units: length, weight, volume, and more.",
+  },
+  {
+    href: "/tools/currency-converter",
+    Icon: DollarSign,
+    title: "Currency Converter",
+    description:
+      "Fetch live exchange rates and convert between world currencies client-side.",
+  },
+  {
+    href: "/tools/image-compressor",
+    Icon: ImageIcon,
+    title: "Image Compressor",
+    description:
+      "Reduce JPEG or PNG file sizes while preserving visual quality.",
+  },
+  {
+    href: "/tools/color-contrast-checker",
+    Icon: Eye,
+    title: "Contrast Checker",
+    description: "Ensure your text meets WCAG accessibility contrast ratios.",
+  },
+  {
+    href: "/tools/base64-encoder-decoder",
+    Icon: Paperclip,
+    title: "Base64 Encoder/Decoder",
+    description: "Encode or decode text and files to Base64 format rapidly.",
+  },
+  {
+    href: "/tools/code-minifier",
+    Icon: Cpu,
+    title: "Code Minifier",
+    description: "Minify HTML, CSS, and JavaScript to boost page load speeds.",
+  },
+  {
+    href: "/tools/markdown-to-html",
+    Icon: FileCode,
+    title: "Markdown → HTML",
+    description:
+      "Convert Markdown into clean, semantic HTML markup in an instant.",
+  },
+  {
+    href: "/tools/regex-tester",
+    Icon: Scissors,
+    title: "Regex Tester",
+    description:
+      "Build and debug regular expressions with real-time match highlighting.",
+  },
+  {
+    href: "/tools/text-diff",
+    Icon: FileText,
+    title: "Text Diff Checker",
+    description:
+      "Compare two blocks of text and highlight additions, deletions, and changes.",
+  },
+  {
+    href: "/tools/unix-timestamp-converter",
+    Icon: CalendarCheck2,
+    title: "Timestamp Converter",
+    description: "Convert UNIX timestamps to human-readable dates and back.",
+  },
+  {
+    href: "/tools/pdf-compressor",
+    Icon: FileArchive,
+    title: "PDF Compressor",
+    description:
+      "Compress PDFs client-side to reduce file size without losing clarity.",
+  },
+  {
+    href: "/tools/pdf-to-word",
+    Icon: FilePlus,
+    title: "PDF → Word Converter",
+    description:
+      "Extract text from PDFs and download as Word-compatible DOC files.",
+  },
+  {
+    href: "/tools/image-resizer",
+    Icon: FileDown,
+    title: "Image Resizer",
+    description:
+      "Resize images, maintain or override aspect ratio, then download.",
+  },
+  {
+    href: "/tools/csv-to-json",
+    Icon: File,
+    title: "CSV → JSON Converter",
+    description:
+      "Transform CSV data into JSON arrays quickly, entirely in-browser.",
+  },
+  {
+    href: "/tools/json-validator",
+    Icon: FileClock,
+    title: "JSON Validator",
+    description: "Validate JSON syntax instantly and spot errors in real-time.",
+  },
+  {
+    href: "/tools/html-to-pdf",
+    Icon: Globe,
+    title: "HTML → PDF Converter",
+    description:
+      "Render HTML pages as PDFs completely client-side, no server needed.",
+  },
+  {
+    href: "/tools/html-formatter",
+    Icon: MessageSquare,
+    title: "HTML Formatter",
+    description: "Beautify or minify HTML code for readability or compactness.",
+  },
+  {
+    href: "/tools/seo-meta-tag-generator",
+    Icon: Tag,
+    title: "SEO Meta Tag Generator",
+    description:
+      "Generate optimized `<title>`, `<meta>` and social tags for any page.",
+  },
+  {
+    href: "/tools/open-graph-preview",
+    Icon: Shield,
+    title: "Open Graph Preview",
+    description:
+      "See how links appear on social platforms via OG metadata preview.",
+  },
+  {
+    href: "/tools/jwt-decoder",
+    Icon: Shield,
+    title: "JWT Decoder",
+    description:
+      "Decode and inspect JWT header, payload & signature client-side.",
+  },
+  {
+    href: "/tools/bcrypt-generator",
+    Icon: FileKey,
+    title: "bcrypt Hash Generator",
+    description:
+      "Generate bcrypt hashes for passwords with adjustable salt rounds.",
+  },
+  {
+    href: "/tools/iso-date-converter",
+    Icon: CalendarDays,
+    title: "ISO Date Converter",
+    description: "Convert ISO 8601 dates and UNIX timestamps.",
+  },
+  {
+    href: "/tools/image-to-base64",
+    Icon: ImagePlus,
+    title: "Image → Base64",
+    description: "Turn images into Base64 data URIs in-browser.",
+  },
+  {
+    href: "/tools/markdown-previewer",
+    Icon: BookOpen,
+    title: "Markdown Previewer",
+    description: "Live-preview Markdown as formatted HTML.",
+  },
+  {
+    href: "/tools/uuid-generator",
+    Icon: Fingerprint,
+    title: "UUID Generator",
+    description: "Create RFC4122 UUIDs instantly.",
+  },
+  {
+    href: "/tools/lorem-ipsum-generator",
+    Icon: AlignLeft,
+    title: "Lorem Ipsum Generator",
+    description: "Generate placeholder text paragraphs.",
+  },
+  {
+    href: "/tools/text-counter",
+    Icon: Type,
+    title: "Word & Character Counter",
+    description: "Count words and characters in any text.",
+  },
+  {
+    href: "/tools/url-encoder-decoder",
+    Icon: LinkIcon,
+    title: "URL Encoder/Decoder",
+    description: "Encode or decode URLs and query strings.",
+  },
 ];
 
 export default function ToolsClient() {
@@ -85,13 +258,17 @@ export default function ToolsClient() {
             Free Online Tools
           </h1>
           <p className="text-lg sm:text-xl text-gray-700 leading-relaxed">
-            Gearizen offers 100% client-side utilities—generators, converters, compressors, formatters, validators, and more—all free and no signup required.
+            Gearizen offers 100% client-side utilities—generators, converters,
+            compressors, formatters, validators, and more—all free and no signup
+            required.
           </p>
         </header>
 
         {/* Grid */}
         <section aria-labelledby="tools-heading">
-          <h2 id="tools-heading" className="sr-only">All Tools</h2>
+          <h2 id="tools-heading" className="sr-only">
+            All Tools
+          </h2>
           <ul className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {tools.map(({ href, Icon, title, description }) => (
               <li key={href} className="list-none">
@@ -100,9 +277,16 @@ export default function ToolsClient() {
                   aria-label={`Navigate to ${title}`}
                   className="group flex flex-col h-full bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-colors"
                 >
-                  <Icon className="w-10 h-10 text-indigo-600 mx-auto mb-4" aria-hidden="true" />
-                  <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-indigo-600 transition-colors">{title}</h3>
-                  <p className="text-gray-600 text-center flex-grow">{description}</p>
+                  <Icon
+                    className="w-10 h-10 text-indigo-600 mx-auto mb-4"
+                    aria-hidden="true"
+                  />
+                  <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-indigo-600 transition-colors">
+                    {title}
+                  </h3>
+                  <p className="text-gray-600 text-center flex-grow">
+                    {description}
+                  </p>
                 </Link>
               </li>
             ))}
@@ -110,5 +294,4 @@ export default function ToolsClient() {
         </section>
       </div>
     </div>
-  );
-}
+  );}
