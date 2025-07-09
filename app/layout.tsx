@@ -4,6 +4,7 @@ import "./globals.css";
 import { ReactNode } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AnalyticsScripts from "@/components/AnalyticsScripts";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -73,6 +74,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className="bg-white text-gray-900 antialiased scroll-smooth"
       suppressHydrationWarning
     >
+      <head>
+        <link
+          rel="preconnect"
+          href="https://pagead2.googlesyndication.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preconnect"
+          href="https://www.googletagmanager.com"
+          crossOrigin="anonymous"
+        />
+        <AnalyticsScripts />
+      </head>
       <body className="flex min-h-screen flex-col">
         {/* Accessible skip link */}
         <a
