@@ -52,8 +52,13 @@ export default function ImageCompressorClient() {
         const canvas = document.createElement("canvas");
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
-        const ctx = canvas.getContext("2d")!;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) throw new Error('Canvas not supported');
         ctx.drawImage(img, 0, 0);
+
+        if (!canvas.toBlob) {
+          throw new Error('Browser does not support image compression');
+        }
 
         canvas.toBlob(
           (blob) => {
