@@ -3,7 +3,9 @@
 "use client";
 
 import { useState, useEffect, ChangeEvent } from "react";
-import NextImage from "next/image";  // Next.js Image bileşeni
+import NextImage from "next/image";  // Next.js Image component
+import Input from "@/components/Input";
+import Button from "@/components/Button";
 
 export default function ImageCompressorClient() {
   const [file, setFile] = useState<File | null>(null);
@@ -116,11 +118,11 @@ export default function ImageCompressorClient() {
       </p>
 
       <div className="max-w-md mx-auto mb-8">
-        <input
+        <Input
           type="file"
           accept="image/*"
           onChange={handleFileChange}
-          className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
+          className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500"
         />
       </div>
 
@@ -136,7 +138,7 @@ export default function ImageCompressorClient() {
                 {Math.round(quality * 100)}%
               </span>
             </label>
-            <input
+            <Input
               id="quality"
               type="range"
               min={0.1}
@@ -149,15 +151,13 @@ export default function ImageCompressorClient() {
           </div>
 
           <div className="text-center mb-8">
-            <button
+            <Button
               onClick={compressImage}
               disabled={processing}
-              className={`px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium ${
-                processing ? "opacity-60 cursor-not-allowed" : ""
-              }`}
+              className={`${processing ? "opacity-60 cursor-not-allowed" : ""}`}
             >
               {processing ? "Compressing..." : "Compress Image"}
-            </button>
+            </Button>
           </div>
 
           {error && (
@@ -213,12 +213,12 @@ export default function ImageCompressorClient() {
 
           {compressedUrl && (
             <div className="text-center">
-              <button
+              <Button
                 onClick={downloadCompressed}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition font-medium"
+                className="bg-green-600 hover:bg-green-700 focus:ring-green-500"
               >
                 Download Compressed Image
-              </button>
+              </Button>
             </div>
           )}
         </>

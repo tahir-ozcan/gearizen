@@ -3,6 +3,8 @@
 
 import { useState, useEffect, ChangeEvent } from "react";
 import { calculateConversion } from "./currency-utils";
+import Input from "@/components/Input";
+import Button from "@/components/Button";
 
 interface Rates {
   [currency: string]: number;
@@ -139,14 +141,13 @@ export default function CurrencyConverterClient() {
             >
               Amount
             </label>
-            <input
+            <Input
               id="amount"
               type="number"
               value={amount}
               onChange={handleAmount}
               min="0"
               step="any"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             />
           </div>
 
@@ -204,23 +205,23 @@ export default function CurrencyConverterClient() {
               Result
             </label>
             <div className="flex items-center space-x-3">
-              <input
+              <Input
                 id="result"
                 type="text"
                 readOnly
                 value={result}
                 placeholder="—"
                 aria-label="Converted amount"
-                className="flex-grow bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                className="flex-grow bg-gray-50 font-mono"
               />
-              <button
+              <Button
                 type="button"
                 onClick={copyResult}
                 disabled={!result}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition text-sm font-medium disabled:opacity-60"
+                className="bg-green-600 hover:bg-green-700 focus:ring-green-500 text-sm disabled:opacity-60"
               >
                 Copy
-              </button>
+              </Button>
             </div>
           </div>
         </form>
