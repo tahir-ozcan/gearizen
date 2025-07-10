@@ -68,7 +68,7 @@ export default function UuidGeneratorClient() {
     >
       <h1
         id="uuid-generator-heading"
-        className="text-4xl sm:text-5xl font-extrabold text-center mb-6 tracking-tight"
+        className="text-4xl font-extrabold text-center mb-6 tracking-tight"
       >
         Free UUID Generator
       </h1>
@@ -91,7 +91,7 @@ export default function UuidGeneratorClient() {
               id="version"
               value={version}
               onChange={(e) => setVersion(e.target.value as Version)}
-              className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+              className="input-base w-auto px-2 py-1 text-sm"
             >
               <option value="v1">v1</option>
               <option value="v4">v4</option>
@@ -114,7 +114,7 @@ export default function UuidGeneratorClient() {
               id="separator"
               value={separator}
               onChange={(e) => setSeparator(e.target.value as Separator)}
-              className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+              className="input-base w-auto px-2 py-1 text-sm"
             >
               <option value="-">Dash (-)</option>
               <option value="_">Underscore (_)</option>
@@ -131,7 +131,7 @@ export default function UuidGeneratorClient() {
               max={50}
               value={count}
               onChange={(e) => setCount(Math.min(50, Math.max(1, Number(e.target.value))))}
-              className="w-20 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+              className="input-base w-20 px-2 py-1 text-sm"
             />
           </label>
         </div>
@@ -167,7 +167,7 @@ export default function UuidGeneratorClient() {
           readOnly
           aria-label="Generated UUIDs"
           value={uuids.join("\n")}
-          className="mt-8 w-full max-w-2xl mx-auto h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+          className="input-base mt-8 w-full max-w-2xl mx-auto h-48 font-mono text-sm bg-gray-50 resize-y"
         />
       )}
     </section>
