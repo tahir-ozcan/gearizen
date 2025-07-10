@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import UuidGeneratorClient from "./uuid-generator-client";
+import UuidGeneratorClient from "./page-client";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata: Metadata = {
