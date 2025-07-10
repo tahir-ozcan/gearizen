@@ -2,6 +2,8 @@
 "use client";
 
 import { useState, ChangeEvent } from "react";
+import jsonlint from "jsonlint-mod";
+import { sortKeysDeep } from "./sort-utils";
 
 export default function JsonFormatterClient() {
   const [input, setInput] = useState("");
@@ -9,6 +11,8 @@ export default function JsonFormatterClient() {
   const [error, setError] = useState<string | null>(null);
   const [minify, setMinify] = useState(false);
   const [indent, setIndent] = useState(2);
+  const [sortKeys, setSortKeys] = useState(false);
+  const [strict, setStrict] = useState(true);
 
   function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value);
@@ -17,9 +21,10 @@ export default function JsonFormatterClient() {
 
   function formatJson() {
     try {
-      const parsed = JSON.parse(input);
+      const parsed = strict ? jsonlint.parse(input) : JSON.parse(input);
+      const processed = sortKeys ? sortKeysDeep(parsed) : parsed;
       const spaced = minify ? 0 : indent;
-      setOutput(JSON.stringify(parsed, null, spaced));
+      setOutput(JSON.stringify(processed, null, spaced));
       setError(null);
     } catch (e: unknown) {
       setOutput("");
@@ -76,7 +81,7 @@ export default function JsonFormatterClient() {
 
         {/* Options & Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-wrap items-center gap-4">
             <label htmlFor="indent" className="flex items-center space-x-2">
               <span className="text-sm font-medium text-gray-700">Indent:</span>
               <select
@@ -103,6 +108,28 @@ export default function JsonFormatterClient() {
               />
               <span className="text-sm text-gray-700">Minify JSON</span>
             </label>
+
+            <label htmlFor="sort-keys" className="flex items-center space-x-2">
+              <input
+                id="sort-keys"
+                type="checkbox"
+                checked={sortKeys}
+                onChange={() => setSortKeys((s) => !s)}
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              />
+              <span className="text-sm text-gray-700">Sort keys</span>
+            </label>
+
+            <label htmlFor="strict" className="flex items-center space-x-2">
+              <input
+                id="strict"
+                type="checkbox"
+                checked={strict}
+                onChange={() => setStrict((s) => !s)}
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              />
+              <span className="text-sm text-gray-700">Strict mode</span>
+            </label>
           </div>
 
           <div className="flex flex-wrap gap-3">
@@ -111,7 +138,7 @@ export default function JsonFormatterClient() {
               onClick={formatJson}
               className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
             >
-              Format / Minify
+              Process JSON
             </button>
             <button
               type="button"

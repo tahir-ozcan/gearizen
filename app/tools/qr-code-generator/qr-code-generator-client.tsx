@@ -128,12 +128,13 @@ export default function QrCodeGeneratorClient() {
       </form>
 
       {qrUrl && (
-        <div className="mt-12 max-w-sm mx-auto space-y-6 text-center">
+        <div className="mt-12 flex flex-col items-center space-y-6">
           <canvas
             ref={canvasRef}
             width={size}
             height={size}
-            className="mx-auto border rounded-md"
+            style={{ width: "100%", maxWidth: size, height: "auto" }}
+            className="border rounded-md"
           />
           <div className="flex justify-center gap-4">
             <button
