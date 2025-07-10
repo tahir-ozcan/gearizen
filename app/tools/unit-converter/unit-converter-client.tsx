@@ -150,7 +150,7 @@ export default function UnitConverterClient() {
     <section
       id="unit-converter"
       aria-labelledby="unit-converter-heading"
-      className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="unit-converter-heading"
