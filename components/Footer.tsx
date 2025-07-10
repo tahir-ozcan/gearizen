@@ -31,11 +31,11 @@ export default function Footer() {
 
   const popularTools: LinkItem[] = [
     { label: "Password Generator", href: "/tools/password-generator" },
-    { label: "JSON Formatter", href: "/tools/json-formatter" },
+    { label: "PDF → Word Converter", href: "/tools/pdf-to-word" },
     { label: "QR Code Generator", href: "/tools/qr-code-generator" },
     { label: "Unit Converter", href: "/tools/unit-converter" },
+    { label: "Image Compressor", href: "/tools/image-compressor" },
     { label: "Currency Converter", href: "/tools/currency-converter" },
-    { label: "Contrast Checker", href: "/tools/color-contrast-checker" },
   ];
 
   const builtWith: LinkItem[] = [
@@ -69,7 +69,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand + Tagline */}
           <div>
-            <Link href="/" aria-label="Go to Gearizen homepage" className="flex items-center mb-4">
+            <Link
+              href="/"
+              aria-label="Go to Gearizen homepage"
+              className="flex items-center mb-4"
+            >
               <Image
                 src="/favicon.png"
                 alt="Gearizen logo"
@@ -82,7 +86,8 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Fast, free, privacy-first web tools for developers, creators, and beyond. No signup. No tracking. 100% client-side.
+              Fast, free, privacy-first web tools for developers, creators, and
+              beyond. No signup. No tracking. 100% client-side.
             </p>
             <div className="mt-4 flex space-x-4">
               {socialLinks.map(({ href, label, icon }) => (
@@ -102,7 +107,10 @@ export default function Footer() {
 
           {/* Site Pages */}
           <nav aria-labelledby="footer-site-pages">
-            <h3 id="footer-site-pages" className="text-lg font-semibold text-gray-900">
+            <h3
+              id="footer-site-pages"
+              className="text-lg font-semibold text-gray-900"
+            >
               Site Pages
             </h3>
             <ul className="mt-4 space-y-2 text-sm">
@@ -121,7 +129,10 @@ export default function Footer() {
 
           {/* Popular Tools */}
           <nav aria-labelledby="footer-popular-tools">
-            <h3 id="footer-popular-tools" className="text-lg font-semibold text-gray-900">
+            <h3
+              id="footer-popular-tools"
+              className="text-lg font-semibold text-gray-900"
+            >
               Popular Tools
             </h3>
             <ul className="mt-4 space-y-2 text-sm">
@@ -140,9 +151,7 @@ export default function Footer() {
 
           {/* Built With */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Built With
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">Built With</h3>
             <ul className="mt-4 space-y-2 text-sm text-gray-600">
               {builtWith.map(({ label, href }) => (
                 <li key={href} className="list-none">

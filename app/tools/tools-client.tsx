@@ -3,6 +3,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import {
   Key,
   Code,
@@ -249,6 +250,13 @@ const tools: Tool[] = [
 ];
 
 export default function ToolsClient() {
+  const [search, setSearch] = useState("");
+  const filteredTools = tools.filter(
+    ({ title, description }) =>
+      title.toLowerCase().includes(search.toLowerCase()) ||
+      description.toLowerCase().includes(search.toLowerCase()),
+  );
+
   return (
     <div className="bg-white text-gray-900 antialiased py-12 sm:py-16 lg:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-12 space-y-12">
@@ -264,13 +272,28 @@ export default function ToolsClient() {
           </p>
         </header>
 
+        {/* Search */}
+        <div className="max-w-md mx-auto">
+          <label htmlFor="tool-search" className="sr-only">
+            Search tools
+          </label>
+          <input
+            id="tool-search"
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search tools..."
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
         {/* Grid */}
         <section aria-labelledby="tools-heading">
           <h2 id="tools-heading" className="sr-only">
             All Tools
           </h2>
           <ul className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {tools.map(({ href, Icon, title, description }) => (
+            {filteredTools.map(({ href, Icon, title, description }) => (
               <li key={href} className="list-none">
                 <Link
                   href={href}
@@ -294,4 +317,5 @@ export default function ToolsClient() {
         </section>
       </div>
     </div>
-  );}
+  );
+}
