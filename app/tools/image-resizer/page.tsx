@@ -46,9 +46,13 @@ export const metadata = {
   }
 };
 
-export default function ImageResizerPage() {  return (
+export default function ImageResizerPage() {
+  return (
     <>
-      <BreadcrumbJsonLd pageTitle="Image Resizer" pageUrl="https://gearizen.com/tools/image-resizer" />
+      <BreadcrumbJsonLd
+        pageTitle="Image Resizer"
+        pageUrl="https://gearizen.com/tools/image-resizer"
+      />
       <ImageResizerClient />
     </>
   );

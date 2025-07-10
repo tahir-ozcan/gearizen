@@ -60,7 +60,7 @@ export default function QrCodeGeneratorClient() {
     <section
       id="qr-code-generator"
       aria-labelledby="qr-heading"
-      className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900 flex flex-col items-center"
     >
       <h1
         id="qr-heading"
@@ -128,12 +128,13 @@ export default function QrCodeGeneratorClient() {
       </form>
 
       {qrUrl && (
-        <div className="mt-12 max-w-sm mx-auto space-y-6 text-center">
+        <div className="mt-12 flex flex-col items-center justify-center space-y-6 text-center w-full">
           <canvas
             ref={canvasRef}
             width={size}
             height={size}
-            className="mx-auto border rounded-md"
+            className="border rounded-md w-full h-auto max-w-xs sm:max-w-sm md:max-w-md"
+            style={{ maxWidth: size }}
           />
           <div className="flex justify-center gap-4">
             <button

@@ -35,7 +35,6 @@ export default function Footer() {
     { label: "QR Code Generator", href: "/tools/qr-code-generator" },
     { label: "Unit Converter", href: "/tools/unit-converter" },
     { label: "Image Compressor", href: "/tools/image-compressor" },
-    { label: "Currency Converter", href: "/tools/currency-converter" },
   ];
 
   const builtWith: LinkItem[] = [
