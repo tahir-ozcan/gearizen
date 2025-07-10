@@ -27,7 +27,12 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
     images: [
-      { url: "/og-placeholder.svg", width: 1200, height: 630, alt: "Gearizen UUID Generator" },
+      {
+        url: "/og-placeholder.svg",
+        width: 1200,
+        height: 630,
+        alt: "Gearizen UUID Generator",
+      },
     ],
   },
   twitter: {
@@ -43,7 +48,10 @@ export const metadata: Metadata = {
 export default function UuidGeneratorPage() {
   return (
     <>
-      <BreadcrumbJsonLd pageTitle="Free UUID Generator" pageUrl="https://gearizen.com/tools/uuid-generator" />
+      <BreadcrumbJsonLd
+        pageTitle="Free UUID Generator"
+        pageUrl="https://gearizen.com/tools/uuid-generator"
+      />
       <UuidGeneratorClient />
     </>
   );

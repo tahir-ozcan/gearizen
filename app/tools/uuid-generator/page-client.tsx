@@ -13,7 +13,9 @@ function uuidV4() {
 function uuidV1() {
   const now = Date.now();
   const timeLow = (now & 0xffffffff).toString(16).padStart(8, "0");
-  const timeMid = (((now / 0x100000000) & 0xffff) | 0).toString(16).padStart(4, "0");
+  const timeMid = (((now / 0x100000000) & 0xffff) | 0)
+    .toString(16)
+    .padStart(4, "0");
   const timeHiAndVersion = ((((now / 0x100000000) >> 16) & 0x0fff) | 0x1000)
     .toString(16)
     .padStart(4, "0");
@@ -68,7 +70,7 @@ export default function UuidGeneratorClient() {
     >
       <h1
         id="uuid-generator-heading"
-        className="text-4xl font-extrabold text-center mb-6 tracking-tight"
+        className="text-4xl sm:text-5xl font-extrabold text-center mb-6 tracking-tight"
       >
         Free UUID Generator
       </h1>
@@ -109,7 +111,9 @@ export default function UuidGeneratorClient() {
           </label>
 
           <label htmlFor="separator" className="flex items-center space-x-2">
-            <span className="text-sm font-medium text-gray-700">Separator:</span>
+            <span className="text-sm font-medium text-gray-700">
+              Separator:
+            </span>
             <select
               id="separator"
               value={separator}
@@ -130,7 +134,9 @@ export default function UuidGeneratorClient() {
               min={1}
               max={50}
               value={count}
-              onChange={(e) => setCount(Math.min(50, Math.max(1, Number(e.target.value))))}
+              onChange={(e) =>
+                setCount(Math.min(50, Math.max(1, Number(e.target.value))))
+              }
               className="input-base w-20 px-2 py-1 text-sm"
             />
           </label>
@@ -139,7 +145,7 @@ export default function UuidGeneratorClient() {
         <div className="flex flex-wrap gap-3">
           <button
             type="submit"
-            className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 transition text-sm font-medium"
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
           >
             Generate
           </button>
