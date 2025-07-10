@@ -47,9 +47,13 @@ export const metadata = {
   },
 };
 
-export default function HtmlToPdfPage() {  return (
+export default function HtmlToPdfPage() {
+  return (
     <>
-      <BreadcrumbJsonLd pageTitle="HTML to PDF" pageUrl="https://gearizen.com/tools/html-to-pdf" />
+      <BreadcrumbJsonLd
+        pageTitle="HTML to PDF"
+        pageUrl="https://gearizen.com/tools/html-to-pdf"
+      />
       <HtmlToPdfClient />
     </>
   );

@@ -7,7 +7,6 @@ import {
   QrCode,
   ArrowRightLeft,
   ImageIcon,
-  DollarSign,
   HelpCircle,
 } from "lucide-react";
 import JsonLd from "./components/JsonLd";
@@ -15,11 +14,11 @@ import JsonLd from "./components/JsonLd";
 export const metadata = {
   title: "Home | Gearizen – Free Client-Side Digital Tools",
   description:
-    "Discover Gearizen’s most in-demand, privacy-first web tools: password generator, PDF to Word converter, QR code generator, unit converter, image compressor, and currency converter—100% client-side, no signup required.",
+    "Discover Gearizen’s most in-demand, privacy-first web tools: password generator, PDF to Word converter, QR code generator, unit converter and image compressor—100% client-side, no signup required.",
   openGraph: {
     title: "Home | Gearizen – Free Client-Side Digital Tools",
     description:
-      "Explore Gearizen’s top tools—passwords, PDF to Word, QR codes, unit & currency conversion, image compression—all privacy-first and signup-free.",
+      "Explore Gearizen’s top tools—passwords, PDF to Word, QR codes, unit conversion and image compression—all privacy-first and signup-free.",
     url: "https://gearizen.com",
     images: [
       {
@@ -81,14 +80,6 @@ const popularTools = [
     ),
     title: "Image Compressor",
     description: "Reduce image file sizes while preserving quality.",
-  },
-  {
-    href: "/tools/currency-converter",
-    icon: (
-      <DollarSign aria-hidden="true" className="w-10 h-10 text-indigo-600" />
-    ),
-    title: "Currency Converter",
-    description: "Get live exchange rates and convert currencies.",
   },
 ];
 

@@ -8,6 +8,7 @@ export default function SeoMetaTagGeneratorClient() {
   const [description, setDescription] = useState("");
   const [url, setUrl] = useState("");
   const [image, setImage] = useState("");
+  const [keywords, setKeywords] = useState("");
   const [twitterCard, setTwitterCard] = useState<"summary" | "summary_large_image">("summary_large_image");
 
   function generateMetaTags(): string {
@@ -16,11 +17,15 @@ export default function SeoMetaTagGeneratorClient() {
       lines.push(`<title>${title}</title>`);
       lines.push(`<meta name="title" content="${title}" />`);
       lines.push(`<meta property="og:title" content="${title}" />`);
+      lines.push(`<meta name="twitter:title" content="${title}" />`);
     }
     if (description) {
       lines.push(`<meta name="description" content="${description}" />`);
       lines.push(`<meta property="og:description" content="${description}" />`);
       lines.push(`<meta name="twitter:description" content="${description}" />`);
+    }
+    if (keywords) {
+      lines.push(`<meta name="keywords" content="${keywords}" />`);
     }
     if (url) {
       lines.push(`<link rel="canonical" href="${url}" />`);
@@ -33,6 +38,8 @@ export default function SeoMetaTagGeneratorClient() {
     }
     lines.push(`<meta property="og:type" content="website" />`);
     lines.push(`<meta name="twitter:card" content="${twitterCard}" />`);
+    lines.push(`<meta property="og:locale" content="en_US" />`);
+    lines.push(`<meta name="twitter:site" content="@gearizen" />`);
     lines.push(`<meta property="og:site_name" content="Gearizen" />`);
     return lines.join("\n");
   }
@@ -91,6 +98,21 @@ export default function SeoMetaTagGeneratorClient() {
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
             placeholder="Enter a concise page description"
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition resize-y"
+          />
+        </div>
+
+        {/* Keywords */}
+        <div>
+          <label htmlFor="meta-keywords" className="block mb-1 font-medium text-gray-800">
+            Keywords
+          </label>
+          <input
+            id="meta-keywords"
+            type="text"
+            value={keywords}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setKeywords(e.target.value)}
+            placeholder="keyword1, keyword2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
           />
         </div>
 
@@ -157,7 +179,7 @@ export default function SeoMetaTagGeneratorClient() {
         <div className="text-center">
           <button
             onClick={handleCopy}
-            disabled={!title && !description && !url && !image}
+            disabled={!title && !description && !url && !image && !keywords}
             className="inline-flex items-center px-8 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium disabled:opacity-60"
           >
             Copy Meta Tags

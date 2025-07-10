@@ -11,6 +11,7 @@ export default function PdfCompressorClient() {
   const [compressedSize, setCompressedSize] = useState<number | null>(null);
   const [isCompressing, setIsCompressing] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [quality, setQuality] = useState(0.8);
 
   // When the user selects a PDF, capture its size and reset any previous output
   useEffect(() => {
@@ -36,14 +37,44 @@ export default function PdfCompressorClient() {
     setCompressedSize(null);
 
     try {
-      // Load the PDF into pdf-lib
+      const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
+      const worker = (
+        await import("pdfjs-dist/legacy/build/pdf.worker.entry?url")
+      ).default;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
+
       const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const srcPdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const destPdf = await PDFDocument.create();
 
-      // Save optimized (object streams enabled by default)
-      const compressedBytes = await pdfDoc.save({ useObjectStreams: true });
+      for (let i = 1; i <= srcPdf.numPages; i++) {
+        const page = await srcPdf.getPage(i);
+        // pdfjs types don't expose getViewport in our minimal declarations
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const viewport = (page as any).getViewport({ scale: 1 });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) throw new Error("Canvas not supported");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (page as any).render({ canvasContext: ctx, viewport }).promise;
 
-      // Create a downloadable blob URL
+        const blob = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob((b) => resolve(b), "image/jpeg", quality)
+        );
+        if (!blob) throw new Error("Compression failed");
+        const img = await destPdf.embedJpg(await blob.arrayBuffer());
+        const pdfPage = destPdf.addPage([viewport.width, viewport.height]);
+        pdfPage.drawImage(img, {
+          x: 0,
+          y: 0,
+          width: viewport.width,
+          height: viewport.height,
+        });
+      }
+
+      const compressedBytes = await destPdf.save({ useObjectStreams: true });
       const blob = new Blob([compressedBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
 
@@ -119,6 +150,25 @@ export default function PdfCompressorClient() {
         <p className="text-center text-gray-700 mb-4">
           Original Size: {formatBytes(originalSize)}
         </p>
+      )}
+
+      {/* Quality slider */}
+      {file && (
+        <div className="max-w-lg mx-auto mb-6">
+          <label htmlFor="quality" className="block mb-2 font-medium text-gray-800">
+            Quality: <span className="font-semibold">{Math.round(quality * 100)}%</span>
+          </label>
+          <input
+            id="quality"
+            type="range"
+            min={0.1}
+            max={1}
+            step={0.1}
+            value={quality}
+            onChange={(e) => setQuality(parseFloat(e.target.value))}
+            className="w-full"
+          />
+        </div>
       )}
 
       {/* Compress button */}
