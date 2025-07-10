@@ -22,7 +22,6 @@ export const metadata = {
     "JSON formatter",
     "QR code generator",
     "unit converter",
-    "currency converter",
     "contrast checker",
     "developer tools",
     "privacy-focused",

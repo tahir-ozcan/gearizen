@@ -10,4 +10,5 @@ test("counts characters including unicode", () => {
   expect(countCharacters("abc")).toBe(3);
   expect(countCharacters("🙂🙂")).toBe(2);
   expect(countCharacters("a b ")).toBe(4);
+  expect(countCharacters("a b", { ignoreSpaces: true })).toBe(2);
 });
