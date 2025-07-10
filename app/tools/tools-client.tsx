@@ -236,7 +236,7 @@ export default function ToolsClient() {
 
   return (
     <div className="bg-white text-gray-900 antialiased py-12 sm:py-16 lg:py-20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12 space-y-12">
+      <div className="container-responsive space-y-12">
         {/* Hero */}
         <header className="text-center max-w-3xl mx-auto space-y-4">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">

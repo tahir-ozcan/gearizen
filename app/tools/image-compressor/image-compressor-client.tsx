@@ -18,24 +18,31 @@ export default function ImageCompressorClient() {
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
-  // When a file is selected update the preview and reset previous results
+  // reset preview when file changes
   useEffect(() => {
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setOriginalUrl(url);
-    setOriginalSize(file.size);
-    if (compressedUrl) {
-      URL.revokeObjectURL(compressedUrl);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setOriginalUrl(reader.result as string);
+      setOriginalSize(file.size);
+      setError(null);
+    };
+    reader.readAsDataURL(file);
+  }, [file]);
+
+  useEffect(() => {
+    return () => {
+      if (compressedUrl) URL.revokeObjectURL(compressedUrl);
+    };
+  }, [compressedUrl]);
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (compressedUrl) URL.revokeObjectURL(compressedUrl);
+    if (originalUrl && originalUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(originalUrl);
     }
     setCompressedUrl(null);
     setCompressedSize(null);
-    setError(null);
-    return () => {
-      URL.revokeObjectURL(url);
-    };
-  }, [file, compressedUrl]);
-
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFile(e.target.files?.[0] ?? null);
   };
 
@@ -46,7 +53,6 @@ export default function ImageCompressorClient() {
 
     // Load the image from the selected file
     const img = new window.Image();
-    img.crossOrigin = 'anonymous';
     img.src = originalUrl;
 
     img.onload = () => {
@@ -104,7 +110,7 @@ export default function ImageCompressorClient() {
     <section
       id="image-compressor"
       aria-labelledby="image-compressor-heading"
-      className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="image-compressor-heading"

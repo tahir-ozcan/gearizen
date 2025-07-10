@@ -106,7 +106,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           role="main"
           tabIndex={-1}
           aria-label="Main content"
-          className="flex-grow container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-8"
+          className="flex-grow container-responsive py-8"
         >
           {children}
         </main>

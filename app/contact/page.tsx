@@ -45,9 +45,11 @@ export const metadata = {
 };
 
 import { Suspense } from "react";
+import Spinner from "../../components/Spinner";
 
-export default function ContactPage() {  return (
-    <Suspense>
+export default function ContactPage() {
+  return (
+    <Suspense fallback={<Spinner className="mx-auto mt-10" />}>
       <ContactClient />
     </Suspense>
   );

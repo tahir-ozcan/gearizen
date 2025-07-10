@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useRef, useEffect, ChangeEvent } from "react";
+import { useState, useRef, useEffect, useCallback, ChangeEvent } from "react";
 import Image from "next/image";
 
 export default function ImageResizerClient() {
@@ -13,28 +13,27 @@ export default function ImageResizerClient() {
   const [width, setWidth] = useState<number>(0);
   const [height, setHeight] = useState<number>(0);
   const [maintainAspect, setMaintainAspect] = useState<boolean>(true);
-  const [processing, setProcessing] = useState<boolean>(false);
 
   // Orijinal boyutları tutmak için ref
   const naturalSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
 
-  // Dosya seçildiğinde preview URL oluştur, cleanup yap
   useEffect(() => {
     if (!file) {
       setOriginalUrl(null);
       return;
     }
-    const url = URL.createObjectURL(file);
-    setOriginalUrl(url);
-    setResizedUrl(null);
-    setError(null);
-    return () => URL.revokeObjectURL(url);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setOriginalUrl(reader.result as string);
+      setResizedUrl(null);
+      setError(null);
+    };
+    reader.readAsDataURL(file);
   }, [file]);
 
   // Görsel yeniden boyutlandırma işlevi
-  const resizeImage = async () => {
+  const resizeImage = useCallback(async () => {
     if (!file || !originalUrl) return;
-    setProcessing(true);
     setError(null);
 
     try {
@@ -70,9 +69,9 @@ export default function ImageResizerClient() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "An unexpected error occurred");
     } finally {
-      setProcessing(false);
+      // no-op
     }
-  };
+  }, [file, originalUrl, width, height, maintainAspect]);
 
   // Yeniden boyutlanmış resmi indir
   const downloadImage = () => {
@@ -83,6 +82,21 @@ export default function ImageResizerClient() {
     a.click();
   };
 
+  useEffect(() => {
+    return () => {
+      if (resizedUrl) URL.revokeObjectURL(resizedUrl);
+    };
+  }, [resizedUrl]);
+
+  // Auto-resize whenever dimensions change
+  useEffect(() => {
+    if (!file || !originalUrl) return;
+    const t = setTimeout(() => {
+      resizeImage();
+    }, 200);
+    return () => clearTimeout(t);
+  }, [file, originalUrl, width, height, maintainAspect, resizeImage]);
+
   // next/image blob loader
   const blobLoader = ({ src }: { src: string }) => src;
 
@@ -90,7 +104,7 @@ export default function ImageResizerClient() {
     <section
       id="image-resizer"
       aria-labelledby="image-resizer-heading"
-      className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="image-resizer-heading"
@@ -115,9 +129,15 @@ export default function ImageResizerClient() {
           id="image-upload"
           type="file"
           accept="image/*"
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setFile(e.target.files?.[0] ?? null)
-          }
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            if (resizedUrl) URL.revokeObjectURL(resizedUrl);
+            if (originalUrl && originalUrl.startsWith("blob:")) {
+              URL.revokeObjectURL(originalUrl);
+            }
+            setResizedUrl(null);
+            setError(null);
+            setFile(e.target.files?.[0] ?? null);
+          }}
           className="block w-full text-sm text-gray-700
                      file:border file:border-gray-300 file:rounded-lg
                      file:px-4 file:py-2 file:bg-white file:text-gray-700
@@ -191,21 +211,8 @@ export default function ImageResizerClient() {
             </label>
           </div>
           {error && (
-            <p role="alert" className="text-red-600 text-sm">
-              {error}
-            </p>
+            <p role="alert" className="text-red-600 text-sm">{error}</p>
           )}
-          <button
-            onClick={resizeImage}
-            disabled={processing}
-            className={`w-full py-3 bg-indigo-600 text-white rounded-lg
-                       hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500
-                       transition font-medium ${
-                         processing ? "opacity-60 cursor-not-allowed" : ""
-                       }`}
-          >
-            {processing ? "Resizing…" : "Resize Image"}
-          </button>
         </div>
       )}
 

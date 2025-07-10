@@ -1,7 +1,8 @@
 // app/tools/pdf-to-word/pdf-to-word-client.tsx
 "use client";
 
-import { useState, ChangeEvent } from "react";
+/* eslint-disable @next/next/no-img-element */
+import { useState, ChangeEvent, useEffect } from "react";
 import { Document, Packer, Paragraph } from "docx";
 import type {
   PDFDocumentProxy,
@@ -15,10 +16,12 @@ export default function PdfToWordClient() {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [docUrl, setDocUrl] = useState<string>("");
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDocUrl("");
     setError(null);
+    setPreviewUrl("");
     setFile(e.target.files?.[0] ?? null);
   };
 
@@ -38,7 +41,7 @@ export default function PdfToWordClient() {
     try {
       const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
       const worker = (
-        await import("pdfjs-dist/legacy/build/pdf.worker.entry?url")
+        await import("pdfjs-dist/legacy/build/pdf.worker.entry?worker&url")
       ).default;
       pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
 
@@ -71,6 +74,32 @@ export default function PdfToWordClient() {
       setProcessing(false);
     }
   };
+
+  useEffect(() => {
+    if (!file) return;
+    (async () => {
+      try {
+        const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
+        const worker = (
+          await import("pdfjs-dist/legacy/build/pdf.worker.entry?worker&url")
+        ).default;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
+        const arrayBuffer = await readFileAsArrayBuffer(file);
+        const pdf: PDFDocumentProxy = await pdfjsLib
+          .getDocument({ data: arrayBuffer })
+          .promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 1 });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        setPreviewUrl(canvas.toDataURL());
+      } catch {}
+    })();
+  }, [file]);
 
   const downloadDoc = () => {
     if (!docUrl || !file) return;
@@ -109,6 +138,12 @@ export default function PdfToWordClient() {
           className="block w-full text-sm text-gray-700 file:border file:border-gray-300 file:rounded-lg file:px-4 file:py-2 file:bg-white hover:file:bg-gray-50 transition"
         />
       </div>
+
+      {previewUrl && (
+        <div className="max-w-lg mx-auto mb-6 text-center">
+          <img src={previewUrl} alt="PDF preview" className="inline-block border rounded" />
+        </div>
+      )}
 
       <div className="text-center mb-8">
         <button

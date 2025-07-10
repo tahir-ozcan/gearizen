@@ -10,12 +10,11 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "jest",
-    "test:e2e": "playwright test",
+    "test:e2e": "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 playwright test",
     "prepare": "husky install",
     "postbuild": "next-sitemap"
   },
   "dependencies": {
-    "@sendgrid/mail": "^8.1.5",
     "bcryptjs": "^3.0.2",
     "diff": "^8.0.2",
     "docx": "^9.5.1",
@@ -24,8 +23,8 @@
     "html2pdf.js": "^0.10.3",
     "isomorphic-dompurify": "^2.26.0",
     "js-beautify": "^1.15.4",
-    "jsonlint-mod": "^1.7.6",
     "json5": "^2.2.3",
+    "jsonlint-mod": "^1.7.6",
     "lucide-react": "^0.525.0",
     "marked": "^16.0.0",
     "next": "^15.3.5",

@@ -21,7 +21,7 @@ npm run dev
 
 ## Usage
 
-After installation run `npm run dev` and open <http://localhost:3000> in your browser.
+After installation run `npm run dev` and open <http://localhost:3000> in your browser. All tools run entirely client-side with no external APIs.
 
 ### Metadata Guidelines
 
@@ -41,12 +41,16 @@ Run the production build to ensure pages compile correctly:
 npm run build
 ```
 
+### Design System
+
+All pages share a light theme with Tailwind CSS utility classes. Buttons, inputs and layout containers use the custom classes `.btn-primary`, `.input-base`, and `.container-responsive` defined in `globals.css`.
+
 ### Ads & Analytics
 
 Google AdSense and Google Analytics are injected into the `<head>` of every
-page through `app/components/AnalyticsLoader.tsx`.  The loader renders the
-following snippets exactly as provided by Google using Next.js `Script`
-components:
+page through `app/components/AnalyticsLoader.tsx`.  Replace the IDs below with
+your own if deploying a fork. The loader renders the following snippets exactly
+as provided by Google using Next.js `Script` components:
 
 ```html
 <!-- Google tag (gtag.js) -->
@@ -88,7 +92,7 @@ End-to-end tests are written with [Playwright](https://playwright.dev/):
 npm run test:e2e
 ```
 
-Install browsers once with `npx playwright install`.
+Install browsers once with `npx playwright install`. The tests run offline using the locally installed browsers; the npm script sets `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` to prevent any downloads. The Contact page now links directly to an email address via `mailto:` so no form submission leaves the browser.
 
 ## Project Structure
 
@@ -114,4 +118,4 @@ gearizen/
 MIT — see LICENSE
 
 ## Contact
-gearizen.tahir.ozcan@gmail.com
+For any questions or feedback, email [gearizen.tahir.ozcan@gmail.com](mailto:gearizen.tahir.ozcan@gmail.com).
