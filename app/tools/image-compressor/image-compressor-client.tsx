@@ -18,6 +18,7 @@ export default function ImageCompressorClient() {
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
+  // reset preview when file changes
   useEffect(() => {
     if (!file) return;
     const reader = new FileReader();
@@ -29,8 +30,17 @@ export default function ImageCompressorClient() {
     reader.readAsDataURL(file);
   }, [file]);
 
+  useEffect(() => {
+    return () => {
+      if (compressedUrl) URL.revokeObjectURL(compressedUrl);
+    };
+  }, [compressedUrl]);
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (compressedUrl) URL.revokeObjectURL(compressedUrl);
+    if (originalUrl && originalUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(originalUrl);
+    }
     setCompressedUrl(null);
     setCompressedSize(null);
     setFile(e.target.files?.[0] ?? null);

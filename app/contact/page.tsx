@@ -46,7 +46,8 @@ export const metadata = {
 
 import { Suspense } from "react";
 
-export default function ContactPage() {  return (
+export default function ContactPage() {
+  return (
     <Suspense>
       <ContactClient />
     </Suspense>

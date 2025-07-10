@@ -88,7 +88,7 @@ End-to-end tests are written with [Playwright](https://playwright.dev/):
 npm run test:e2e
 ```
 
-Install browsers once with `npx playwright install`.
+Install browsers once with `npx playwright install`. The Contact page now links directly to an email address via `mailto:` so no form submission leaves the browser.
 
 ## Project Structure
 
@@ -114,4 +114,4 @@ gearizen/
 MIT — see LICENSE
 
 ## Contact
-gearizen.tahir.ozcan@gmail.com
+For any questions or feedback, email [gearizen.tahir.ozcan@gmail.com](mailto:gearizen.tahir.ozcan@gmail.com).
