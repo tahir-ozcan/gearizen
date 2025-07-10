@@ -48,4 +48,5 @@ export const metadata = {
 };
 
 export default function AboutPage() {
-  return <AboutClient />;}
+  return <AboutClient />;
+}

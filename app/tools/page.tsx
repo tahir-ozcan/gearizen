@@ -67,5 +67,6 @@ export const metadata = {
   },
 };
 
-export default function ToolsPage() {  return <ToolsClient />;
+export default function ToolsPage() {
+  return <ToolsClient />;
 }
