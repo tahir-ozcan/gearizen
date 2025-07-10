@@ -8,7 +8,7 @@ import type {
   PDFPageProxy,
   TextContent,
   TextItem,
-} from "pdfjs-dist/types/src/display/api";
+} from "pdfjs-dist/legacy/build/pdf";
 
 export default function PdfToWordClient() {
   const [file, setFile] = useState<File | null>(null);
@@ -36,9 +36,11 @@ export default function PdfToWordClient() {
     setError(null);
     setDocUrl("");
     try {
-      const pdfjsLib = await import("pdfjs-dist");
-      pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.3.93/pdf.worker.min.js";
+      const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
+      const worker = (
+        await import("pdfjs-dist/legacy/build/pdf.worker.entry?url")
+      ).default;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
 
       const arrayBuffer = await readFileAsArrayBuffer(file);
       const pdf: PDFDocumentProxy = await pdfjsLib
