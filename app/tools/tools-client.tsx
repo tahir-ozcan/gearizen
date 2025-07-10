@@ -22,7 +22,6 @@ import {
   FilePlus,
   FileDown,
   FileArchive,
-  FileClock,
   MessageSquare,
   Tag,
   Globe,
@@ -148,12 +147,6 @@ const tools: Tool[] = [
     title: "CSV → JSON Converter",
     description:
       "Transform CSV data into JSON arrays quickly, entirely in-browser.",
-  },
-  {
-    href: "/tools/json-validator",
-    Icon: FileClock,
-    title: "JSON Validator",
-    description: "Validate JSON syntax instantly and spot errors in real-time.",
   },
   {
     href: "/tools/html-to-pdf",

@@ -13,7 +13,7 @@ export const metadata = {
     "password generator",
     "bcrypt generator",
     "JSON formatter",
-    "JSON validator",
+    "JSON tools",
     "QR code generator",
     "unit converter",
     "image compressor",
