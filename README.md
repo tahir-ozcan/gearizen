@@ -94,6 +94,7 @@ npm run test:e2e
 
 Install browsers once with `npx playwright install`. The tests run offline using the locally installed browsers; the npm script sets `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` to prevent any downloads. The Contact page now links directly to an email address via `mailto:` so no form submission leaves the browser.
 
+
 ## Project Structure
 
 ```bash
