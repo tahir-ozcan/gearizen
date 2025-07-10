@@ -9,7 +9,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
-    "test": "tsx node_modules/uvu/bin.js app/tools '\\.test\\.ts$'",
+    "test": "jest",
     "test:e2e": "playwright test",
     "prepare": "husky install",
     "postbuild": "next-sitemap"
@@ -41,6 +41,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/diff": "^7.0.2",
     "@types/dompurify": "^3.0.5",
+    "@types/jest": "^30.0.0",
     "@types/js-beautify": "^1.14.3",
     "@types/marked": "^5.0.2",
     "@types/node": "^20.19.4",
@@ -52,14 +53,14 @@
     "eslint": "^9.8.0",
     "eslint-config-next": "15.3.5",
     "husky": "^8.0.0",
+    "jest": "^30.0.4",
     "lint-staged": "^16.1.2",
     "next-sitemap": "^4.2.3",
     "prettier": "^3.0.0",
     "sharp": "^0.34.2",
     "tailwindcss": "^4.0.1",
-    "tsx": "^4.7.0",
-    "typescript": "^5.8.3",
-    "uvu": "^0.5.6"
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.8.3"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,css,md}": [

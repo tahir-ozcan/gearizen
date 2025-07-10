@@ -47,10 +47,13 @@ export const metadata = {
   },
 };
 
-export default function CurrencyConverterPage() {  return (
+export default function CurrencyConverterPage() {
+  return (
     <>
-      <BreadcrumbJsonLd pageTitle="Currency Converter" pageUrl="https://gearizen.com/tools/currency-converter" />
+      <BreadcrumbJsonLd
+        pageTitle="Currency Converter"
+        pageUrl="https://gearizen.com/tools/currency-converter"
+      />
       <CurrencyConverterClient />
     </>
-  );
-}
+  );}

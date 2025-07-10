@@ -1,5 +1,3 @@
-import { test } from 'uvu';
-import * as assert from 'uvu/assert';
 import { compressBuffer, loadFile } from './compress-utils';
 
 const samplePath = 'public/favicon.png';
@@ -9,7 +7,5 @@ const samplePath = 'public/favicon.png';
 test('compressBuffer reduces size', async () => {
   const orig = await loadFile(samplePath);
   const compressed = await compressBuffer(orig, 0.5);
-  assert.ok(compressed.length < orig.length, 'compressed size should be smaller');
+  expect(compressed.length).toBeLessThan(orig.length);
 });
-
-test.run();

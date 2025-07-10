@@ -19,13 +19,16 @@ export default function CurrencyConverterClient() {
 
   useEffect(() => {
     // Load rates whenever the base currency changes
+    const controller = new AbortController();
+
     async function loadRates() {
       setLoading(true);
       setError(null);
 
       try {
         const res = await fetch(
-          `https://api.exchangerate.host/latest?base=${encodeURIComponent(base)}`
+          `https://api.exchangerate.host/latest?base=${encodeURIComponent(base)}`,
+          { signal: controller.signal }
         );
         if (!res.ok) {
           throw new Error(`HTTP Error ${res.status}`);
@@ -64,6 +67,8 @@ export default function CurrencyConverterClient() {
     }
 
     loadRates();
+
+    return () => controller.abort();
   }, [base]);
 
   const handleAmount = (e: ChangeEvent<HTMLInputElement>) =>
