@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 export default function UuidGeneratorClient() {
   const generate = () => crypto.randomUUID();
   const copy = async (uuid: string) => {
@@ -11,7 +13,7 @@ export default function UuidGeneratorClient() {
     }
   };
 
-  const uuid = generate();
+  const [uuid, setUuid] = useState(generate());
 
   return (
     <section className="space-y-6 max-w-xl mx-auto text-center">
@@ -30,6 +32,13 @@ export default function UuidGeneratorClient() {
           className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           Copy
+        </button>
+        <button
+          type="button"
+          onClick={() => setUuid(generate())}
+          className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700"
+        >
+          Generate
         </button>
       </div>
     </section>

@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 
 type CategoryKey = "length" | "weight" | "temperature" | "volume";
 
@@ -115,6 +115,19 @@ export default function UnitConverterClient() {
   const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const value = parseFloat(input);
+    if (isNaN(value)) {
+      setError("Please enter a valid number.");
+      setOutput("");
+      return;
+    }
+    const result = convert(category, fromUnit, toUnit, value);
+    setOutput(result.toFixed(6).replace(/\.?0+$/, ""));
+    setError(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category, fromUnit, toUnit, input]);
+
   const onCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const cat = e.target.value as CategoryKey;
     setCategory(cat);
@@ -125,18 +138,6 @@ export default function UnitConverterClient() {
     setError(null);
   };
 
-  const onConvert = (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    const value = parseFloat(input);
-    if (isNaN(value)) {
-      setError("Please enter a valid number.");
-      setOutput("");
-      return;
-    }
-    const result = convert(category, fromUnit, toUnit, value);
-    setOutput(result.toFixed(6).replace(/\.?0+$/, ""));
-  };
 
   const swapUnits = () => {
     setFromUnit(toUnit);
@@ -162,7 +163,7 @@ export default function UnitConverterClient() {
       </p>
 
       <form
-        onSubmit={onConvert}
+        onSubmit={(e) => e.preventDefault()}
         className="max-w-lg mx-auto space-y-6"
         aria-label="Unit converter form"
       >
@@ -249,12 +250,6 @@ export default function UnitConverterClient() {
           </p>
         )}
 
-        <button
-          type="submit"
-          className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
-        >
-          Convert
-        </button>
       </form>
 
       {output !== "" && (

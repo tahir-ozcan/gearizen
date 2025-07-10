@@ -25,7 +25,8 @@ export default function HtmlToPdfClient() {
     setProcessing(true);
     try {
       // Dynamically import html2pdf.js in the browser
-      const { default: html2pdf } = await import("html2pdf.js");
+      const mod = await import("html2pdf.js");
+      const html2pdf = (mod as any).default ?? mod;
       // Inject the HTML into a hidden container
       previewRef.current.innerHTML = htmlInput;
       // Configure PDF options

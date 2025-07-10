@@ -10,9 +10,9 @@ import {
   TextContent,
   TextItem,
 } from "pdfjs-dist/legacy/build/pdf";
+import workerSrc from "pdfjs-dist/build/pdf.worker.min.js?url";
 
-// use the exported version on GlobalWorkerOptions
-GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${GlobalWorkerOptions.version}/pdf.worker.min.js`;
+GlobalWorkerOptions.workerSrc = workerSrc;
 
 export default function PdfToWordClient() {
   const [file, setFile] = useState<File | null>(null);

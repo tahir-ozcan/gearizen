@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, ChangeEvent } from "react";
-import Image from "next/image";
 
 interface OgMetadata {
   title: string;
@@ -100,15 +99,11 @@ export default function OpenGraphPreviewClient() {
       {metadata && (
         <div className="max-w-lg mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
           {metadata.image && (
-            <div className="relative w-full h-48">
-              <Image
-                src={metadata.image}
-                alt={metadata.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 768px"
-              />
-            </div>
+            <img
+              src={metadata.image}
+              alt={metadata.title}
+              className="w-full h-48 object-cover"
+            />
           )}
           <div className="p-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-2">

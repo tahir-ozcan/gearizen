@@ -21,6 +21,9 @@ export default function CurrencyConverterClient() {
   // Load exchange rates when the base currency changes only. Target is
   // intentionally omitted from the dependency array to avoid re-fetching after
   // setting the default target currency.
+  const apiBase = process.env.NEXT_PUBLIC_CURRENCY_API ??
+    "https://api.exchangerate.host/latest";
+
   useEffect(() => {
     // Load rates whenever the base currency changes
     const controller = new AbortController();
@@ -30,10 +33,8 @@ export default function CurrencyConverterClient() {
       setError(null);
 
       try {
-        const res = await fetch(
-          `https://api.exchangerate.host/latest?base=${encodeURIComponent(base)}`,
-          { signal: controller.signal }
-        );
+        const url = `${apiBase}?base=${encodeURIComponent(base)}`;
+        const res = await fetch(url, { signal: controller.signal });
         if (!res.ok) {
           throw new Error(`HTTP Error ${res.status}`);
         }
@@ -46,7 +47,7 @@ export default function CurrencyConverterClient() {
         }
 
         if (json.success === false) {
-          throw new Error("API error");
+          throw new Error("API error: check NEXT_PUBLIC_CURRENCY_API");
         }
 
         if (typeof json.rates !== "object" || json.rates === null) {
