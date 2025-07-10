@@ -4,12 +4,20 @@ import type { NextConfig } from "next";
 const ContentSecurityPolicy =
   "default-src 'self'; " +
   "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://pagead2.googlesyndication.com; " +
-  "img-src 'self' data: https://www.google-analytics.com https://pagead2.googlesyndication.com; " +
+  "img-src 'self' data: https:; " +
   "style-src 'self' 'unsafe-inline'; " +
   "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://api.exchangerate.host; " +
   "frame-src https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com;";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+  },
   async headers() {
     const securityHeaders = [
       {

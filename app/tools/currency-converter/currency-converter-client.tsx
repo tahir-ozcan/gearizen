@@ -45,7 +45,7 @@ export default function CurrencyConverterClient() {
           throw new Error("Invalid response format");
         }
 
-        if (json.success === false) {
+        if (json.success !== true) {
           throw new Error("API error");
         }
 

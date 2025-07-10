@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 
 type CategoryKey = "length" | "weight" | "temperature" | "volume";
 
@@ -115,33 +115,42 @@ export default function UnitConverterClient() {
   const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    calculate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const calculate = (
+    cat: CategoryKey = category,
+    from: string = fromUnit,
+    to: string = toUnit,
+    val: string = input
+  ) => {
+    const value = parseFloat(val);
+    if (isNaN(value)) {
+      setError("Please enter a valid number.");
+      setOutput("");
+      return;
+    }
+    const result = convert(cat, from, to, value);
+    setOutput(result.toFixed(6).replace(/\.?0+$/, ""));
+    setError(null);
+  };
+
   const onCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const cat = e.target.value as CategoryKey;
     setCategory(cat);
     const units = Object.keys(categories[cat].units);
     setFromUnit(units[0]);
     setToUnit(units[1] || units[0]);
-    setOutput("");
-    setError(null);
+    calculate(cat, units[0], units[1] || units[0], input);
   };
 
-  const onConvert = (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    const value = parseFloat(input);
-    if (isNaN(value)) {
-      setError("Please enter a valid number.");
-      setOutput("");
-      return;
-    }
-    const result = convert(category, fromUnit, toUnit, value);
-    setOutput(result.toFixed(6).replace(/\.?0+$/, ""));
-  };
 
   const swapUnits = () => {
     setFromUnit(toUnit);
     setToUnit(fromUnit);
-    setOutput("");
+    calculate(category, toUnit, fromUnit, input);
   };
 
   return (
@@ -161,11 +170,7 @@ export default function UnitConverterClient() {
         instantly. 100% client-side, no signup required.
       </p>
 
-      <form
-        onSubmit={onConvert}
-        className="max-w-lg mx-auto space-y-6"
-        aria-label="Unit converter form"
-      >
+      <form className="max-w-lg mx-auto space-y-6" aria-label="Unit converter form">
         <div>
           <label htmlFor="category" className="block mb-1 font-medium text-gray-800">
             Category
@@ -192,7 +197,10 @@ export default function UnitConverterClient() {
             <select
               id="from-unit"
               value={fromUnit}
-              onChange={e => setFromUnit(e.target.value)}
+              onChange={e => {
+                setFromUnit(e.target.value);
+                calculate(category, e.target.value, toUnit, input);
+              }}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             >
               {Object.entries(categories[category].units).map(([value, label]) => (
@@ -209,7 +217,10 @@ export default function UnitConverterClient() {
             <select
               id="to-unit"
               value={toUnit}
-              onChange={e => setToUnit(e.target.value)}
+              onChange={e => {
+                setToUnit(e.target.value);
+                calculate(category, fromUnit, e.target.value, input);
+              }}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             >
               {Object.entries(categories[category].units).map(([value, label]) => (
@@ -237,7 +248,10 @@ export default function UnitConverterClient() {
             id="input-value"
             type="text"
             value={input}
-            onChange={e => setInput(e.target.value)}
+            onChange={e => {
+              setInput(e.target.value);
+              calculate(category, fromUnit, toUnit, e.target.value);
+            }}
             placeholder="Enter value"
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono"
           />
@@ -250,7 +264,8 @@ export default function UnitConverterClient() {
         )}
 
         <button
-          type="submit"
+          type="button"
+          onClick={() => calculate()}
           className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
         >
           Convert

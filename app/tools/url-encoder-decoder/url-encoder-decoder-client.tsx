@@ -5,9 +5,30 @@ import { useState, ChangeEvent } from "react";
 export default function UrlEncoderDecoderClient() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
+  const [mode, setMode] = useState<"standard" | "component" | "base64">(
+    "standard"
+  );
 
-  const encode = () => setOutput(encodeURIComponent(input));
-  const decode = () => setOutput(decodeURIComponent(input));
+  const encode = () => {
+    if (mode === "base64") {
+      setOutput(btoa(unescape(encodeURIComponent(input))));
+    } else if (mode === "component") {
+      setOutput(encodeURIComponent(input).replace(/%2F/g, "/"));
+    } else {
+      setOutput(encodeURIComponent(input));
+    }
+  };
+  const decode = () => {
+    try {
+      if (mode === "base64") {
+        setOutput(decodeURIComponent(escape(atob(input))));
+      } else {
+        setOutput(decodeURIComponent(input));
+      }
+    } catch {
+      setOutput("Invalid input");
+    }
+  };
 
   const copy = async () => {
     if (!output) return;
@@ -24,6 +45,23 @@ export default function UrlEncoderDecoderClient() {
   return (
     <section className="space-y-6 max-w-xl mx-auto">
       <h1 className="text-4xl font-extrabold text-center mb-6">URL Encoder / Decoder</h1>
+      <div>
+        <label className="block mb-1 font-medium" htmlFor="mode-select">
+          Mode
+        </label>
+        <select
+          id="mode-select"
+          value={mode}
+          onChange={(e) =>
+            setMode(e.target.value as "standard" | "component" | "base64")
+          }
+          className="w-full border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="standard">Standard</option>
+          <option value="component">Component Safe</option>
+          <option value="base64">Base64</option>
+        </select>
+      </div>
       <textarea
         value={input}
         onChange={handleInput}
