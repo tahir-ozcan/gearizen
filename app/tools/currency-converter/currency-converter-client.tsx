@@ -10,6 +10,13 @@ interface Rates {
   [currency: string]: number;
 }
 
+const fallbackRates: Rates = {
+  USD: 1,
+  EUR: 0.9,
+  GBP: 0.78,
+  TRY: 32,
+};
+
 export default function CurrencyConverterClient() {
   const [amount, setAmount] = useState<number>(1);
   const [base, setBase] = useState<string>("USD");
@@ -62,9 +69,9 @@ export default function CurrencyConverterClient() {
           setTarget(codes[0]);
         }
       } catch (e: unknown) {
-        // Capture network or parsing errors and surface a friendly message
+        // Fallback to bundled rates if the API request fails
         setError(e instanceof Error ? e.message : "Failed to load rates");
-        setRates({});
+        setRates(fallbackRates);
       } finally {
         setLoading(false);
       }

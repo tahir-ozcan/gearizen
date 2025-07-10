@@ -4,22 +4,13 @@
 
 import { useState, ChangeEvent } from "react";
 
-type Language = "javascript" | "css" | "html";
-
 export default function CodeMinifierClient() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [lang, setLang] = useState<Language>("javascript");
 
   const handleInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
-    setOutput("");
-    setError(null);
-  };
-
-  const handleLang = (e: ChangeEvent<HTMLSelectElement>) => {
-    setLang(e.target.value as Language);
     setOutput("");
     setError(null);
   };
@@ -55,12 +46,11 @@ export default function CodeMinifierClient() {
 
   const downloadOutput = () => {
     if (!output) return;
-    const ext = lang === "javascript" ? "js" : lang === "css" ? "css" : "html";
     const blob = new Blob([output], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `minified.${ext}`;
+    a.download = `minified.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -82,30 +72,13 @@ export default function CodeMinifierClient() {
         no signup required.
       </p>
 
-      {/* Language selector */}
-      <div className="flex justify-center mb-6">
-        <label htmlFor="lang" className="sr-only">
-          Select language
-        </label>
-        <select
-          id="lang"
-          value={lang}
-          onChange={handleLang}
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-        >
-          <option value="javascript">JavaScript</option>
-          <option value="css">CSS</option>
-          <option value="html">HTML</option>
-        </select>
-      </div>
-
       {/* Input */}
       <textarea
         id="code-input"
         aria-label="Code input"
         value={input}
         onChange={handleInput}
-        placeholder={`Paste your ${lang.toUpperCase()} code here...`}
+        placeholder="Paste your code here..."
         className="w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
       />
 

@@ -11,8 +11,8 @@ import {
   TextItem,
 } from "pdfjs-dist/legacy/build/pdf";
 
-// use the exported version on GlobalWorkerOptions
-GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${GlobalWorkerOptions.version}/pdf.worker.min.js`;
+// Use a locally bundled worker to avoid CDN issues
+GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
 
 export default function PdfToWordClient() {
   const [file, setFile] = useState<File | null>(null);

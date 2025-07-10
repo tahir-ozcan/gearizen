@@ -184,13 +184,6 @@ const tools: Tool[] = [
       "Generate optimized `<title>`, `<meta>` and social tags for any page.",
   },
   {
-    href: "/tools/open-graph-preview",
-    Icon: Shield,
-    title: "Open Graph Preview",
-    description:
-      "See how links appear on social platforms via OG metadata preview.",
-  },
-  {
     href: "/tools/jwt-decoder",
     Icon: Shield,
     title: "JWT Decoder",
