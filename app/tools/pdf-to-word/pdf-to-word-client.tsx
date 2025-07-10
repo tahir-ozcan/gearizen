@@ -2,83 +2,82 @@
 "use client";
 
 import { useState, ChangeEvent } from "react";
-import {
-  getDocument,
-  GlobalWorkerOptions,
+import { Document, Packer, Paragraph } from "docx";
+import type {
   PDFDocumentProxy,
   PDFPageProxy,
   TextContent,
   TextItem,
-} from "pdfjs-dist/legacy/build/pdf";
-
-// use the exported version on GlobalWorkerOptions
-GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${GlobalWorkerOptions.version}/pdf.worker.min.js`;
+} from "pdfjs-dist/types/src/display/api";
 
 export default function PdfToWordClient() {
   const [file, setFile] = useState<File | null>(null);
-  const [isConverting, setIsConverting] = useState(false);
-  const [error, setError] = useState<string>("");
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [docUrl, setDocUrl] = useState<string>("");
 
-  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDocUrl("");
-    setError("");
+    setError(null);
     setFile(e.target.files?.[0] ?? null);
-  }
+  };
 
-  async function convertPdf() {
+  const readFileAsArrayBuffer = (file: File) =>
+    new Promise<ArrayBuffer>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as ArrayBuffer);
+      reader.onerror = () => reject(new Error("Failed to read file."));
+      reader.readAsArrayBuffer(file);
+    });
+
+  const convertPdf = async () => {
     if (!file) return;
-    setIsConverting(true);
-    setError("");
+    setProcessing(true);
+    setError(null);
     setDocUrl("");
-
     try {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf: PDFDocumentProxy = await getDocument({ data: arrayBuffer }).promise;
+      const pdfjsLib = await import("pdfjs-dist");
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.3.93/pdf.worker.min.js";
 
-      let fullText = "";
+      const arrayBuffer = await readFileAsArrayBuffer(file);
+      const pdf: PDFDocumentProxy = await pdfjsLib
+        .getDocument({ data: arrayBuffer })
+        .promise;
+      const pageTexts: string[] = [];
       for (let i = 1; i <= pdf.numPages; i++) {
         const page: PDFPageProxy = await pdf.getPage(i);
         const content: TextContent = await page.getTextContent();
-        const strings: string[] = content.items.map((item: TextItem) => item.str);
-        fullText += strings.join(" ") + "\n\n";
+        const text = (content.items as TextItem[])
+          .map((item) => item.str)
+          .join(" ");
+        pageTexts.push(text);
       }
 
-      const htmlDoc = `<!DOCTYPE html>
-<html>
-  <head><meta charset="utf-8"/><title>${file.name}</title></head>
-  <body>
-    <pre style="font-family:Calibri, sans-serif; font-size:11pt; white-space: pre-wrap;">
-${fullText
-  .replace(/&/g, "&amp;")
-  .replace(/</g, "&lt;")
-  .replace(/>/g, "&gt;")}
-    </pre>
-  </body>
-</html>`;
+      const doc = new Document({
+        sections: [{ children: pageTexts.map((t) => new Paragraph(t)) }],
+      });
 
-      const blob = new Blob([htmlDoc], { type: "application/msword" });
+      const blob = await Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
       setDocUrl(url);
-    } catch (e: unknown) {
+    } catch (e) {
       setError(
-        e instanceof Error
-          ? e.message
-          : "An unexpected error occurred during conversion."
+        e instanceof Error ? e.message : "An error occurred during conversion."
       );
     } finally {
-      setIsConverting(false);
+      setProcessing(false);
     }
-  }
+  };
 
-  function downloadDoc() {
+  const downloadDoc = () => {
     if (!docUrl || !file) return;
     const a = document.createElement("a");
     a.href = docUrl;
-    const base = file.name.replace(/\.pdf$/i, "");
-    a.download = `${base}.doc`;
+    a.download = file.name.replace(/\.pdf$/i, "") + ".docx";
     a.click();
-  }
+    URL.revokeObjectURL(docUrl);
+  };
 
   return (
     <section
@@ -90,22 +89,18 @@ ${fullText
         id="pdf-to-word-heading"
         className="text-4xl sm:text-5xl font-extrabold text-center mb-6 tracking-tight"
       >
-        PDF → Word Converter
+        PDF to Word Converter
       </h1>
       <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-        Extract text from a PDF and download it as a Word-compatible document—
-        100% client-side, no signup required.
+        Upload a PDF and convert its text to a Word document—all right in your browser.
       </p>
 
       <div className="max-w-lg mx-auto mb-6">
-        <label
-          htmlFor="pdf-to-word-upload"
-          className="block mb-2 font-medium text-gray-800"
-        >
+        <label htmlFor="pdf-upload" className="block mb-2 font-medium text-gray-800">
           Choose PDF File
         </label>
         <input
-          id="pdf-to-word-upload"
+          id="pdf-upload"
           type="file"
           accept="application/pdf"
           onChange={handleFileChange}
@@ -116,12 +111,34 @@ ${fullText
       <div className="text-center mb-8">
         <button
           onClick={convertPdf}
-          disabled={!file || isConverting}
-          className={`inline-flex items-center px-8 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium disabled:opacity-60 ${
-            isConverting ? "cursor-not-allowed" : ""
+          disabled={!file || processing}
+          className={`inline-flex items-center px-8 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium ${
+            processing ? "opacity-60 cursor-not-allowed" : ""
           }`}
         >
-          {isConverting ? "Converting…" : "Convert to Word"}
+          {processing && (
+            <svg
+              className="animate-spin h-5 w-5 mr-2"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              />
+            </svg>
+          )}
+          {processing ? "Converting…" : "Convert"}
         </button>
       </div>
 
