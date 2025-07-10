@@ -1,6 +1,5 @@
 // app/tools/currency-converter/currency-converter-client.tsx
 "use client";
-/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useState, useEffect, ChangeEvent } from "react";
 import { calculateConversion } from "./currency-utils";
@@ -17,6 +16,9 @@ export default function CurrencyConverterClient() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Load exchange rates when the base currency changes only. Target is
+  // intentionally omitted from the dependency array to avoid re-fetching after
+  // setting the default target currency.
   useEffect(() => {
     // Load rates whenever the base currency changes
     const controller = new AbortController();
@@ -69,6 +71,7 @@ export default function CurrencyConverterClient() {
     loadRates();
 
     return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [base]);
 
   const handleAmount = (e: ChangeEvent<HTMLInputElement>) =>
