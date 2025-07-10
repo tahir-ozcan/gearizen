@@ -29,7 +29,7 @@ Each page exports a `metadata` object to define `<title>`, description and socia
 
 ### Testing
 
-Unit tests are written with [uvu](https://github.com/lukeed/uvu). Execute all tests with:
+Unit tests are written with [Jest](https://jestjs.io/). Execute all tests with:
 
 ```bash
 npm test
@@ -76,7 +76,7 @@ npm start
 
 ### Running Tests
 
-Unit tests use [uvu](https://github.com/lukeed/uvu):
+Unit tests use [Jest](https://jestjs.io/):
 
 ```bash
 npm test
