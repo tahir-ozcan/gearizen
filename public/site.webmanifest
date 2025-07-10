@@ -1,7 +1,7 @@
 {
   "name": "Gearizen – Free Client-Side Digital Tools",
   "short_name": "Gearizen",
-  "description": "Fast, privacy-first web tools (password generator, JSON formatter, text converter, QR code, unit & currency converter, contrast checker) — 100% client-side, no signup.",
+  "description": "Fast, privacy-first web tools (password generator, JSON formatter, text converter, QR code, unit converter, contrast checker) — 100% client-side, no signup.",
   "start_url": "/?utm_source=homescreen",
   "scope": "/",
   "display": "standalone",
