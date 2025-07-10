@@ -114,4 +114,4 @@ gearizen/
 MIT — see LICENSE
 
 ## Contact
-tahir59201@gmail.com
+gearizen.tahir.ozcan@gmail.com
