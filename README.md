@@ -21,7 +21,7 @@ npm run dev
 
 ## Usage
 
-After installation run `npm run dev` and open <http://localhost:3000> in your browser.
+After installation run `npm run dev` and open <http://localhost:3000> in your browser. All tools run entirely client-side with no external APIs.
 
 ### Metadata Guidelines
 
@@ -44,9 +44,9 @@ npm run build
 ### Ads & Analytics
 
 Google AdSense and Google Analytics are injected into the `<head>` of every
-page through `app/components/AnalyticsLoader.tsx`.  The loader renders the
-following snippets exactly as provided by Google using Next.js `Script`
-components:
+page through `app/components/AnalyticsLoader.tsx`.  Replace the IDs below with
+your own if deploying a fork. The loader renders the following snippets exactly
+as provided by Google using Next.js `Script` components:
 
 ```html
 <!-- Google tag (gtag.js) -->

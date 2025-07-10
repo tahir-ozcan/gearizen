@@ -24,6 +24,11 @@ declare module "pdfjs-dist/legacy/build/pdf" {
      * The result contains an array of text items and optional styles map.
      */
     getTextContent(): Promise<TextContent>;
+    getViewport(params: { scale: number }): { width: number; height: number };
+    render(options: {
+      canvasContext: CanvasRenderingContext2D;
+      viewport: { width: number; height: number };
+    }): { promise: Promise<void> };
   }
 
   /** The result of .getTextContent(), containing text items and optional style definitions. */
@@ -90,3 +95,4 @@ declare module "pdfjs-dist/legacy/build/pdf" {
 /** The companion worker entrypoint. */
 declare module "pdfjs-dist/legacy/build/pdf.worker.entry";
 declare module "pdfjs-dist/legacy/build/pdf.worker.entry?url";
+declare module "pdfjs-dist/legacy/build/pdf.worker.entry?worker&url";

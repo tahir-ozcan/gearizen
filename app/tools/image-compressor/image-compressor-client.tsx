@@ -18,24 +18,21 @@ export default function ImageCompressorClient() {
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
-  // When a file is selected update the preview and reset previous results
   useEffect(() => {
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setOriginalUrl(url);
-    setOriginalSize(file.size);
-    if (compressedUrl) {
-      URL.revokeObjectURL(compressedUrl);
-    }
-    setCompressedUrl(null);
-    setCompressedSize(null);
-    setError(null);
-    return () => {
-      URL.revokeObjectURL(url);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setOriginalUrl(reader.result as string);
+      setOriginalSize(file.size);
+      setError(null);
     };
-  }, [file, compressedUrl]);
+    reader.readAsDataURL(file);
+  }, [file]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (compressedUrl) URL.revokeObjectURL(compressedUrl);
+    setCompressedUrl(null);
+    setCompressedSize(null);
     setFile(e.target.files?.[0] ?? null);
   };
 
@@ -46,7 +43,6 @@ export default function ImageCompressorClient() {
 
     // Load the image from the selected file
     const img = new window.Image();
-    img.crossOrigin = 'anonymous';
     img.src = originalUrl;
 
     img.onload = () => {
