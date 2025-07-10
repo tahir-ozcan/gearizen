@@ -2,6 +2,7 @@
 
 import { useState, ChangeEvent, useMemo } from "react";
 import { renderMarkdown } from "./render-markdown";
+import Textarea from "@/components/Textarea";
 
 export default function MarkdownPreviewerClient() {
   const [markdown, setMarkdown] = useState("# Hello World\n");
@@ -19,10 +20,10 @@ export default function MarkdownPreviewerClient() {
       <h1 className="text-4xl font-extrabold text-center mb-6">Markdown Previewer</h1>
       <p className="text-center text-gray-600 mb-4">Live-preview your Markdown as you type.</p>
       <div className="grid gap-6 md:grid-cols-2">
-        <textarea
+        <Textarea
           value={markdown}
           onChange={handleChange}
-          className="w-full h-64 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="h-64 font-mono text-sm resize-y"
         />
         <div
           className="prose max-w-none p-4 border border-gray-300 rounded-lg bg-gray-50 overflow-auto"

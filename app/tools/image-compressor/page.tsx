@@ -46,9 +46,13 @@ export const metadata = {
   },
 };
 
-export default function ImageCompressorPage() {  return (
+export default function ImageCompressorPage() {
+  return (
     <>
-      <BreadcrumbJsonLd pageTitle="Image Compressor" pageUrl="https://gearizen.com/tools/image-compressor" />
+      <BreadcrumbJsonLd
+        pageTitle="Image Compressor"
+        pageUrl="https://gearizen.com/tools/image-compressor"
+      />
       <ImageCompressorClient />
     </>
   );
