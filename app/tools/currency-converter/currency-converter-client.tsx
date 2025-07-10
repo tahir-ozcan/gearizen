@@ -1,80 +1,18 @@
 // app/tools/currency-converter/currency-converter-client.tsx
 "use client";
 
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, ChangeEvent } from "react";
 import { calculateConversion } from "./currency-utils";
+import { rates as baseRates } from "./exchange-rates";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
-
-interface Rates {
-  [currency: string]: number;
-}
 
 export default function CurrencyConverterClient() {
   const [amount, setAmount] = useState<number>(1);
   const [base, setBase] = useState<string>("USD");
   const [target, setTarget] = useState<string>("EUR");
-  const [rates, setRates] = useState<Rates>({});
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
 
-  // Load exchange rates when the base currency changes only. Target is
-  // intentionally omitted from the dependency array to avoid re-fetching after
-  // setting the default target currency.
-  useEffect(() => {
-    // Load rates whenever the base currency changes
-    const controller = new AbortController();
-
-    async function loadRates() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const res = await fetch(
-          `https://api.exchangerate.host/latest?base=${encodeURIComponent(base)}`,
-          { signal: controller.signal }
-        );
-        if (!res.ok) {
-          throw new Error(`HTTP Error ${res.status}`);
-        }
-
-        const json = await res.json();
-
-        // API shape: { success: boolean, rates: { USD: 1, ... } }
-        if (!json || typeof json !== "object") {
-          throw new Error("Invalid response format");
-        }
-
-        if (json.success === false) {
-          throw new Error("API error");
-        }
-
-        if (typeof json.rates !== "object" || json.rates === null) {
-          throw new Error("Invalid response format");
-        }
-
-        const newRates = json.rates as Rates;
-        setRates(newRates);
-
-        // target kodumuz yeni gelen listede yoksa ilkini seç
-        const codes = Object.keys(newRates).sort();
-        if (!codes.includes(target)) {
-          setTarget(codes[0]);
-        }
-      } catch (e: unknown) {
-        // Capture network or parsing errors and surface a friendly message
-        setError(e instanceof Error ? e.message : "Failed to load rates");
-        setRates({});
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadRates();
-
-    return () => controller.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [base]);
+  const rates = baseRates;
 
   const handleAmount = (e: ChangeEvent<HTMLInputElement>) =>
     setAmount(Number(e.target.value));
@@ -83,8 +21,12 @@ export default function CurrencyConverterClient() {
   const handleTarget = (e: ChangeEvent<HTMLSelectElement>) =>
     setTarget(e.target.value);
 
-  const rate = rates[target];
-  const result = typeof rate === "number" ? calculateConversion(amount, rate) : "";
+  const rate =
+    baseRates[base] && baseRates[target]
+      ? baseRates[target] / baseRates[base]
+      : undefined;
+  const result =
+    typeof rate === "number" ? calculateConversion(amount, rate) : "";
 
   const copyResult = async () => {
     if (!result) return;
@@ -111,28 +53,14 @@ export default function CurrencyConverterClient() {
         Currency Converter
       </h1>
       <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-        Convert between world currencies in real time. Rates fetched live from
-        a free API; 100% client-side, no signup required.
+        Convert between common world currencies using offline rates. Everything
+        runs client-side—no network requests or signup required.
       </p>
 
-      {loading && (
-        <p className="text-center text-gray-700 mb-6">Loading rates…</p>
-      )}
-
-      {error && (
-        <div
-          role="alert"
-          className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm"
-        >
-          Error: {error}
-        </div>
-      )}
-
-      {!loading && !error && (
-        <form
-          className="max-w-md mx-auto space-y-6"
-          onSubmit={(e) => e.preventDefault()}
-        >
+      <form
+        className="max-w-md mx-auto space-y-6"
+        onSubmit={(e) => e.preventDefault()}
+      >
           {/* Amount */}
           <div>
             <label
@@ -225,7 +153,6 @@ export default function CurrencyConverterClient() {
             </div>
           </div>
         </form>
-      )}
-    </section>
+      </section>
   );
 }

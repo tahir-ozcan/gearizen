@@ -133,7 +133,8 @@ export default function QrCodeGeneratorClient() {
             ref={canvasRef}
             width={size}
             height={size}
-            className="mx-auto border rounded-md"
+            className="mx-auto border rounded-md w-full h-auto"
+            style={{ maxWidth: `${size}px` }}
           />
           <div className="flex justify-center gap-4">
             <button

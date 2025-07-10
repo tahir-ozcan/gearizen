@@ -5,9 +5,10 @@ import { countWords, countCharacters } from "./count-utils";
 
 export default function TextCounterClient() {
   const [text, setText] = useState("");
+  const [includeSpaces, setIncludeSpaces] = useState(false);
 
   const words = countWords(text);
-  const chars = countCharacters(text);
+  const chars = countCharacters(text, includeSpaces);
 
   return (
     <section
@@ -31,6 +32,15 @@ export default function TextCounterClient() {
         placeholder="Enter your text..."
         className="w-full max-w-3xl mx-auto block border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition resize-y"
       />
+      <label className="mt-4 flex items-center justify-center space-x-2 text-sm">
+        <input
+          type="checkbox"
+          checked={includeSpaces}
+          onChange={() => setIncludeSpaces(!includeSpaces)}
+          className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+        />
+        <span>Count spaces</span>
+      </label>
       <div className="mt-6 flex justify-center gap-8 text-lg font-medium">
         <span>{words} words</span>
         <span>{chars} characters</span>

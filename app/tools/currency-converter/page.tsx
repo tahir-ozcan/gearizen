@@ -7,7 +7,7 @@ export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "Currency Converter",
   description:
-    "Convert amounts between world currencies instantly with Gearizen’s free client-side Currency Converter. Live exchange rates, no signup required.",
+    "Convert amounts between popular currencies using offline rates. Gearizen’s Currency Converter runs entirely client-side with no signup required.",
   keywords: [
     "currency converter",
     "exchange rate converter",
@@ -23,7 +23,7 @@ export const metadata = {
   openGraph: {
     title: "Currency Converter | Gearizen",
     description:
-      "Use Gearizen’s client-side Currency Converter to convert between global currencies with live exchange rates—100% free, no signup needed.",
+      "Use Gearizen’s client-side Currency Converter to convert between global currencies offline—no network requests or signup needed.",
     url: "https://gearizen.com/tools/currency-converter",
     siteName: "Gearizen",
     locale: "en_US",
@@ -41,7 +41,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Currency Converter | Gearizen",
     description:
-      "Instantly convert currencies with live rates using Gearizen’s free client-side Currency Converter. No account needed, privacy-focused.",
+      "Instantly convert currencies offline with Gearizen’s free client-side Currency Converter. No account needed, privacy-focused.",
     creator: "@gearizen",
     images: ["/og-placeholder.svg"],
   },
@@ -56,4 +56,5 @@ export default function CurrencyConverterPage() {
       />
       <CurrencyConverterClient />
     </>
-  );}
+  );
+}

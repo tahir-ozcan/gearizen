@@ -76,7 +76,7 @@ const tools: Tool[] = [
     Icon: DollarSign,
     title: "Currency Converter",
     description:
-      "Fetch live exchange rates and convert between world currencies client-side.",
+      "Convert between popular currencies using offline rates—100% client-side.",
   },
   {
     href: "/tools/image-compressor",
@@ -183,13 +183,6 @@ const tools: Tool[] = [
     title: "SEO Meta Tag Generator",
     description:
       "Generate optimized `<title>`, `<meta>` and social tags for any page.",
-  },
-  {
-    href: "/tools/open-graph-preview",
-    Icon: Shield,
-    title: "Open Graph Preview",
-    description:
-      "See how links appear on social platforms via OG metadata preview.",
   },
   {
     href: "/tools/jwt-decoder",
