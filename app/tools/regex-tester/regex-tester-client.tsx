@@ -1,7 +1,8 @@
 // app/tools/regex-tester/regex-tester-client.tsx
 "use client";
 
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
+import useDebounce from "@/lib/useDebounce";
 
 export default function RegexTesterClient() {
   const [pattern, setPattern] = useState("");
@@ -9,6 +10,26 @@ export default function RegexTesterClient() {
   const [testInput, setTestInput] = useState("");
   const [matches, setMatches] = useState<string[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const debouncedPattern = useDebounce(pattern);
+  const debouncedFlags = useDebounce(flags);
+  const debouncedInput = useDebounce(testInput);
+
+  useEffect(() => {
+    if (!debouncedPattern.trim()) {
+      setError("Please enter a regex pattern.");
+      setMatches([]);
+      return;
+    }
+    try {
+      const regex = new RegExp(debouncedPattern, debouncedFlags);
+      const allMatches = Array.from(debouncedInput.matchAll(regex), (m) => m[0]);
+      setMatches(allMatches);
+      setError(null);
+    } catch (e) {
+      setMatches([]);
+      setError(e instanceof Error ? e.message : "Invalid regex");
+    }
+  }, [debouncedPattern, debouncedFlags, debouncedInput]);
 
   function handlePatternChange(e: ChangeEvent<HTMLInputElement>) {
     setPattern(e.target.value);
@@ -27,27 +48,6 @@ export default function RegexTesterClient() {
     setMatches(null);
   }
 
-  function runTest() {
-    // if user hasn't typed a pattern, don't try to match
-    if (pattern.trim() === "") {
-      setError("Please enter a regex pattern.");
-      setMatches([]);
-      return;
-    }
-
-    try {
-      setError(null);
-      // build the regex
-      const regex = new RegExp(pattern, flags);
-      // collect all full-match groups
-      const allMatches = Array.from(testInput.matchAll(regex), (m) => m[0]);
-      setMatches(allMatches);
-    } catch (e) {
-      // invalid pattern or flags
-      setError(e instanceof Error ? e.message : "Invalid regex");
-      setMatches([]);
-    }
-  }
 
   async function copyMatches() {
     if (!matches || matches.length === 0) return;
@@ -63,7 +63,7 @@ export default function RegexTesterClient() {
     <section
       id="regex-tester"
       aria-labelledby="regex-tester-heading"
-      className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="regex-tester-heading"
@@ -129,13 +129,6 @@ export default function RegexTesterClient() {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap justify-center gap-4">
-          <button
-            type="button"
-            onClick={runTest}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
-          >
-            Test Regex
-          </button>
           <button
             type="button"
             onClick={copyMatches}

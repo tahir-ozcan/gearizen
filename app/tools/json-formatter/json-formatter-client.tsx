@@ -1,7 +1,8 @@
 // app/tools/json-formatter/json-formatter-client.tsx
 "use client";
 
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
+import useDebounce from "@/lib/useDebounce";
 
 type Mode = "beautify" | "minify" | "validate";
 
@@ -13,6 +14,16 @@ export default function JsonFormatterClient() {
   const [indent, setIndent] = useState(2);
   const [strict, setStrict] = useState(true);
   const [sortKeys, setSortKeys] = useState(false);
+  const debouncedInput = useDebounce(input);
+
+  useEffect(() => {
+    if (!debouncedInput.trim()) {
+      setOutput('');
+      return;
+    }
+    processJson(debouncedInput);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedInput, mode, indent, strict, sortKeys]);
 
   function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value);
@@ -32,10 +43,10 @@ export default function JsonFormatterClient() {
     return obj;
   }
 
-  async function processJson() {
+  async function processJson(src: string) {
     try {
       const parser = strict ? JSON : await import("json5");
-      let parsed = parser.parse(input);
+      let parsed = parser.parse(src);
       if (sortKeys) parsed = sortObject(parsed);
 
       if (mode === "validate") {
@@ -76,7 +87,7 @@ export default function JsonFormatterClient() {
     <section
       id="json-formatter"
       aria-labelledby="json-formatter-heading"
-      className="container mx-auto px-4 sm:px-6 lg:px-12 py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="json-formatter-heading"
@@ -173,13 +184,6 @@ export default function JsonFormatterClient() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={processJson}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
-            >
-              Process
-            </button>
             <button
               type="button"
               onClick={copyOutput}

@@ -90,7 +90,7 @@ export default function HomePage() {
       {/* Hero */}
       <section
         aria-labelledby="hero-heading"
-        className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 pt-16 pb-12 text-center"
+        className="container-responsive pt-16 pb-12 text-center"
       >
         <h1
           id="hero-heading"
@@ -113,7 +113,7 @@ export default function HomePage() {
       {/* Popular Tools */}
       <section
         aria-labelledby="tools-heading"
-        className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 pb-16"
+        className="container-responsive pb-16"
       >
         <h2
           id="tools-heading"

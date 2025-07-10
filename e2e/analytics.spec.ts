@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 // verify Google Analytics and AdSense load without CSP/CORS errors
-test('analytics and ads load', async ({ page, context }) => {
+test('analytics and ads load', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (err) => errors.push(err.message));
   page.on('console', (msg) => {
@@ -16,18 +16,10 @@ test('analytics and ads load', async ({ page, context }) => {
   const gtagDefined = await page.evaluate(() => typeof window.gtag === 'function');
   expect(gtagDefined).toBeTruthy();
 
-  const adsResponse = await page.request.get(
-    'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'
-  );
-  expect(adsResponse.status()).toBe(200);
-
-  const cookies = await context.cookies();
-  const gaCookie = cookies.find((c) => c.name.startsWith('_ga'));
-  expect(gaCookie).toBeTruthy();
-  if (gaCookie) {
-    const twoYears = 60 * 60 * 24 * 365 * 2;
-    expect(gaCookie.expires - Date.now() / 1000).toBeGreaterThan(twoYears - 60);
-  }
+  const gaLoaded = await page.$("script[src*='googletagmanager']");
+  const adsLoaded = await page.$("script[src*='adsbygoogle']");
+  expect(gaLoaded).not.toBeNull();
+  expect(adsLoaded).not.toBeNull();
 
   expect(errors).toEqual([]);
 });

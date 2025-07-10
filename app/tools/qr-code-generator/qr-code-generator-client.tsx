@@ -2,7 +2,8 @@
 
 "use client";
 
-import { useState, useRef, FormEvent, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
+import useDebounce from "@/lib/useDebounce";
 import QRCode from "qrcode";
 
 export default function QrCodeGeneratorClient() {
@@ -12,22 +13,19 @@ export default function QrCodeGeneratorClient() {
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const generateQr = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setQrUrl(null);
-    if (!text.trim()) {
-      setError("Please enter text or URL to encode.");
+  const debouncedText = useDebounce(text);
+
+  useEffect(() => {
+    if (!debouncedText.trim()) {
+      setQrUrl(null);
+      setError(null);
       return;
     }
-    try {
-      const opts = { width: size, margin: 1 };
-      const dataUrl = await QRCode.toDataURL(text, opts);
-      setQrUrl(dataUrl);
-    } catch {
-      setError("Failed to generate QR code. Try different input.");
-    }
-  };
+    const opts = { width: size, margin: 1 };
+    QRCode.toDataURL(debouncedText, opts)
+      .then(setQrUrl)
+      .catch(() => setError("Failed to generate QR code. Try different input."));
+  }, [debouncedText, size]);
 
   // Draw to canvas whenever qrUrl updates
   useEffect(() => {
@@ -60,7 +58,7 @@ export default function QrCodeGeneratorClient() {
     <section
       id="qr-code-generator"
       aria-labelledby="qr-heading"
-      className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="qr-heading"
@@ -72,11 +70,7 @@ export default function QrCodeGeneratorClient() {
         Create custom QR codes instantly. Enter any text or URL, adjust size, and download your code—100% client-side, no signup required.
       </p>
 
-      <form
-        onSubmit={generateQr}
-        className="max-w-lg mx-auto space-y-6"
-        aria-label="Generate QR code form"
-      >
+      <div className="max-w-lg mx-auto space-y-6" aria-label="Generate QR code form">
         <div>
           <label
             htmlFor="qr-text"
@@ -119,13 +113,7 @@ export default function QrCodeGeneratorClient() {
           </p>
         )}
 
-        <button
-          type="submit"
-          className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
-        >
-          Generate QR Code
-        </button>
-      </form>
+      </div>
 
       {qrUrl && (
         <div

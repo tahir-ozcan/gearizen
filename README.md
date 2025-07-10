@@ -41,6 +41,10 @@ Run the production build to ensure pages compile correctly:
 npm run build
 ```
 
+### Design System
+
+All pages share a light theme with Tailwind CSS utility classes. Buttons, inputs and layout containers use the custom classes `.btn-primary`, `.input-base`, and `.container-responsive` defined in `globals.css`.
+
 ### Ads & Analytics
 
 Google AdSense and Google Analytics are injected into the `<head>` of every
@@ -88,7 +92,8 @@ End-to-end tests are written with [Playwright](https://playwright.dev/):
 npm run test:e2e
 ```
 
-Install browsers once with `npx playwright install`. The Contact page now links directly to an email address via `mailto:` so no form submission leaves the browser.
+Install browsers once with `npx playwright install`. The tests run offline using the locally installed browsers; the npm script sets `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` to prevent any downloads. The Contact page now links directly to an email address via `mailto:` so no form submission leaves the browser.
+
 
 ## Project Structure
 

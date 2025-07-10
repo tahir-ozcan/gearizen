@@ -74,7 +74,7 @@ export default function PasswordGeneratorClient() {
     <section
       id="password-generator"
       aria-labelledby="password-generator-heading"
-      className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="password-generator-heading"
@@ -191,13 +191,6 @@ export default function PasswordGeneratorClient() {
           </div>
         </fieldset>
 
-        {/* Generate Button */}
-        <button
-          type="submit"
-          className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
-        >
-          Generate Password
-        </button>
       </form>
     </section>
   );

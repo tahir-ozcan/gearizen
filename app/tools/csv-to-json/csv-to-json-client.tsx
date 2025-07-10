@@ -2,7 +2,8 @@
 
 "use client";
 
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
+import useDebounce from "@/lib/useDebounce";
 import Papa from "papaparse";
 
 export default function CsvToJsonClient() {
@@ -16,16 +17,15 @@ export default function CsvToJsonClient() {
     setJsonText("");
   };
 
-  const convertCsv = (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setJsonText("");
-    if (!csvText.trim()) {
-      setError("Please paste or type your CSV data above.");
+  const debouncedCsv = useDebounce(csvText);
+
+  useEffect(() => {
+    if (!debouncedCsv.trim()) {
+      setJsonText("");
       return;
     }
     try {
-      const result = Papa.parse(csvText, {
+      const result = Papa.parse(debouncedCsv, {
         header: true,
         skipEmptyLines: true,
       });
@@ -33,14 +33,16 @@ export default function CsvToJsonClient() {
         throw new Error(result.errors[0].message);
       }
       setJsonText(JSON.stringify(result.data, null, 2));
+      setError(null);
     } catch (err) {
+      setJsonText("");
       setError(
         err instanceof Error
           ? err.message
           : "An unknown error occurred during parsing."
       );
     }
-  };
+  }, [debouncedCsv]);
 
   const copyJson = async () => {
     if (!jsonText) return;
@@ -67,7 +69,7 @@ export default function CsvToJsonClient() {
     <section
       id="csv-to-json"
       aria-labelledby="csv-to-json-heading"
-      className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="csv-to-json-heading"
@@ -80,11 +82,7 @@ export default function CsvToJsonClient() {
         skips empty lines—100% client-side, no signup required.
       </p>
 
-      <form
-        onSubmit={convertCsv}
-        className="max-w-4xl mx-auto space-y-6"
-        aria-label="CSV to JSON form"
-      >
+      <div className="max-w-4xl mx-auto space-y-6" aria-label="CSV to JSON form">
         <div>
           <label htmlFor="csv-input" className="block mb-1 font-medium text-gray-800">
             CSV Input
@@ -105,13 +103,7 @@ export default function CsvToJsonClient() {
           </p>
         )}
 
-        <button
-          type="submit"
-          className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
-        >
-          Convert to JSON
-        </button>
-      </form>
+      </div>
 
       {jsonText && (
         <div className="mt-12 max-w-4xl mx-auto space-y-6">
