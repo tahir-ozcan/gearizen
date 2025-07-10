@@ -45,4 +45,5 @@ export const metadata = {
 };
 
 export default function TermsPage() {
-  return <TermsClient />;}
+  return <TermsClient />;
+}

@@ -46,4 +46,5 @@ export const metadata = {
 };
 
 export default function PrivacyPage() {
-  return <PrivacyClient />;}
+  return <PrivacyClient />;
+}

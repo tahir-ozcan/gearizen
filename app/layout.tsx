@@ -76,8 +76,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+          rel="preconnect"
+          href="https://www.googletagmanager.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
         <meta name="google-adsense-account" content="ca-pub-2108375251131552" />
         <AnalyticsLoader />
       </head>
@@ -108,4 +116,5 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Footer />
       </body>
     </html>
-  );}
+  );
+}

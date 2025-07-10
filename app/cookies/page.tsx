@@ -47,4 +47,5 @@ export const metadata = {
 };
 
 export default function CookiePage() {
-  return <CookiesClient />;}
+  return <CookiesClient />;
+}

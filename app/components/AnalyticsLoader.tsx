@@ -8,6 +8,7 @@ export default function AnalyticsLoader() {
         async
         src="https://www.googletagmanager.com/gtag/js?id=G-V74SWZ9H8B"
         strategy="afterInteractive"
+        crossOrigin="anonymous"
       />
       <Script id="gtag-init" strategy="afterInteractive">
         {`
@@ -22,6 +23,7 @@ export default function AnalyticsLoader() {
         async
         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2108375251131552"
         strategy="afterInteractive"
+        crossOrigin="anonymous"
       />
     </>
   );

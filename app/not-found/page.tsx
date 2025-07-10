@@ -45,4 +45,5 @@ export const metadata = {
 };
 
 export default function NotFoundPage() {
-  return <NotFoundClient />;}
+  return <NotFoundClient />;
+}
