@@ -2,17 +2,12 @@
 "use client";
 
 import { useState, ChangeEvent } from "react";
-import {
-  getDocument,
-  GlobalWorkerOptions,
-  PDFDocumentProxy,
-  PDFPageProxy,
-  TextContent,
-  TextItem,
-} from "pdfjs-dist/legacy/build/pdf";
+import * as pdfjsLib from "pdfjs-dist";
+import type { TextItem } from "pdfjs-dist/types/src/display/api";
+import { Document, Packer, Paragraph } from "docx";
 
-// use the exported version on GlobalWorkerOptions
-GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${GlobalWorkerOptions.version}/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.3.93/pdf.worker.min.js";
 
 export default function PdfToWordClient() {
   const [file, setFile] = useState<File | null>(null);
@@ -34,30 +29,26 @@ export default function PdfToWordClient() {
 
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const pdf: PDFDocumentProxy = await getDocument({ data: arrayBuffer }).promise;
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
-      let fullText = "";
+      const paragraphs: Paragraph[] = [];
       for (let i = 1; i <= pdf.numPages; i++) {
-        const page: PDFPageProxy = await pdf.getPage(i);
-        const content: TextContent = await page.getTextContent();
-        const strings: string[] = content.items.map((item: TextItem) => item.str);
-        fullText += strings.join(" ") + "\n\n";
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const text = (content.items as TextItem[])
+          .map((item) => item.str)
+          .join(" ");
+        if (text.trim()) {
+          paragraphs.push(new Paragraph(text));
+          paragraphs.push(new Paragraph(""));
+        }
       }
 
-      const htmlDoc = `<!DOCTYPE html>
-<html>
-  <head><meta charset="utf-8"/><title>${file.name}</title></head>
-  <body>
-    <pre style="font-family:Calibri, sans-serif; font-size:11pt; white-space: pre-wrap;">
-${fullText
-  .replace(/&/g, "&amp;")
-  .replace(/</g, "&lt;")
-  .replace(/>/g, "&gt;")}
-    </pre>
-  </body>
-</html>`;
+      const doc = new Document({
+        sections: [{ properties: {}, children: paragraphs }],
+      });
 
-      const blob = new Blob([htmlDoc], { type: "application/msword" });
+      const blob = await Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
       setDocUrl(url);
     } catch (e: unknown) {
@@ -76,7 +67,7 @@ ${fullText
     const a = document.createElement("a");
     a.href = docUrl;
     const base = file.name.replace(/\.pdf$/i, "");
-    a.download = `${base}.doc`;
+    a.download = `${base}.docx`;
     a.click();
   }
 
@@ -93,7 +84,7 @@ ${fullText
         PDF → Word Converter
       </h1>
       <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-        Extract text from a PDF and download it as a Word-compatible document—
+        Extract text from a PDF and download it as a Word (.docx) document—
         100% client-side, no signup required.
       </p>
 
@@ -140,7 +131,7 @@ ${fullText
             onClick={downloadDoc}
             className="inline-flex items-center px-8 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition font-medium"
           >
-            Download Word File
+            Download DOCX File
           </button>
         </div>
       )}

@@ -6,7 +6,7 @@ export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "PDF to Word Converter",
   description:
-    "Convert your PDFs into Word-compatible documents instantly in the browser with Gearizen’s free client-side PDF to Word Converter. No signup required.",
+    "Convert your PDFs into Word (.docx) documents instantly in the browser with Gearizen’s free client-side PDF to Word Converter. No signup required.",
   keywords: [
     "pdf to word",
     "pdf converter",
@@ -21,7 +21,7 @@ export const metadata = {
   openGraph: {
     title: "PDF to Word Converter | Gearizen",
     description:
-      "Effortlessly extract text from PDFs and download as Word documents—100% client-side, no signup required.",
+      "Effortlessly extract text from PDFs and download as DOCX files—100% client-side, no signup required.",
     url: "https://gearizen.com/tools/pdf-to-word",
     siteName: "Gearizen",
     locale: "en_US",
@@ -39,7 +39,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "PDF to Word Converter | Gearizen",
     description:
-      "Use Gearizen’s free client-side PDF to Word Converter to turn your PDFs into editable Word documents instantly—no signup needed.",
+      "Use Gearizen’s free client-side PDF to Word Converter to turn your PDFs into editable DOCX files instantly—no signup needed.",
     creator: "@gearizen",
     images: ["/og-placeholder.svg"],
   },

@@ -142,7 +142,7 @@ const tools: Tool[] = [
     Icon: FilePlus,
     title: "PDF → Word Converter",
     description:
-      "Extract text from PDFs and download as Word-compatible DOC files.",
+      "Extract text from PDFs and download as DOCX files.",
   },
   {
     href: "/tools/image-resizer",
