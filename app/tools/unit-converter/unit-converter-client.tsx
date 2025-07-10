@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 
 type CategoryKey = "length" | "weight" | "temperature" | "volume";
 
@@ -127,6 +127,10 @@ export default function UnitConverterClient() {
 
   const onConvert = (e: FormEvent) => {
     e.preventDefault();
+    recalc();
+  };
+
+  const recalc = () => {
     setError(null);
     const value = parseFloat(input);
     if (isNaN(value)) {
@@ -137,6 +141,11 @@ export default function UnitConverterClient() {
     const result = convert(category, fromUnit, toUnit, value);
     setOutput(result.toFixed(6).replace(/\.?0+$/, ""));
   };
+
+  useEffect(() => {
+    recalc();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category, fromUnit, toUnit, input]);
 
   const swapUnits = () => {
     setFromUnit(toUnit);

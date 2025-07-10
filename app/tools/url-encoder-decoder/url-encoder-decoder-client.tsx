@@ -5,9 +5,24 @@ import { useState, ChangeEvent } from "react";
 export default function UrlEncoderDecoderClient() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
+  const [mode, setMode] = useState("standard");
 
-  const encode = () => setOutput(encodeURIComponent(input));
-  const decode = () => setOutput(decodeURIComponent(input));
+  const encode = () => {
+    if (mode === "base64") {
+      setOutput(btoa(input));
+    } else if (mode === "component") {
+      setOutput(encodeURI(input));
+    } else {
+      setOutput(encodeURIComponent(input));
+    }
+  };
+  const decode = () => {
+    if (mode === "base64") {
+      try { setOutput(atob(input)); } catch { setOutput("Invalid base64") }
+    } else {
+      setOutput(decodeURIComponent(input));
+    }
+  };
 
   const copy = async () => {
     if (!output) return;
@@ -30,7 +45,19 @@ export default function UrlEncoderDecoderClient() {
         placeholder="Enter text or URL..."
         className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
       />
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-4 items-end">
+        <label className="text-sm font-medium">
+          Mode:
+          <select
+            value={mode}
+            onChange={(e) => setMode(e.target.value)}
+            className="ml-2 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="standard">Standard</option>
+            <option value="component">Component Safe</option>
+            <option value="base64">Base64</option>
+          </select>
+        </label>
         <button onClick={encode} className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
           Encode
         </button>

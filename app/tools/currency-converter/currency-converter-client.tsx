@@ -30,10 +30,10 @@ export default function CurrencyConverterClient() {
       setError(null);
 
       try {
-        const res = await fetch(
-          `https://api.exchangerate.host/latest?base=${encodeURIComponent(base)}`,
-          { signal: controller.signal }
-        );
+        const api = process.env.NEXT_PUBLIC_RATES_URL ||
+          "https://api.exchangerate.host/latest";
+        const url = `${api}?base=${encodeURIComponent(base)}`;
+        const res = await fetch(url, { signal: controller.signal });
         if (!res.ok) {
           throw new Error(`HTTP Error ${res.status}`);
         }

@@ -103,7 +103,7 @@ export default function OpenGraphPreviewClient() {
             <div className="relative w-full h-48">
               <Image
                 src={metadata.image}
-                alt={metadata.title}
+                alt={metadata.title || "Preview image"}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 768px"
