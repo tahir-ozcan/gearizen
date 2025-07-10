@@ -18,17 +18,18 @@ export default function ImageResizerClient() {
   // Orijinal boyutları tutmak için ref
   const naturalSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
 
-  // Dosya seçildiğinde preview URL oluştur, cleanup yap
   useEffect(() => {
     if (!file) {
       setOriginalUrl(null);
       return;
     }
-    const url = URL.createObjectURL(file);
-    setOriginalUrl(url);
-    setResizedUrl(null);
-    setError(null);
-    return () => URL.revokeObjectURL(url);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setOriginalUrl(reader.result as string);
+      setResizedUrl(null);
+      setError(null);
+    };
+    reader.readAsDataURL(file);
   }, [file]);
 
   // Görsel yeniden boyutlandırma işlevi

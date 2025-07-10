@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 
 type CategoryKey = "length" | "weight" | "temperature" | "volume";
 
@@ -125,18 +125,20 @@ export default function UnitConverterClient() {
     setError(null);
   };
 
-  const onConvert = (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    const value = parseFloat(input);
-    if (isNaN(value)) {
-      setError("Please enter a valid number.");
-      setOutput("");
-      return;
-    }
-    const result = convert(category, fromUnit, toUnit, value);
-    setOutput(result.toFixed(6).replace(/\.?0+$/, ""));
-  };
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const value = parseFloat(input);
+      if (isNaN(value)) {
+        setError("Please enter a valid number.");
+        setOutput("");
+        return;
+      }
+      setError(null);
+      const result = convert(category, fromUnit, toUnit, value);
+      setOutput(result.toFixed(6).replace(/\.?0+$/, ""));
+    }, 300);
+    return () => clearTimeout(t);
+  }, [category, fromUnit, toUnit, input]);
 
   const swapUnits = () => {
     setFromUnit(toUnit);
@@ -162,7 +164,7 @@ export default function UnitConverterClient() {
       </p>
 
       <form
-        onSubmit={onConvert}
+        onSubmit={(e) => e.preventDefault()}
         className="max-w-lg mx-auto space-y-6"
         aria-label="Unit converter form"
       >
@@ -248,13 +250,6 @@ export default function UnitConverterClient() {
             {error}
           </p>
         )}
-
-        <button
-          type="submit"
-          className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
-        >
-          Convert
-        </button>
       </form>
 
       {output !== "" && (
