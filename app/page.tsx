@@ -3,11 +3,11 @@
 import Link from "next/link";
 import {
   Key,
-  Code,
+  FilePlus,
   QrCode,
   ArrowRightLeft,
-  DollarSign,
   ImageIcon,
+  DollarSign,
   HelpCircle,
 } from "lucide-react";
 import JsonLd from "./components/JsonLd";
@@ -15,11 +15,11 @@ import JsonLd from "./components/JsonLd";
 export const metadata = {
   title: "Home | Gearizen – Free Client-Side Digital Tools",
   description:
-    "Discover Gearizen’s most in-demand, privacy-first web tools: password generator, JSON formatter, QR code generator, unit converter, currency converter, and image compressor—100% client-side, no signup required.",
+    "Discover Gearizen’s most in-demand, privacy-first web tools: password generator, PDF to Word converter, QR code generator, unit converter, image compressor, and currency converter—100% client-side, no signup required.",
   openGraph: {
     title: "Home | Gearizen – Free Client-Side Digital Tools",
     description:
-      "Explore Gearizen’s top tools—passwords, JSON, QR codes, unit & currency conversion, image compression—all privacy-first and signup-free.",
+      "Explore Gearizen’s top tools—passwords, PDF to Word, QR codes, unit & currency conversion, image compression—all privacy-first and signup-free.",
     url: "https://gearizen.com",
     images: [
       {
@@ -52,10 +52,10 @@ const popularTools = [
     description: "Generate strong, customizable passwords instantly.",
   },
   {
-    href: "/tools/json-formatter",
-    icon: <Code aria-hidden="true" className="w-10 h-10 text-indigo-600" />,
-    title: "JSON Formatter",
-    description: "Validate, beautify, or minify your JSON data effortlessly.",
+    href: "/tools/pdf-to-word",
+    icon: <FilePlus aria-hidden="true" className="w-10 h-10 text-indigo-600" />,
+    title: "PDF → Word Converter",
+    description: "Convert PDFs to editable Word documents quickly.",
   },
   {
     href: "/tools/qr-code-generator",
@@ -75,18 +75,20 @@ const popularTools = [
     description: "Convert between metric and imperial units easily.",
   },
   {
+    href: "/tools/image-compressor",
+    icon: (
+      <ImageIcon aria-hidden="true" className="w-10 h-10 text-indigo-600" />
+    ),
+    title: "Image Compressor",
+    description: "Reduce image file sizes while preserving quality.",
+  },
+  {
     href: "/tools/currency-converter",
     icon: (
       <DollarSign aria-hidden="true" className="w-10 h-10 text-indigo-600" />
     ),
     title: "Currency Converter",
     description: "Get live exchange rates and convert currencies.",
-  },
-  {
-    href: "/tools/image-compressor",
-    icon: <ImageIcon aria-hidden="true" className="w-10 h-10 text-indigo-600" />,
-    title: "Image Compressor",
-    description: "Reduce image file sizes while preserving quality.",
   },
 ];
 
