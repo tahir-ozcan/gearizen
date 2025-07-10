@@ -46,9 +46,13 @@ export const metadata = {
   },
 };
 
-export default function QrCodeGeneratorPage() {  return (
+export default function QrCodeGeneratorPage() {
+  return (
     <>
-      <BreadcrumbJsonLd pageTitle="QR Code Generator" pageUrl="https://gearizen.com/tools/qr-code-generator" />
+      <BreadcrumbJsonLd
+        pageTitle="QR Code Generator"
+        pageUrl="https://gearizen.com/tools/qr-code-generator"
+      />
       <QrCodeGeneratorClient />
     </>
   );

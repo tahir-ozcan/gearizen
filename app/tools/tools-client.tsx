@@ -9,7 +9,6 @@ import {
   Code,
   QrCode,
   ArrowRightLeft,
-  DollarSign,
   ImageIcon,
   Eye,
   Paperclip,
@@ -23,7 +22,6 @@ import {
   FilePlus,
   FileDown,
   FileArchive,
-  FileClock,
   MessageSquare,
   Tag,
   Globe,
@@ -72,18 +70,10 @@ const tools: Tool[] = [
       "Convert between metric and imperial units: length, weight, volume, and more.",
   },
   {
-    href: "/tools/currency-converter",
-    Icon: DollarSign,
-    title: "Currency Converter",
-    description:
-      "Fetch live exchange rates and convert between world currencies client-side.",
-  },
-  {
     href: "/tools/image-compressor",
     Icon: ImageIcon,
     title: "Image Compressor",
-    description:
-      "Reduce JPEG or PNG file sizes while preserving visual quality.",
+    description: "Reduce JPEG or PNG file sizes while preserving visual quality.",
   },
   {
     href: "/tools/color-contrast-checker",
@@ -159,12 +149,6 @@ const tools: Tool[] = [
       "Transform CSV data into JSON arrays quickly, entirely in-browser.",
   },
   {
-    href: "/tools/json-validator",
-    Icon: FileClock,
-    title: "JSON Validator",
-    description: "Validate JSON syntax instantly and spot errors in real-time.",
-  },
-  {
     href: "/tools/html-to-pdf",
     Icon: Globe,
     title: "HTML → PDF Converter",
@@ -183,13 +167,6 @@ const tools: Tool[] = [
     title: "SEO Meta Tag Generator",
     description:
       "Generate optimized `<title>`, `<meta>` and social tags for any page.",
-  },
-  {
-    href: "/tools/open-graph-preview",
-    Icon: Shield,
-    title: "Open Graph Preview",
-    description:
-      "See how links appear on social platforms via OG metadata preview.",
   },
   {
     href: "/tools/jwt-decoder",

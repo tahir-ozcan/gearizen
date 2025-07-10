@@ -45,9 +45,13 @@ export const metadata = {
   },
 };
 
-export default function PdfToWordPage() {  return (
+export default function PdfToWordPage() {
+  return (
     <>
-      <BreadcrumbJsonLd pageTitle="PDF to Word Converter" pageUrl="https://gearizen.com/tools/pdf-to-word" />
+      <BreadcrumbJsonLd
+        pageTitle="PDF to Word Converter"
+        pageUrl="https://gearizen.com/tools/pdf-to-word"
+      />
       <PdfToWordClient />
     </>
   );

@@ -44,9 +44,13 @@ export const metadata = {
   },
 };
 
-export default function SeoMetaTagGeneratorPage() {  return (
+export default function SeoMetaTagGeneratorPage() {
+  return (
     <>
-      <BreadcrumbJsonLd pageTitle="SEO Meta Tag Generator" pageUrl="https://gearizen.com/tools/seo-meta-tag-generator" />
+      <BreadcrumbJsonLd
+        pageTitle="SEO Meta Tag Generator"
+        pageUrl="https://gearizen.com/tools/seo-meta-tag-generator"
+      />
       <SeoMetaTagGeneratorClient />
     </>
   );

@@ -3,23 +3,47 @@
 
 import { useState, ChangeEvent } from "react";
 
+type Mode = "beautify" | "minify" | "validate";
+
 export default function JsonFormatterClient() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [minify, setMinify] = useState(false);
+  const [mode, setMode] = useState<Mode>("beautify");
   const [indent, setIndent] = useState(2);
+  const [strict, setStrict] = useState(true);
+  const [sortKeys, setSortKeys] = useState(false);
 
   function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value);
     setError(null);
   }
 
-  function formatJson() {
+  function sortObject(obj: unknown): unknown {
+    if (Array.isArray(obj)) return obj.map(sortObject);
+    if (obj && typeof obj === "object") {
+      return Object.keys(obj)
+        .sort()
+        .reduce<Record<string, unknown>>((acc, key) => {
+          acc[key] = sortObject((obj as Record<string, unknown>)[key]);
+          return acc;
+        }, {});
+    }
+    return obj;
+  }
+
+  async function processJson() {
     try {
-      const parsed = JSON.parse(input);
-      const spaced = minify ? 0 : indent;
-      setOutput(JSON.stringify(parsed, null, spaced));
+      const parser = strict ? JSON : await import("json5");
+      let parsed = parser.parse(input);
+      if (sortKeys) parsed = sortObject(parsed);
+
+      if (mode === "validate") {
+        setOutput("Valid JSON");
+      } else {
+        const space = mode === "minify" ? 0 : indent;
+        setOutput(JSON.stringify(parsed, null, space));
+      }
       setError(null);
     } catch (e: unknown) {
       setOutput("");
@@ -75,13 +99,13 @@ export default function JsonFormatterClient() {
         />
 
         {/* Options & Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 space-y-4 sm:space-y-0">
             <label htmlFor="indent" className="flex items-center space-x-2">
               <span className="text-sm font-medium text-gray-700">Indent:</span>
               <select
                 id="indent"
-                disabled={minify}
+                disabled={mode === 'minify'}
                 value={indent}
                 onChange={(e) => setIndent(Number(e.target.value))}
                 className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
@@ -93,25 +117,68 @@ export default function JsonFormatterClient() {
               </select>
             </label>
 
-            <label htmlFor="minify" className="flex items-center space-x-2">
+            <label className="flex items-center space-x-1">
               <input
-                id="minify"
+                type="radio"
+                name="mode"
+                value="beautify"
+                checked={mode === 'beautify'}
+                onChange={() => setMode('beautify')}
+                className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+              />
+              <span className="text-sm text-gray-700">Beautify</span>
+            </label>
+            <label className="flex items-center space-x-1">
+              <input
+                type="radio"
+                name="mode"
+                value="minify"
+                checked={mode === 'minify'}
+                onChange={() => setMode('minify')}
+                className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+              />
+              <span className="text-sm text-gray-700">Minify</span>
+            </label>
+            <label className="flex items-center space-x-1">
+              <input
+                type="radio"
+                name="mode"
+                value="validate"
+                checked={mode === 'validate'}
+                onChange={() => setMode('validate')}
+                className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+              />
+              <span className="text-sm text-gray-700">Validate</span>
+            </label>
+
+            <label className="flex items-center space-x-2">
+              <input
                 type="checkbox"
-                checked={minify}
-                onChange={() => setMinify((m) => !m)}
+                checked={sortKeys}
+                onChange={() => setSortKeys((s) => !s)}
                 className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
-              <span className="text-sm text-gray-700">Minify JSON</span>
+              <span className="text-sm text-gray-700">Sort keys</span>
+            </label>
+
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={!strict}
+                onChange={() => setStrict((v) => !v)}
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              />
+              <span className="text-sm text-gray-700">Lenient JSON5</span>
             </label>
           </div>
 
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={formatJson}
+              onClick={processJson}
               className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
             >
-              Format / Minify
+              Process
             </button>
             <button
               type="button"

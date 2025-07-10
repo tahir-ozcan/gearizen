@@ -45,9 +45,13 @@ export const metadata = {
   },
 };
 
-export default function PdfCompressorPage() {  return (
+export default function PdfCompressorPage() {
+  return (
     <>
-      <BreadcrumbJsonLd pageTitle="PDF Compressor" pageUrl="https://gearizen.com/tools/pdf-compressor" />
+      <BreadcrumbJsonLd
+        pageTitle="PDF Compressor"
+        pageUrl="https://gearizen.com/tools/pdf-compressor"
+      />
       <PdfCompressorClient />
     </>
   );
