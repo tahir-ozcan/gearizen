@@ -9,7 +9,7 @@ export default function CookiesClient() {
     <section
       id="cookie-policy"
       aria-labelledby="cookie-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       {/* Başlık */}
       <h1
@@ -64,7 +64,7 @@ export default function CookiesClient() {
               href="https://adssettings.google.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded transition-colors"
+              className="text-indigo-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded transition-colors"
             >
               Google Ads Settings
             </a>
@@ -91,7 +91,7 @@ export default function CookiesClient() {
             If you have any questions about our cookie policy, please{" "}
             <Link
               href="/contact"
-              className="text-brand-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded transition-colors"
+              className="text-indigo-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded transition-colors"
             >
               contact us
             </Link>
