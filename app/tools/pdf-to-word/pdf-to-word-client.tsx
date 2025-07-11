@@ -1,8 +1,8 @@
 // app/tools/pdf-to-word/pdf-to-word-client.tsx
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
 import { useState, ChangeEvent, useEffect } from "react";
+import PreviewImage from "@/components/PreviewImage";
 import { Document, Packer, Paragraph } from "docx";
 import type {
   PDFDocumentProxy,
@@ -17,6 +17,9 @@ export default function PdfToWordClient() {
   const [error, setError] = useState<string | null>(null);
   const [docUrl, setDocUrl] = useState<string>("");
   const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [previewSize, setPreviewSize] = useState<{ w: number; h: number } | null>(
+    null
+  );
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDocUrl("");
@@ -97,6 +100,7 @@ export default function PdfToWordClient() {
         if (!ctx) return;
         await page.render({ canvasContext: ctx, viewport }).promise;
         setPreviewUrl(canvas.toDataURL());
+        setPreviewSize({ w: canvas.width, h: canvas.height });
       } catch {}
     })();
   }, [file]);
@@ -139,9 +143,14 @@ export default function PdfToWordClient() {
         />
       </div>
 
-      {previewUrl && (
+      {previewUrl && previewSize && (
         <div className="max-w-lg mx-auto mb-6 text-center">
-          <img src={previewUrl} alt="PDF preview" className="inline-block border rounded" />
+          <PreviewImage
+            src={previewUrl}
+            alt="PDF preview"
+            width={previewSize.w}
+            height={previewSize.h}
+          />
         </div>
       )}
 

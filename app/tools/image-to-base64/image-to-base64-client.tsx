@@ -1,16 +1,24 @@
 "use client";
 
 import { useState, ChangeEvent } from "react";
+import PreviewImage from "@/components/PreviewImage";
 
 export default function ImageToBase64Client() {
   const [result, setResult] = useState("");
+  const [preview, setPreview] = useState<{ src: string; w: number; h: number } | null>(null);
 
   const handleFile = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      setResult(reader.result as string);
+      const result = reader.result as string;
+      setResult(result);
+      const img = new window.Image();
+      img.onload = () => {
+        setPreview({ src: result, w: img.naturalWidth, h: img.naturalHeight });
+      };
+      img.src = result;
     };
     reader.readAsDataURL(file);
   };
@@ -35,6 +43,17 @@ export default function ImageToBase64Client() {
         onChange={handleFile}
         className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-indigo-600 file:text-white hover:file:bg-indigo-700"
       />
+      {preview && (
+        <div className="max-w-md mx-auto space-y-4 text-center">
+          <PreviewImage
+            src={preview.src}
+            alt="Selected image preview"
+            width={preview.w}
+            height={preview.h}
+          />
+        </div>
+      )}
+
       {result && (
         <div className="space-y-4">
           <textarea
