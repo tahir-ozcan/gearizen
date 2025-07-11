@@ -37,6 +37,7 @@ import {
   Calculator,
   Palette,
   ListOrdered,
+  Search,
 } from "lucide-react";
 
 interface Tool {
@@ -227,6 +228,13 @@ const tools: Tool[] = [
     Icon: LinkIcon,
     title: "URL Encoder/Decoder",
     description: "Encode or decode URLs and query strings.",
+  },
+  {
+    href: "/tools/url-parser",
+    Icon: Search,
+    title: "URL Parser",
+    description:
+      "Break down URLs to view protocol, host, path and query parameters.",
   },
   {
     href: "/tools/base-converter",

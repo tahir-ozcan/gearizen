@@ -31,6 +31,7 @@ export const metadata = {
     "CSV to JSON",
     "HTML formatter",
     "HTML to PDF",
+    "URL parser",
     "SEO meta tag generator",
     "JWT decoder",
     "word counter",
