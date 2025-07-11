@@ -98,13 +98,6 @@ const tools: Tool[] = [
     description: "Minify HTML, CSS, and JavaScript to boost page load speeds.",
   },
   {
-    href: "/tools/markdown-to-html",
-    Icon: FileCode,
-    title: "Markdown → HTML",
-    description:
-      "Convert Markdown into clean, semantic HTML markup in an instant.",
-  },
-  {
     href: "/tools/regex-tester",
     Icon: Scissors,
     title: "Regex Tester",
@@ -160,10 +153,10 @@ const tools: Tool[] = [
       "Render HTML pages as PDFs completely client-side, no server needed.",
   },
   {
-    href: "/tools/html-formatter",
+    href: "/tools/markup-formatter",
     Icon: MessageSquare,
-    title: "HTML Formatter",
-    description: "Beautify or minify HTML code for readability or compactness.",
+    title: "Markup Formatter",
+    description: "Beautify or minify HTML and XML directly in your browser.",
   },
   {
     href: "/tools/seo-meta-tag-generator",
@@ -201,8 +194,8 @@ const tools: Tool[] = [
   {
     href: "/tools/markdown-previewer",
     Icon: BookOpen,
-    title: "Markdown Previewer",
-    description: "Live-preview Markdown as formatted HTML.",
+    title: "Markdown Preview & Converter",
+    description: "Preview Markdown live and copy or download sanitized HTML.",
   },
   {
     href: "/tools/uuid-generator",
@@ -251,12 +244,6 @@ const tools: Tool[] = [
     Icon: Type,
     title: "Text Case Converter",
     description: "Convert text between upper, lower, camel, snake and more.",
-  },
-  {
-    href: "/tools/xml-formatter",
-    Icon: FileCode,
-    title: "XML Formatter",
-    description: "Beautify or minify XML documents instantly.",
   },
 ];
 
