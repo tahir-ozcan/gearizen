@@ -41,7 +41,7 @@ export default function PdfToWordClient() {
     try {
       const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
       const worker = (
-        await import("pdfjs-dist/legacy/build/pdf.worker.entry?worker&url")
+        await import("pdfjs-dist/legacy/build/pdf.worker.mjs?worker&url")
       ).default;
       pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
 
@@ -81,7 +81,7 @@ export default function PdfToWordClient() {
       try {
         const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
         const worker = (
-          await import("pdfjs-dist/legacy/build/pdf.worker.entry?worker&url")
+          await import("pdfjs-dist/legacy/build/pdf.worker.mjs?worker&url")
         ).default;
         pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
         const arrayBuffer = await readFileAsArrayBuffer(file);

@@ -93,6 +93,6 @@ declare module "pdfjs-dist/legacy/build/pdf" {
 }
 
 /** The companion worker entrypoint. */
-declare module "pdfjs-dist/legacy/build/pdf.worker.entry";
-declare module "pdfjs-dist/legacy/build/pdf.worker.entry?url";
-declare module "pdfjs-dist/legacy/build/pdf.worker.entry?worker&url";
+declare module "pdfjs-dist/legacy/build/pdf.worker.mjs";
+declare module "pdfjs-dist/legacy/build/pdf.worker.mjs?url";
+declare module "pdfjs-dist/legacy/build/pdf.worker.mjs?worker&url";
