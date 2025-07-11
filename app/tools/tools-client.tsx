@@ -34,6 +34,7 @@ import {
   Type,
   Link as LinkIcon,
   Hash,
+  Binary,
   Braces,
 } from "lucide-react";
 
@@ -232,6 +233,13 @@ const tools: Tool[] = [
     Icon: Hash,
     title: "Hash Generator",
     description: "Create SHA-256, SHA-1 or MD5 hashes for any text.",
+  },
+  {
+    href: "/tools/base-converter",
+    Icon: Binary,
+    title: "Number Base Converter",
+    description:
+      "Translate numbers between binary, octal, decimal and hexadecimal.",
   },
   {
     href: "/tools/yaml-json-converter",
