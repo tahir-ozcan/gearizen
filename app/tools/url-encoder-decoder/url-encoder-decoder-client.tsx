@@ -37,13 +37,13 @@ export default function UrlEncoderDecoderClient() {
         value={input}
         onChange={handleInput}
         placeholder="Enter text or URL..."
-        className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-brand-500"
+        className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
       />
       <div className="flex flex-wrap gap-4">
-        <button onClick={encode} className="px-4 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+        <button onClick={encode} className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
           Encode
         </button>
-        <button onClick={decode} className="px-4 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+        <button onClick={decode} className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
           Decode
         </button>
         <button onClick={copy} disabled={!output} className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 disabled:opacity-60">
@@ -54,7 +54,7 @@ export default function UrlEncoderDecoderClient() {
         readOnly
         value={output}
         placeholder="Result will appear here..."
-        className="w-full h-32 p-3 border border-gray-300 rounded-lg bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-brand-500"
+        className="w-full h-32 p-3 border border-gray-300 rounded-lg bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
       />
     </section>
   );

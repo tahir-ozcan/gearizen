@@ -56,7 +56,7 @@ export default function HtmlFormatterClient() {
     <section
       id="html-formatter"
       aria-labelledby="html-formatter-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="html-formatter-heading"
@@ -78,7 +78,7 @@ export default function HtmlFormatterClient() {
         onChange={handleInputChange}
         placeholder="<div>Hello&nbsp;World</div>"
         rows={10}
-        className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
+        className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
       />
 
       <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
@@ -90,7 +90,7 @@ export default function HtmlFormatterClient() {
               value={indentSize}
               onChange={e => setIndentSize(Number(e.target.value))}
               disabled={minify}
-              className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
+              className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
             >
               <option value={0}>0</option>
               <option value={2}>2</option>
@@ -105,7 +105,7 @@ export default function HtmlFormatterClient() {
               type="checkbox"
               checked={minify}
               onChange={() => setMinify(!minify)}
-              className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
             />
             <span className="text-sm text-gray-700">Minify</span>
           </label>
@@ -115,7 +115,7 @@ export default function HtmlFormatterClient() {
           <button
             type="button"
             onClick={runFormat}
-            className="px-4 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition text-sm font-medium"
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
           >
             Format / Minify
           </button>
@@ -158,7 +158,7 @@ export default function HtmlFormatterClient() {
             value={output}
             readOnly
             rows={10}
-            className="mt-6 w-full p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
+            className="mt-6 w-full p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           />
         </>
       )}

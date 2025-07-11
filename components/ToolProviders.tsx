@@ -13,7 +13,7 @@ export default function ToolProviders({ children }: { children: ReactNode }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-4 right-4 z-50 px-3 py-2 bg-brand-600 text-white rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+        className="fixed bottom-4 right-4 z-50 px-3 py-2 bg-indigo-600 text-white rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
         aria-label="Toggle tool settings"
       >
         ⚙️

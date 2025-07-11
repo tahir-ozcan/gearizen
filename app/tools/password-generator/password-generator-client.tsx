@@ -63,7 +63,7 @@ export default function PasswordGeneratorClient() {
     <section
       id="password-generator"
       aria-labelledby="password-generator-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="password-generator-heading"
@@ -91,13 +91,13 @@ export default function PasswordGeneratorClient() {
             readOnly
             value={password}
             aria-label="Generated password"
-            className="flex-grow bg-white border border-gray-300 rounded-lg px-4 py-2 font-mono text-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
+            className="flex-grow bg-white border border-gray-300 rounded-lg px-4 py-2 font-mono text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           />
           <button
             type="button"
             onClick={copyPassword}
             aria-label="Copy password to clipboard"
-            className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium"
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
           >
             {copied ? "Copied!" : "Copy"}
           </button>
@@ -146,7 +146,7 @@ export default function PasswordGeneratorClient() {
                 type="checkbox"
                 checked={useUpper}
                 onChange={() => setUseUpper((u) => !u)}
-                className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
               <span className="text-gray-700 select-none">Uppercase (A–Z)</span>
             </label>
@@ -155,7 +155,7 @@ export default function PasswordGeneratorClient() {
                 type="checkbox"
                 checked={useLower}
                 onChange={() => setUseLower((u) => !u)}
-                className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
               <span className="text-gray-700 select-none">Lowercase (a–z)</span>
             </label>
@@ -164,28 +164,29 @@ export default function PasswordGeneratorClient() {
                 type="checkbox"
                 checked={useDigits}
                 onChange={() => setUseDigits((d) => !d)}
-                className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
               <span className="text-gray-700 select-none">Numbers (0–9)</span>
 
             </label>
-            <div className="flex items-center space-x-2">
+            <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 checked={useSymbols}
                 onChange={() => setUseSymbols((s) => !s)}
-                className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
-
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
-              <button
-                type="button"
-                onClick={() => navigator.clipboard.writeText(cliCommand)}
-                className="px-3 py-1 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                Copy
-              </button>
-            </div>
+              <span className="text-gray-700 select-none">Symbols (!@#$%)</span>
+            </label>
           </div>
+
+          <button
+            type="button"
+            onClick={() => navigator.clipboard.writeText(cliCommand)}
+            className="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium"
+          >
+            Copy CLI Command
+          </button>
         </fieldset>
       </form>
     </section>

@@ -9,7 +9,7 @@ export default function PrivacyClient() {
     <section
       id="privacy-policy"
       aria-labelledby="privacy-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="privacy-heading"
@@ -97,7 +97,7 @@ export default function PrivacyClient() {
             If you have questions about this policy, please{" "}
             <Link
               href="/contact"
-              className="text-brand-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded transition-colors"
+              className="text-indigo-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded transition-colors"
               aria-label="Go to Contact page"
             >
               get in touch
