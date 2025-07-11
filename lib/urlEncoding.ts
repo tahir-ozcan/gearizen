@@ -4,8 +4,8 @@ export function encodeUrl(input: string): string {
 
 export function decodeUrl(input: string): string {
   try {
-    return decodeURIComponent(input);
+    return decodeURIComponent(input.replace(/\+/g, " "));
   } catch {
-    throw new Error('Invalid URL encoding');
+    throw new Error("Invalid URL encoding");
   }
 }
