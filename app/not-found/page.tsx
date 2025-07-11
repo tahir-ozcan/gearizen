@@ -1,6 +1,7 @@
 // app/not-found/page.tsx
 
 import NotFoundClient from "./not-found-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -45,5 +46,13 @@ export const metadata = {
 };
 
 export default function NotFoundPage() {
-  return <NotFoundClient />;
+  return (
+    <>
+      <BreadcrumbJsonLd
+        pageTitle="404 – Page Not Found"
+        pageUrl="https://gearizen.com/404"
+      />
+      <NotFoundClient />
+    </>
+  );
 }

@@ -1,6 +1,7 @@
 // app/contact/page.tsx
 
 import ContactClient from "./contact-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -49,8 +50,14 @@ import Spinner from "../../components/Spinner";
 
 export default function ContactPage() {
   return (
-    <Suspense fallback={<Spinner className="mx-auto mt-10" />}>
-      <ContactClient />
-    </Suspense>
+    <>
+      <BreadcrumbJsonLd
+        pageTitle="Contact Us"
+        pageUrl="https://gearizen.com/contact"
+      />
+      <Suspense fallback={<Spinner className="mx-auto mt-10" />}>
+        <ContactClient />
+      </Suspense>
+    </>
   );
 }

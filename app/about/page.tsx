@@ -1,6 +1,7 @@
 // app/about/page.tsx
 
 import AboutClient from "./about-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -48,5 +49,13 @@ export const metadata = {
 };
 
 export default function AboutPage() {
-  return <AboutClient />;
+  return (
+    <>
+      <BreadcrumbJsonLd
+        pageTitle="About Us"
+        pageUrl="https://gearizen.com/about"
+      />
+      <AboutClient />
+    </>
+  );
 }
