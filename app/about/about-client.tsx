@@ -14,7 +14,7 @@ export default function AboutClient() {
       {/* Heading */}
       <h1
         id="about-heading"
-        className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight text-center text-gray-900"
+        className="gradient-text text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight text-center"
       >
         About Gearizen
       </h1>

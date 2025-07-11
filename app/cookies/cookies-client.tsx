@@ -14,7 +14,7 @@ export default function CookiesClient() {
       {/* Başlık */}
       <h1
         id="cookie-heading"
-        className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight text-center text-gray-900"
+        className="gradient-text text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight text-center"
       >
         Cookie Policy
       </h1>

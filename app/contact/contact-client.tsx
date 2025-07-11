@@ -11,7 +11,7 @@ export default function ContactClient() {
     >
       <h1
         id="contact-heading"
-        className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-8 tracking-tight text-center"
+        className="gradient-text text-4xl sm:text-5xl md:text-6xl font-extrabold mb-8 tracking-tight text-center"
       >
         Contact Us
       </h1>

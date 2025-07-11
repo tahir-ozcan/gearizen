@@ -26,7 +26,7 @@ export default function NotFoundClient() {
       >
         404
       </h1>
-      <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-6">
+      <h2 className="gradient-text text-2xl sm:text-3xl font-semibold mb-6">
         Oops! Page Not Found
       </h2>
       <p className="max-w-xl text-base sm:text-lg text-gray-700 mb-8 leading-relaxed">
