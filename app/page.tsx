@@ -1,6 +1,7 @@
 // app/page.tsx
 
 import Link from "next/link";
+import CardLink from "@/components/CardLink";
 import {
   Key,
   FilePlus,
@@ -138,10 +139,10 @@ export default function HomePage() {
         <ul className="mt-8 grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {popularTools.map(({ href, icon, title, description }) => (
             <li key={href} className="list-none">
-              <Link
+              <CardLink
                 href={href}
                 aria-label={`Navigate to ${title}`}
-                className="group flex flex-col h-full bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-colors"
+                className="group flex flex-col h-full"
               >
                 <div className="mb-6 flex items-center justify-center">
                   {icon}
@@ -152,16 +153,16 @@ export default function HomePage() {
                 <p className="text-gray-600 flex-grow text-center">
                   {description}
                 </p>
-              </Link>
+              </CardLink>
             </li>
           ))}
 
           {/* Suggest a Tool */}
           <li className="list-none">
-            <Link
+            <CardLink
               href="/contact"
               aria-label="Suggest a tool to the Gearizen team"
-              className="group flex flex-col items-center justify-center bg-white border border-dashed border-gray-300 rounded-2xl p-6 shadow-sm hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-colors text-center"
+              className="group flex flex-col items-center justify-center border-dashed border-gray-300 text-center"
             >
               <HelpCircle
                 aria-hidden="true"
@@ -173,7 +174,7 @@ export default function HomePage() {
               <p className="text-gray-500 max-w-xs">
                 Have an idea? Let us know what tool you’d like to see next.
               </p>
-            </Link>
+            </CardLink>
           </li>
         </ul>
       </section>
