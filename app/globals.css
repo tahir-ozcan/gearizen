@@ -7,19 +7,19 @@
   h4,
   h5,
   h6 {
-    @apply font-display;
+    font-family: theme('fontFamily.sans');
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply px-6 py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium;
+    @apply px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium;
   }
   .btn-secondary {
     @apply px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 transition font-medium;
   }
   .input-base {
-    @apply w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 transition;
+    @apply w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition;
   }
   .container-responsive {
     @apply container mx-auto px-4 sm:px-6 md:px-8 lg:px-12;

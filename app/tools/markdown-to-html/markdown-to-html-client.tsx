@@ -53,7 +53,7 @@ export default function MarkdownToHtmlClient() {
     <section
       id="markdown-to-html"
       aria-labelledby="markdown-to-html-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="markdown-to-html-heading"
@@ -77,7 +77,7 @@ export default function MarkdownToHtmlClient() {
             value={markdown}
             onChange={handleMarkdownChange}
             placeholder="Enter Markdown here..."
-            className="w-full h-64 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
+            className="w-full h-64 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           />
         </div>
 
@@ -91,7 +91,7 @@ export default function MarkdownToHtmlClient() {
             value={html}
             readOnly
             placeholder="Converted HTML will appear here..."
-            className="w-full h-64 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
+            className="w-full h-64 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           />
         </div>
       </div>
@@ -101,7 +101,7 @@ export default function MarkdownToHtmlClient() {
         <button
           type="button"
           onClick={convert}
-          className="px-6 py-3 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition text-sm font-medium"
+          className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
         >
           Convert
         </button>

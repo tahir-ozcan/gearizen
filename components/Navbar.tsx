@@ -50,7 +50,7 @@ export default function Navbar() {
       {/* Skip link */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 px-4 py-2 bg-brand-600 text-white rounded-md"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 px-4 py-2 bg-indigo-600 text-white rounded-md"
       >
         Skip to main content
       </a>
@@ -87,10 +87,10 @@ export default function Navbar() {
                 aria-current={active ? "page" : undefined}
                 className={`
                   relative text-sm font-medium transition-colors
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
                   ${
                     active
-                      ? "text-brand-600 after:absolute after:-bottom-1 after:left-0 after:w-full after:h-0.5 after:bg-brand-600"
+                      ? "text-indigo-600 after:absolute after:-bottom-1 after:left-0 after:w-full after:h-0.5 after:bg-indigo-600"
                       : "text-gray-700 hover:text-gray-900"
                   }
                 `}
@@ -108,7 +108,7 @@ export default function Navbar() {
           aria-label={isOpen ? "Close menu" : "Open menu"}
           aria-expanded={isOpen}
           aria-controls="mobile-menu"
-          className="md:hidden p-2 rounded-md text-gray-800 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 transition"
+          className="md:hidden p-2 rounded-md text-gray-800 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 transition"
         >
           {isOpen ? (
             <X className="w-6 h-6" aria-hidden="true" />
@@ -139,10 +139,10 @@ export default function Navbar() {
                     aria-current={active ? "page" : undefined}
                     className={`
                       block w-full px-4 py-2 text-base font-medium rounded-md transition-colors
-                      focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2
+                      focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
                       ${
                         active
-                          ? "bg-brand-50 text-brand-600"
+                          ? "bg-indigo-50 text-indigo-600"
                           : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                       }
                     `}
