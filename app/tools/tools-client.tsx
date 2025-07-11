@@ -38,6 +38,7 @@ import {
   Palette,
   ListOrdered,
   Link2,
+  Search,
 } from "lucide-react";
 
 interface Tool {
@@ -234,6 +235,13 @@ const tools: Tool[] = [
     Icon: Link2,
     title: "URL Slug Generator",
     description: "Slugify text into SEO-friendly URLs quickly.",
+  },
+  {
+    href: "/tools/url-parser",
+    Icon: Search,
+    title: "URL Parser",
+    description:
+      "Break down URLs to view protocol, host, path and query parameters.",
   },
   {
     href: "/tools/base-converter",
