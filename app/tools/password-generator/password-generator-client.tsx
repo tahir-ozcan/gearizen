@@ -3,7 +3,9 @@
 "use client";
 
 import { useState, useEffect, useCallback, ChangeEvent } from "react";
-import { generatePassword } from "@/lib/generate-password";
+// Correct relative path to the shared password utility
+import { generatePassword } from "../../../lib/generate-password";
+
 
 
 export default function PasswordGeneratorClient() {
