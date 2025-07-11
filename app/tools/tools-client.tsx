@@ -35,6 +35,7 @@ import {
   Hash,
   Braces,
   Calculator,
+  Ampersand,
   Palette,
   ListOrdered,
   Link2,
@@ -229,6 +230,12 @@ const tools: Tool[] = [
     Icon: LinkIcon,
     title: "URL Encoder/Decoder",
     description: "Encode or decode URLs and query strings.",
+  },
+  {
+    href: "/tools/html-entity-encoder-decoder",
+    Icon: Ampersand,
+    title: "HTML Entity Encoder/Decoder",
+    description: "Convert characters to HTML entities or decode them back.",
   },
   {
     href: "/tools/slug-generator",
