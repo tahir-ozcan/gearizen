@@ -9,7 +9,7 @@ export default function CookiesClient() {
     <section
       id="cookie-policy"
       aria-labelledby="cookie-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="hero-section"
     >
       {/* Başlık */}
       <h1

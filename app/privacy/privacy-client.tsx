@@ -9,7 +9,7 @@ export default function PrivacyClient() {
     <section
       id="privacy-policy"
       aria-labelledby="privacy-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="hero-section"
     >
       <h1
         id="privacy-heading"

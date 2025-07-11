@@ -103,7 +103,7 @@ export default function HomePage() {
       {/* Hero */}
       <section
         aria-labelledby="hero-heading"
-        className="container-responsive pt-20 pb-16 text-center"
+        className="hero-section text-center pb-16"
       >
         <h1
           id="hero-heading"

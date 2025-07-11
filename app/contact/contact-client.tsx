@@ -7,7 +7,7 @@ export default function ContactClient() {
     <section
       id="contact-gearizen"
       aria-labelledby="contact-heading"
-      className="container-responsive py-20 text-gray-900"
+      className="hero-section"
     >
       <h1
         id="contact-heading"

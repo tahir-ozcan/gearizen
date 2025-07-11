@@ -16,7 +16,7 @@ export default function NotFoundClient() {
     <section
       id="notfound-section"
       aria-labelledby="notfound-title"
-      className="container-responsive py-20 flex flex-col items-center justify-center min-h-screen text-center text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="hero-section flex flex-col items-center justify-center min-h-screen text-center"
     >
       <h1
         id="notfound-title"

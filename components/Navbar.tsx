@@ -44,7 +44,7 @@ export default function Navbar() {
 
   return (
     <header
-      className="sticky top-0 z-50 bg-white border-b border-gray-200"
+      className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm"
       role="banner"
     >
       {/* Skip link */}

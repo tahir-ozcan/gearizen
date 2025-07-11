@@ -253,7 +253,7 @@ export default function ToolsClient() {
     <section
       id="all-tools"
       aria-labelledby="all-tools-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900 space-y-12"
+      className="hero-section space-y-12"
     >
       {/* Hero */}
       <header className="text-center max-w-3xl mx-auto space-y-4">

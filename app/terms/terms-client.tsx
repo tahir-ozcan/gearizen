@@ -9,7 +9,7 @@ export default function TermsClient() {
     <section
       id="terms-of-use"
       aria-labelledby="terms-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="hero-section"
     >
       <h1
         id="terms-heading"
