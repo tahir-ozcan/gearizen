@@ -26,7 +26,6 @@ import {
   Tag,
   Globe,
   Shield,
-  CalendarDays,
   ImagePlus,
   BookOpen,
   Fingerprint,
@@ -37,6 +36,7 @@ import {
   Braces,
   Calculator,
   Palette,
+  ListOrdered,
 } from "lucide-react";
 
 interface Tool {
@@ -187,12 +187,6 @@ const tools: Tool[] = [
       "Generate bcrypt hashes for passwords with adjustable salt rounds.",
   },
   {
-    href: "/tools/iso-date-converter",
-    Icon: CalendarDays,
-    title: "ISO Date Converter",
-    description: "Convert ISO 8601 dates and UNIX timestamps.",
-  },
-  {
     href: "/tools/image-to-base64",
     Icon: ImagePlus,
     title: "Image → Base64",
@@ -221,6 +215,12 @@ const tools: Tool[] = [
     Icon: Type,
     title: "Word & Character Counter",
     description: "Count words and characters in any text.",
+  },
+  {
+    href: "/tools/text-sorter",
+    Icon: ListOrdered,
+    title: "Text Sorter",
+    description: "Sort lines alphabetically and remove duplicates.",
   },
   {
     href: "/tools/url-encoder-decoder",
