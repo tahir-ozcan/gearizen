@@ -36,6 +36,7 @@ import {
   Hash,
   Braces,
   Calculator,
+  Palette,
 } from "lucide-react";
 
 interface Tool {
@@ -86,6 +87,12 @@ const tools: Tool[] = [
     description: "Ensure your text meets WCAG accessibility contrast ratios.",
   },
   {
+    href: "/tools/color-converter",
+    Icon: Palette,
+    title: "Color Converter",
+    description: "Convert colors between HEX, RGB and HSL with preview.",
+  },
+  {
     href: "/tools/base64-encoder-decoder",
     Icon: Paperclip,
     title: "Base64 Encoder/Decoder",
@@ -96,13 +103,6 @@ const tools: Tool[] = [
     Icon: Cpu,
     title: "Code Minifier",
     description: "Minify HTML, CSS, and JavaScript to boost page load speeds.",
-  },
-  {
-    href: "/tools/markdown-to-html",
-    Icon: FileCode,
-    title: "Markdown → HTML",
-    description:
-      "Convert Markdown into clean, semantic HTML markup in an instant.",
   },
   {
     href: "/tools/regex-tester",
@@ -199,10 +199,10 @@ const tools: Tool[] = [
     description: "Turn images into Base64 data URIs in-browser.",
   },
   {
-    href: "/tools/markdown-previewer",
+    href: "/tools/markdown-converter",
     Icon: BookOpen,
-    title: "Markdown Previewer",
-    description: "Live-preview Markdown as formatted HTML.",
+    title: "Markdown Converter",
+    description: "Edit Markdown, preview live, and copy clean HTML.",
   },
   {
     href: "/tools/uuid-generator",
