@@ -103,7 +103,7 @@ export default function HomePage() {
       {/* Hero */}
       <section
         aria-labelledby="hero-heading"
-        className="container-responsive pt-20 pb-16 text-center"
+        className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center"
       >
         <h1
           id="hero-heading"
@@ -126,7 +126,7 @@ export default function HomePage() {
       {/* Popular Tools */}
       <section
         aria-labelledby="tools-heading"
-        className="container-responsive pb-20"
+        className="container mx-auto px-4 sm:px-6 lg:px-8 pb-20"
       >
         <h2
           id="tools-heading"
@@ -135,7 +135,7 @@ export default function HomePage() {
           Popular & Essential Tools
         </h2>
 
-        <ul className="mt-8 grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <ul className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {popularTools.map(({ href, icon, title, description }) => (
             <li key={href} className="list-none">
               <Link
