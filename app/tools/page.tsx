@@ -36,6 +36,7 @@ export const metadata = {
     "JWT decoder",
     "word counter",
     "character counter",
+    "slug generator",
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
   robots: { index: true, follow: true },

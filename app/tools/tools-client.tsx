@@ -37,6 +37,7 @@ import {
   Calculator,
   Palette,
   ListOrdered,
+  Link2,
   Search,
 } from "lucide-react";
 
@@ -228,6 +229,12 @@ const tools: Tool[] = [
     Icon: LinkIcon,
     title: "URL Encoder/Decoder",
     description: "Encode or decode URLs and query strings.",
+  },
+  {
+    href: "/tools/slug-generator",
+    Icon: Link2,
+    title: "URL Slug Generator",
+    description: "Slugify text into SEO-friendly URLs quickly.",
   },
   {
     href: "/tools/url-parser",
