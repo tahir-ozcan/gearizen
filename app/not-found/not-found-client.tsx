@@ -16,13 +16,13 @@ export default function NotFoundClient() {
     <section
       id="notfound-section"
       aria-labelledby="notfound-title"
-      className="container-responsive py-20 flex flex-col items-center justify-center min-h-screen text-center text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
+      className="container-responsive py-20 flex flex-col items-center justify-center min-h-screen text-center text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="notfound-title"
         tabIndex={-1}
         aria-label="404 - Page Not Found"
-        className="text-7xl sm:text-8xl font-extrabold text-brand-600 mb-4 tracking-tight"
+        className="text-7xl sm:text-8xl font-extrabold text-indigo-600 mb-4 tracking-tight"
       >
         404
       </h1>
@@ -37,7 +37,7 @@ export default function NotFoundClient() {
       <Link
         href="/"
         aria-label="Return to Gearizen homepage"
-        className="inline-block bg-brand-600 text-white font-semibold rounded-md px-6 py-3 hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 transition"
+        className="inline-block bg-indigo-600 text-white font-semibold rounded-md px-6 py-3 hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 transition"
       >
         Go to Homepage
       </Link>

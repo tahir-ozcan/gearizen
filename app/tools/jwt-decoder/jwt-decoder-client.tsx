@@ -59,7 +59,7 @@ export default function JwtDecoderClient() {
     <section
       id="jwt-decoder"
       aria-labelledby="jwt-decoder-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="jwt-decoder-heading"
@@ -80,13 +80,13 @@ export default function JwtDecoderClient() {
         value={token}
         onChange={handleChange}
         placeholder="Paste your JWT here..."
-        className="w-full h-32 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
+        className="w-full h-32 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
       />
 
       <div className="mt-4 text-center">
         <button
           onClick={decodeJwt}
-          className="inline-block px-6 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition text-sm font-medium"
+          className="inline-block px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
         >
           Decode Token
         </button>
@@ -111,7 +111,7 @@ export default function JwtDecoderClient() {
               </h2>
               <button
                 onClick={() => copyJson(parts.header, "Header JSON")}
-                className="text-brand-600 hover:underline focus:outline-none focus:ring-2 focus:ring-brand-500 rounded transition text-sm"
+                className="text-indigo-600 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded transition text-sm"
               >
                 Copy
               </button>
@@ -129,7 +129,7 @@ export default function JwtDecoderClient() {
               </h2>
               <button
                 onClick={() => copyJson(parts.payload, "Payload JSON")}
-                className="text-brand-600 hover:underline focus:outline-none focus:ring-2 focus:ring-brand-500 rounded transition text-sm"
+                className="text-indigo-600 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded transition text-sm"
               >
                 Copy
               </button>
@@ -152,7 +152,7 @@ export default function JwtDecoderClient() {
                     () => alert("❌ Copy failed.")
                   )
                 }
-                className="text-brand-600 hover:underline focus:outline-none focus:ring-2 focus:ring-brand-500 rounded transition text-sm"
+                className="text-indigo-600 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded transition text-sm"
               >
                 Copy
               </button>
