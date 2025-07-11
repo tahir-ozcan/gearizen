@@ -35,6 +35,7 @@ import {
   Link as LinkIcon,
   Hash,
   Braces,
+  Calculator,
 } from "lucide-react";
 
 interface Tool {
@@ -226,6 +227,12 @@ const tools: Tool[] = [
     Icon: LinkIcon,
     title: "URL Encoder/Decoder",
     description: "Encode or decode URLs and query strings.",
+  },
+  {
+    href: "/tools/base-converter",
+    Icon: Calculator,
+    title: "Number Base Converter",
+    description: "Convert numbers between binary, decimal, hex and more.",
   },
   {
     href: "/tools/sha-hash-generator",
