@@ -69,7 +69,7 @@ export default function CsvToJsonClient() {
     <section
       id="csv-to-json"
       aria-labelledby="csv-to-json-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="csv-to-json-heading"
@@ -93,7 +93,7 @@ export default function CsvToJsonClient() {
             onChange={handleCsvChange}
             placeholder="column1,column2,column3\nvalue1,value2,value3\n…"
             rows={8}
-            className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
+            className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           />
         </div>
 
@@ -115,7 +115,7 @@ export default function CsvToJsonClient() {
             readOnly
             value={jsonText}
             rows={10}
-            className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
+            className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           />
           <div className="flex justify-center gap-4">
             <button
