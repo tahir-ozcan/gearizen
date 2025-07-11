@@ -146,11 +146,11 @@ const tools: Tool[] = [
       "Resize images, maintain or override aspect ratio, then download.",
   },
   {
-    href: "/tools/csv-to-json",
+    href: "/tools/csv-json-converter",
     Icon: File,
-    title: "CSV → JSON Converter",
+    title: "CSV ⇄ JSON Converter",
     description:
-      "Transform CSV data into JSON arrays quickly, entirely in-browser.",
+      "Convert CSV files to JSON or JSON arrays to CSV with no server involved.",
   },
   {
     href: "/tools/html-to-pdf",
