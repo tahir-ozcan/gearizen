@@ -70,7 +70,7 @@ export default function UnixTimestampConverterClient() {
     <section
       id="unix-timestamp-converter"
       aria-labelledby="utc-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="utc-heading"
@@ -96,7 +96,7 @@ export default function UnixTimestampConverterClient() {
             value={timestampInput}
             onChange={handleTimestampChange}
             placeholder="e.g. 1657286400 or 1657286400000"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-mono"
           />
           {tsError && (
             <p role="alert" className="text-red-600 text-sm">
@@ -105,7 +105,7 @@ export default function UnixTimestampConverterClient() {
           )}
           <button
             type="submit"
-            className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
+            className="w-full py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium"
           >
             Convert to Date
           </button>
@@ -133,7 +133,7 @@ export default function UnixTimestampConverterClient() {
             value={dateInput}
             onChange={handleDateChange}
             placeholder="e.g. 2023-07-08T00:00:00Z"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
           />
           {dateError && (
             <p role="alert" className="text-red-600 text-sm">
@@ -142,7 +142,7 @@ export default function UnixTimestampConverterClient() {
           )}
           <button
             type="submit"
-            className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
+            className="w-full py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium"
           >
             Convert to Timestamp
           </button>

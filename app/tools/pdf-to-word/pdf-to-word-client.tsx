@@ -114,7 +114,7 @@ export default function PdfToWordClient() {
     <section
       id="pdf-to-word"
       aria-labelledby="pdf-to-word-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="pdf-to-word-heading"
@@ -149,7 +149,7 @@ export default function PdfToWordClient() {
         <button
           onClick={convertPdf}
           disabled={!file || processing}
-          className={`inline-flex items-center px-8 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium ${
+          className={`inline-flex items-center px-8 py-3 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium ${
             processing ? "opacity-60 cursor-not-allowed" : ""
           }`}
         >

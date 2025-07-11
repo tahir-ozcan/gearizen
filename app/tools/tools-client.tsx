@@ -238,7 +238,7 @@ export default function ToolsClient() {
     <section
       id="all-tools"
       aria-labelledby="all-tools-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900 space-y-12"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900 space-y-12"
     >
         {/* Hero */}
         <header className="text-center max-w-3xl mx-auto space-y-4">
@@ -263,7 +263,7 @@ export default function ToolsClient() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search tools..."
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
@@ -278,13 +278,13 @@ export default function ToolsClient() {
                 <Link
                   href={href}
                   aria-label={`Navigate to ${title}`}
-                  className="group flex flex-col h-full bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-colors"
+                  className="group flex flex-col h-full bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 transition-colors"
                 >
                   <Icon
-                    className="w-10 h-10 text-indigo-600 mx-auto mb-4"
+                    className="w-10 h-10 text-brand-600 mx-auto mb-4"
                     aria-hidden="true"
                   />
-                  <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-indigo-600 transition-colors">
+                  <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-brand-600 transition-colors">
                     {title}
                   </h3>
                   <p className="text-gray-600 text-center flex-grow">

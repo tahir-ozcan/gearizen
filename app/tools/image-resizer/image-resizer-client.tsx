@@ -104,7 +104,7 @@ export default function ImageResizerClient() {
     <section
       id="image-resizer"
       aria-labelledby="image-resizer-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="image-resizer-heading"
@@ -180,7 +180,7 @@ export default function ImageResizerClient() {
               value={width}
               onChange={e => setWidth(Number(e.target.value))}
               className="w-24 p-2 border border-gray-300 rounded-lg
-                         focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+                         focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
             />
           </div>
           <div className="flex items-center justify-between">
@@ -195,7 +195,7 @@ export default function ImageResizerClient() {
               onChange={e => setHeight(Number(e.target.value))}
               disabled={maintainAspect}
               className="w-24 p-2 border border-gray-300 rounded-lg
-                         focus:outline-none focus:ring-1 focus:ring-indigo-500 transition disabled:opacity-50"
+                         focus:outline-none focus:ring-1 focus:ring-brand-500 transition disabled:opacity-50"
             />
           </div>
           <div className="flex items-center space-x-2">
@@ -204,7 +204,7 @@ export default function ImageResizerClient() {
               type="checkbox"
               checked={maintainAspect}
               onChange={() => setMaintainAspect(a => !a)}
-              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
             />
             <label htmlFor="maintain-aspect" className="text-gray-700">
               Maintain aspect ratio

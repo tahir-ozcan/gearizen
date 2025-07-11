@@ -33,19 +33,19 @@ export default function ImageToBase64Client() {
         type="file"
         accept="image/*"
         onChange={handleFile}
-        className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-indigo-600 file:text-white hover:file:bg-indigo-700"
+        className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-brand-600 file:text-white hover:file:bg-brand-700"
       />
       {result && (
         <div className="space-y-4">
           <textarea
             readOnly
             value={result}
-            className="w-full h-40 p-3 border border-gray-300 rounded-lg font-mono text-xs bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full h-40 p-3 border border-gray-300 rounded-lg font-mono text-xs bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
           <button
             type="button"
             onClick={copy}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-4 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             Copy
           </button>
