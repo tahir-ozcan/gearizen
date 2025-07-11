@@ -101,8 +101,10 @@ export function convert(
         return celsius;
     }
   } else {
-    const baseValue = value * (factors[category][from] ?? 1);
-    const result = baseValue / (factors[category][to] ?? 1);
+    const cat = factors[category];
+    if (!cat) return value;
+    const baseValue = value * (cat[from] ?? 1);
+    const result = baseValue / (cat[to] ?? 1);
     return result;
   }
 }
