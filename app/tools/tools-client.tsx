@@ -239,6 +239,18 @@ const tools: Tool[] = [
     title: "YAML ⇄ JSON Converter",
     description: "Convert YAML to JSON or JSON to YAML in-browser.",
   },
+  {
+    href: "/tools/text-case-converter",
+    Icon: Type,
+    title: "Text Case Converter",
+    description: "Convert text between upper, lower, camel, snake and more.",
+  },
+  {
+    href: "/tools/xml-formatter",
+    Icon: FileCode,
+    title: "XML Formatter",
+    description: "Beautify or minify XML documents instantly.",
+  },
 ];
 
 export default function ToolsClient() {
