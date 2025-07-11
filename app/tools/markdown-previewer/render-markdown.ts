@@ -8,7 +8,8 @@ import DOMPurify from "isomorphic-dompurify";
 marked.setOptions({ gfm: true, breaks: true, async: false });
 
 export function renderMarkdown(src: string): string {
+  const input = src ?? "";
   // marked.parse returns a string (because async is disabled above). DOMPurify
   // sanitizes the HTML to keep the preview safe against XSS attacks.
-  return DOMPurify.sanitize(marked.parse(src) as string);
+  return DOMPurify.sanitize(marked.parse(input) as string);
 }
