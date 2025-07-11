@@ -29,6 +29,7 @@ export const metadata = {
     "PDF compressor",
     "PDF to Word",
     "CSV to JSON",
+    "JSON to CSV",
     "HTML formatter",
     "HTML to PDF",
     "SEO meta tag generator",

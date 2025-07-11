@@ -35,6 +35,7 @@ import {
   Link as LinkIcon,
   Hash,
   Braces,
+  Table,
 } from "lucide-react";
 
 interface Tool {
@@ -150,6 +151,13 @@ const tools: Tool[] = [
     title: "CSV → JSON Converter",
     description:
       "Transform CSV data into JSON arrays quickly, entirely in-browser.",
+  },
+  {
+    href: "/tools/json-to-csv",
+    Icon: Table,
+    title: "JSON → CSV Converter",
+    description:
+      "Turn JSON arrays into CSV data instantly, 100% client-side.",
   },
   {
     href: "/tools/html-to-pdf",
