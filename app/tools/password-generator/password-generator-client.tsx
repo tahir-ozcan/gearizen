@@ -3,8 +3,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, ChangeEvent } from "react";
-import { generatePassword } from "../../../../lib/generate-password";
-
+import { generatePassword } from "@/lib/generate-password";
 
 export default function PasswordGeneratorClient() {
   const [length, setLength] = useState(16);
@@ -166,7 +165,6 @@ export default function PasswordGeneratorClient() {
             </label>
           </div>
         </fieldset>
-
       </form>
     </section>
   );
