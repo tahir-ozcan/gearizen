@@ -7,7 +7,7 @@ export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "Markdown → HTML Converter",
   description:
-    "Convert your Markdown to clean, sanitized HTML instantly with Gearizen’s free client-side Markdown→HTML tool. Copy or download without signup!",
+    "Write Markdown and see the HTML instantly. Gearizen’s client-side converter lets you copy or download sanitized markup with no signup.",
   keywords: [
     "markdown to html",
     "markdown converter",
@@ -21,7 +21,7 @@ export const metadata = {
   openGraph: {
     title: "Markdown → HTML Converter | Gearizen",
     description:
-      "Instantly convert Markdown into sanitized HTML with Gearizen’s client-side Markdown→HTML Converter. No signup required.",
+      "Instantly preview and convert Markdown into clean HTML with Gearizen’s client-side tool. No signup required.",
     url: "https://gearizen.com/tools/markdown-to-html",
     siteName: "Gearizen",
     locale: "en_US",
@@ -39,15 +39,19 @@ export const metadata = {
     card: "summary_large_image",
     title: "Markdown → HTML Converter | Gearizen",
     description:
-      "Use Gearizen’s client-side Markdown→HTML tool to transform your Markdown into clean, ready-to-use HTML. Copy or download instantly.",
+      "Use Gearizen’s Markdown converter to preview and export sanitized HTML. 100% client-side.",
     creator: "@gearizen",
     images: ["/og-placeholder.svg"],
   },
 };
 
-export default function MarkdownToHtmlPage() {  return (
+export default function MarkdownToHtmlPage() {
+  return (
     <>
-      <BreadcrumbJsonLd pageTitle="Markdown → HTML Converter" pageUrl="https://gearizen.com/tools/markdown-to-html" />
+      <BreadcrumbJsonLd
+        pageTitle="Markdown → HTML Converter"
+        pageUrl="https://gearizen.com/tools/markdown-to-html"
+      />
       <MarkdownToHtmlClient />
     </>
   );

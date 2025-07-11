@@ -102,7 +102,7 @@ const tools: Tool[] = [
     Icon: FileCode,
     title: "Markdown → HTML",
     description:
-      "Convert Markdown into clean, semantic HTML markup in an instant.",
+      "Write Markdown and preview sanitized HTML instantly—copy or download with a click.",
   },
   {
     href: "/tools/regex-tester",
@@ -187,22 +187,10 @@ const tools: Tool[] = [
       "Generate bcrypt hashes for passwords with adjustable salt rounds.",
   },
   {
-    href: "/tools/iso-date-converter",
-    Icon: CalendarDays,
-    title: "ISO Date Converter",
-    description: "Convert ISO 8601 dates and UNIX timestamps.",
-  },
-  {
     href: "/tools/image-to-base64",
     Icon: ImagePlus,
     title: "Image → Base64",
     description: "Turn images into Base64 data URIs in-browser.",
-  },
-  {
-    href: "/tools/markdown-previewer",
-    Icon: BookOpen,
-    title: "Markdown Previewer",
-    description: "Live-preview Markdown as formatted HTML.",
   },
   {
     href: "/tools/uuid-generator",

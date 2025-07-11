@@ -2,13 +2,12 @@
 
 "use client";
 
-import { useState, ChangeEvent } from "react";
-import { marked } from "marked";
-import DOMPurify from "isomorphic-dompurify";
+import { useState, ChangeEvent, useMemo } from "react";
+import { renderMarkdown } from "./render-markdown";
 
 export default function MarkdownToHtmlClient() {
   const [markdown, setMarkdown] = useState("");
-  const [html, setHtml] = useState("");
+  const html = useMemo(() => renderMarkdown(markdown), [markdown]);
   const [error, setError] = useState<string | null>(null);
 
   const handleMarkdownChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -16,17 +15,7 @@ export default function MarkdownToHtmlClient() {
     setError(null);
   };
 
-  // convert artık async, raw'ı await ediyoruz
-  const convert = async () => {
-    try {
-      const raw = await marked(markdown);               // string | Promise<string>
-      const clean = DOMPurify.sanitize(raw as string);  // artık kesin string
-      setHtml(clean);
-    } catch {
-      setError("Conversion failed. Please check your Markdown syntax.");
-      setHtml("");
-    }
-  };
+
 
   const copyHtml = async () => {
     if (!html) return;
@@ -62,8 +51,8 @@ export default function MarkdownToHtmlClient() {
         Markdown → HTML Converter
       </h1>
       <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-        Paste Markdown on the left, convert to clean HTML on the right.  
-        Copy or download your HTML snippet—100% client-side, no signup.
+        Write Markdown on the left and see a live HTML preview on the right.
+        Copy or download the sanitized markup—100% client-side, no signup.
       </p>
 
       <div className="grid gap-8 lg:grid-cols-2">
@@ -81,17 +70,13 @@ export default function MarkdownToHtmlClient() {
           />
         </div>
 
-        {/* HTML Output */}
+        {/* Live Preview */}
         <div>
-          <label htmlFor="html-output" className="sr-only">
-            HTML output
-          </label>
-          <textarea
+          <div
             id="html-output"
-            value={html}
-            readOnly
-            placeholder="Converted HTML will appear here..."
-            className="w-full h-64 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="prose max-w-none p-4 border border-gray-300 rounded-lg bg-gray-50 overflow-auto h-64"
+            aria-label="HTML preview"
+            dangerouslySetInnerHTML={{ __html: html }}
           />
         </div>
       </div>
@@ -100,15 +85,8 @@ export default function MarkdownToHtmlClient() {
       <div className="mt-8 flex flex-wrap justify-center gap-4">
         <button
           type="button"
-          onClick={convert}
-          className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
-        >
-          Convert
-        </button>
-        <button
-          type="button"
           onClick={copyHtml}
-          disabled={!html}
+          disabled={!markdown}
           className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition text-sm font-medium disabled:opacity-60"
         >
           Copy HTML
@@ -116,7 +94,7 @@ export default function MarkdownToHtmlClient() {
         <button
           type="button"
           onClick={downloadHtml}
-          disabled={!html}
+          disabled={!markdown}
           className="px-6 py-3 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 transition text-sm font-medium disabled:opacity-60"
         >
           Download HTML
