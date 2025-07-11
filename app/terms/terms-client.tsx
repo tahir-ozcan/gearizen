@@ -9,7 +9,7 @@ export default function TermsClient() {
     <section
       id="terms-of-use"
       aria-labelledby="terms-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="terms-heading"
@@ -23,7 +23,7 @@ export default function TermsClient() {
         “Service”), you agree to these Terms of Use and our{" "}
         <Link
           href="/privacy"
-          className="text-indigo-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded transition-colors"
+          className="text-brand-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded transition-colors"
         >
           Privacy Policy
         </Link>
@@ -118,7 +118,7 @@ export default function TermsClient() {
             If you have any questions about these terms, please{" "}
             <Link
               href="/contact"
-              className="text-indigo-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded transition-colors"
+              className="text-brand-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded transition-colors"
             >
               get in touch
             </Link>

@@ -62,7 +62,7 @@ export default function PasswordGeneratorClient() {
     <section
       id="password-generator"
       aria-labelledby="password-generator-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="password-generator-heading"
@@ -84,29 +84,19 @@ export default function PasswordGeneratorClient() {
           Your Password
         </label>
         <div className="flex items-center space-x-3">
-          {rawMode ? (
-            <pre
-              id="generated-password"
-              aria-label="Generated password"
-              className="flex-grow bg-white border border-gray-300 rounded-lg px-4 py-2 font-mono text-lg overflow-x-auto"
-            >
-              {password}
-            </pre>
-          ) : (
-            <input
-              id="generated-password"
-              type="text"
-              readOnly
-              value={password}
-              aria-label="Generated password"
-              className="flex-grow bg-white border border-gray-300 rounded-lg px-4 py-2 font-mono text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-            />
-          )}
+          <input
+            id="generated-password"
+            type="text"
+            readOnly
+            value={password}
+            aria-label="Generated password"
+            className="flex-grow bg-white border border-gray-300 rounded-lg px-4 py-2 font-mono text-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
+          />
           <button
             type="button"
             onClick={copyPassword}
             aria-label="Copy password to clipboard"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
+            className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium"
           >
             {copied ? "Copied!" : "Copy"}
           </button>
@@ -122,102 +112,69 @@ export default function PasswordGeneratorClient() {
         className="space-y-8 max-w-2xl mx-auto"
         aria-label="Password options"
       >
-        <details open className="space-y-8">
-          <summary className="cursor-pointer text-lg font-semibold text-gray-800">
-            Basic Options
-          </summary>
-          {/* Length Slider */}
-          <div>
-            <label
-              htmlFor="length"
-              className="block mb-2 font-medium text-gray-800"
-            >
-              Length: <span className="font-semibold">{length}</span>
-            </label>
-            <input
-              id="length"
-              type="range"
-              min={8}
-              max={64}
-              value={length}
-              onChange={handleLength}
-              aria-valuemin={8}
-              aria-valuemax={64}
-              aria-valuenow={length}
-              className="w-full"
-            />
-          </div>
-
-          {/* Character Sets */}
-          <fieldset className="space-y-4">
-            <legend className="text-lg font-semibold text-gray-800 mb-2">
-              Include Characters
-            </legend>
-            <div className="grid grid-cols-2 gap-4">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={useUpper}
-                  onChange={() => setUseUpper((u) => !u)}
-                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                />
-                <span className="text-gray-700 select-none">Uppercase (A–Z)</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={useLower}
-                  onChange={() => setUseLower((u) => !u)}
-                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                />
-                <span className="text-gray-700 select-none">Lowercase (a–z)</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={useDigits}
-                  onChange={() => setUseDigits((d) => !d)}
-                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                />
-                <span className="text-gray-700 select-none">Numbers (0–9)</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={useSymbols}
-                  onChange={() => setUseSymbols((s) => !s)}
-                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                />
-                <span className="text-gray-700 select-none">Symbols (!@#$…)</span>
-              </label>
-            </div>
-          </fieldset>
-        </details>
-
-        <details className="space-y-4">
-          <summary className="cursor-pointer text-lg font-semibold text-gray-800">
-            Advanced Options
-          </summary>
-          <label className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              checked={rawMode}
-              onChange={() => setRawMode((r) => !r)}
-              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-            />
-            <span className="text-gray-700 select-none">Raw mode</span>
+        {/* Length Slider */}
+        <div>
+          <label
+            htmlFor="length"
+            className="block mb-2 font-medium text-gray-800"
+          >
+            Length: <span className="font-semibold">{length}</span>
           </label>
-          <div>
-            <label htmlFor="cli-command" className="block mb-2 font-medium text-gray-800">
-              CLI Command
+          <input
+            id="length"
+            type="range"
+            min={8}
+            max={64}
+            value={length}
+            onChange={handleLength}
+            aria-valuemin={8}
+            aria-valuemax={64}
+            aria-valuenow={length}
+            className="w-full"
+          />
+        </div>
+
+        {/* Character Sets */}
+        <fieldset className="space-y-4">
+          <legend className="text-lg font-semibold text-gray-800 mb-2">
+            Include Characters
+          </legend>
+          <div className="grid grid-cols-2 gap-4">
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={useUpper}
+                onChange={() => setUseUpper((u) => !u)}
+                className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
+              />
+              <span className="text-gray-700 select-none">Uppercase (A–Z)</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={useLower}
+                onChange={() => setUseLower((u) => !u)}
+                className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
+              />
+              <span className="text-gray-700 select-none">Lowercase (a–z)</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={useDigits}
+                onChange={() => setUseDigits((d) => !d)}
+                className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
+              />
+              <span className="text-gray-700 select-none">Numbers (0–9)</span>
+
             </label>
             <div className="flex items-center space-x-2">
               <input
-                id="cli-command"
-                type="text"
-                readOnly
-                value={cliCommand}
-                className="flex-grow bg-gray-100 border border-gray-300 rounded-md px-2 py-1 font-mono text-sm"
+                type="checkbox"
+                checked={useSymbols}
+                onChange={() => setUseSymbols((s) => !s)}
+                className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
+
               />
               <button
                 type="button"

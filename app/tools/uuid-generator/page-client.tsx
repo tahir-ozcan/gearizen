@@ -66,7 +66,7 @@ export default function UuidGeneratorClient() {
     <section
       id="uuid-generator"
       aria-labelledby="uuid-generator-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="uuid-generator-heading"
@@ -105,7 +105,7 @@ export default function UuidGeneratorClient() {
               type="checkbox"
               checked={uppercase}
               onChange={() => setUppercase((v) => !v)}
-              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
             />
             <span className="text-sm text-gray-700">Uppercase</span>
           </label>
@@ -145,7 +145,7 @@ export default function UuidGeneratorClient() {
         <div className="flex flex-wrap gap-3">
           <button
             type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
+            className="px-4 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition text-sm font-medium"
           >
             Generate
           </button>
