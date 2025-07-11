@@ -67,7 +67,7 @@ export default function ColorContrastCheckerClient() {
     <section
       id="color-contrast-checker"
       aria-labelledby="contrast-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="contrast-heading"
@@ -120,7 +120,7 @@ export default function ColorContrastCheckerClient() {
       <div className="max-w-md mx-auto space-y-4 mb-10">
         <p className="text-center text-xl font-semibold">
           Contrast Ratio:{" "}
-          <span className="text-indigo-600">{contrastRatio}:1</span>
+          <span className="text-brand-600">{contrastRatio}:1</span>
         </p>
         <ul className="space-y-1 text-gray-700">
           <li>
@@ -170,7 +170,7 @@ export default function ColorContrastCheckerClient() {
       <div className="text-center">
         <button
           onClick={copyCss}
-          className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
+          className="px-6 py-3 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition text-sm font-medium"
         >
           Copy CSS Snippet
         </button>

@@ -14,7 +14,7 @@ export default function GlobalError({ reset }: { reset: () => void }) {
         <div className="space-x-4">
           <button
             onClick={reset}
-            className="px-4 py-2 rounded bg-indigo-600 text-white"
+            className="px-4 py-2 rounded bg-brand-600 text-white"
           >
             Try Again
           </button>

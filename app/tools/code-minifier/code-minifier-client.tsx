@@ -60,7 +60,7 @@ export default function CodeMinifierClient() {
     <section
       id="code-minifier"
       aria-labelledby="code-minifier-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="code-minifier-heading"
@@ -80,7 +80,7 @@ export default function CodeMinifierClient() {
         value={input}
         onChange={handleInput}
         placeholder="Paste your code here..."
-        className="w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+        className="w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
       />
 
       {/* Controls */}
@@ -88,7 +88,7 @@ export default function CodeMinifierClient() {
         <button
           type="button"
           onClick={minifyCode}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
+          className="px-4 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition text-sm font-medium"
         >
           Minify
         </button>
@@ -127,7 +127,7 @@ export default function CodeMinifierClient() {
           aria-label="Minified code output"
           value={output}
           readOnly
-          className="mt-6 w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+          className="mt-6 w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
         />
       )}
     </section>

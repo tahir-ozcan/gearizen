@@ -48,7 +48,7 @@ export default function TextDiffClient() {
     <section
       id="text-diff"
       aria-labelledby="text-diff-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="text-diff-heading"
@@ -72,7 +72,7 @@ export default function TextDiffClient() {
               value={original}
               onChange={handleOriginalChange}
               placeholder="Enter original text..."
-              className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
             />
           </div>
           <div>
@@ -84,7 +84,7 @@ export default function TextDiffClient() {
               value={modified}
               onChange={handleModifiedChange}
               placeholder="Enter modified text..."
-              className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
             />
           </div>
         </div>
@@ -92,7 +92,7 @@ export default function TextDiffClient() {
         <div className="text-center">
           <button
             type="submit"
-            className="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
+            className="px-8 py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium"
           >
             Compare
           </button>

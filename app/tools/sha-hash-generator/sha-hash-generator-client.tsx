@@ -51,7 +51,7 @@ export default function ShaHashGeneratorClient() {
     <section
       id="sha-hash-generator"
       aria-labelledby="sha-hash-generator-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-16 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="sha-hash-generator-heading"
@@ -77,7 +77,7 @@ export default function ShaHashGeneratorClient() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             rows={4}
-            className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
           />
         </div>
 
@@ -94,7 +94,7 @@ export default function ShaHashGeneratorClient() {
             onChange={(e) =>
               setAlgorithm(e.target.value as "SHA-256" | "SHA-1" | "MD5")
             }
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="SHA-256">SHA-256</option>
             <option value="SHA-1">SHA-1</option>
@@ -105,7 +105,7 @@ export default function ShaHashGeneratorClient() {
         <button
           type="button"
           onClick={generate}
-          className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
+          className="w-full py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium"
         >
           Generate Hash
         </button>
@@ -123,7 +123,7 @@ export default function ShaHashGeneratorClient() {
               readOnly
               value={hash}
               rows={4}
-              className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
             />
             <div className="flex justify-end gap-4">
               <button

@@ -17,7 +17,7 @@ export default function ContactClient() {
       </h1>
       <p className="text-lg text-gray-700 mb-12 max-w-xl mx-auto text-center">
         Have questions or feedback? Please email us at
-        <a href="mailto:gearizen.tahir.ozcan@gmail.com" className="text-indigo-600 underline ml-1">
+        <a href="mailto:gearizen.tahir.ozcan@gmail.com" className="text-brand-600 underline ml-1">
           gearizen.tahir.ozcan@gmail.com
         </a>
         .

@@ -152,7 +152,7 @@ export default function UnitConverterClient() {
     <section
       id="unit-converter"
       aria-labelledby="unit-converter-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="unit-converter-heading"
@@ -178,7 +178,7 @@ export default function UnitConverterClient() {
             id="category"
             value={category}
             onChange={onCategoryChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
           >
             {Object.entries(categories).map(([key, { label }]) => (
               <option key={key} value={key}>
@@ -197,7 +197,7 @@ export default function UnitConverterClient() {
               id="from-unit"
               value={fromUnit}
               onChange={e => setFromUnit(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
             >
               {Object.entries(categories[category].units).map(([value, label]) => (
                 <option key={value} value={value}>
@@ -214,7 +214,7 @@ export default function UnitConverterClient() {
               id="to-unit"
               value={toUnit}
               onChange={e => setToUnit(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
             >
               {Object.entries(categories[category].units).map(([value, label]) => (
                 <option key={value} value={value}>
@@ -228,7 +228,7 @@ export default function UnitConverterClient() {
         <button
           type="button"
           onClick={swapUnits}
-          className="block mx-auto text-indigo-600 hover:underline focus:outline-none transition"
+          className="block mx-auto text-brand-600 hover:underline focus:outline-none transition"
         >
           Swap units
         </button>
@@ -243,7 +243,7 @@ export default function UnitConverterClient() {
             value={input}
             onChange={e => setInput(e.target.value)}
             placeholder="Enter value"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-mono"
           />
         </div>
 
@@ -258,7 +258,7 @@ export default function UnitConverterClient() {
         <div className="mt-12 max-w-lg mx-auto text-center">
           <p className="text-xl">
             Result:{" "}
-            <span className="font-mono text-xl text-indigo-600">
+            <span className="font-mono text-xl text-brand-600">
               {output}
             </span>{" "}
             {categories[category].units[toUnit]}
