@@ -1,6 +1,7 @@
 // app/tools/page.tsx
 
 import ToolsClient from "./tools-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -66,5 +67,13 @@ export const metadata = {
 };
 
 export default function ToolsPage() {
-  return <ToolsClient />;
+  return (
+    <>
+      <BreadcrumbJsonLd
+        pageTitle="Free Online Tools"
+        pageUrl="https://gearizen.com/tools"
+      />
+      <ToolsClient />
+    </>
+  );
 }

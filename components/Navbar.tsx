@@ -55,7 +55,7 @@ export default function Navbar() {
         Skip to main content
       </a>
 
-      <div className="container mx-auto px-6 lg:px-12 flex items-center justify-between h-16">
+      <div className="container-responsive flex items-center justify-between h-16">
         {/* Logo */}
         <Link
           href="/"
@@ -74,7 +74,10 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop navigation */}
-        <nav aria-label="Primary" className="hidden md:flex items-center space-x-6">
+        <nav
+          aria-label="Primary"
+          className="hidden md:flex items-center space-x-6"
+        >
           {navLinks.map(({ href, label }) => {
             const active = pathname === href;
             return (
@@ -85,9 +88,11 @@ export default function Navbar() {
                 className={`
                   relative text-sm font-medium transition-colors
                   focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
-                  ${active
-                    ? "text-indigo-600 after:absolute after:-bottom-1 after:left-0 after:w-full after:h-0.5 after:bg-indigo-600"
-                    : "text-gray-700 hover:text-gray-900"}
+                  ${
+                    active
+                      ? "text-indigo-600 after:absolute after:-bottom-1 after:left-0 after:w-full after:h-0.5 after:bg-indigo-600"
+                      : "text-gray-700 hover:text-gray-900"
+                  }
                 `}
               >
                 {label}
@@ -122,7 +127,7 @@ export default function Navbar() {
           ${isOpen ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0 pointer-events-none"}
         `}
       >
-        <div className="container mx-auto px-6 lg:px-12 py-4">
+        <div className="container-responsive py-4">
           <ul className="flex flex-col space-y-2">
             {navLinks.map(({ href, label }) => {
               const active = pathname === href;
@@ -135,9 +140,11 @@ export default function Navbar() {
                     className={`
                       block w-full px-4 py-2 text-base font-medium rounded-md transition-colors
                       focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
-                      ${active
-                        ? "bg-indigo-50 text-indigo-600"
-                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"}
+                      ${
+                        active
+                          ? "bg-indigo-50 text-indigo-600"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      }
                     `}
                   >
                     {label}
