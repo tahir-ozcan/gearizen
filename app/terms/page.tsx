@@ -1,6 +1,7 @@
 // app/terms/page.tsx
 
 import TermsClient from "./terms-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -45,5 +46,13 @@ export const metadata = {
 };
 
 export default function TermsPage() {
-  return <TermsClient />;
+  return (
+    <>
+      <BreadcrumbJsonLd
+        pageTitle="Terms of Use"
+        pageUrl="https://gearizen.com/terms"
+      />
+      <TermsClient />
+    </>
+  );
 }

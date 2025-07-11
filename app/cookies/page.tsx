@@ -1,6 +1,7 @@
 // app/cookies/page.tsx
 
 import CookiesClient from "./cookies-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -47,5 +48,13 @@ export const metadata = {
 };
 
 export default function CookiePage() {
-  return <CookiesClient />;
+  return (
+    <>
+      <BreadcrumbJsonLd
+        pageTitle="Cookie Policy"
+        pageUrl="https://gearizen.com/cookies"
+      />
+      <CookiesClient />
+    </>
+  );
 }

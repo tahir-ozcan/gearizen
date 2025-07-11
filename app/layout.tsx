@@ -5,6 +5,15 @@ import { ReactNode } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AnalyticsLoader from "./components/AnalyticsLoader";
+import { Inter, Poppins } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-poppins",
+  display: "swap",
+});
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -70,7 +79,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className="bg-white text-gray-900 antialiased scroll-smooth"
+      className={`${inter.variable} ${poppins.variable} bg-white text-gray-900 antialiased scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
@@ -89,16 +98,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <AnalyticsLoader />
       </head>
       <body className="flex min-h-screen flex-col">
-        {/* Accessible skip link */}
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 px-4 py-2 bg-indigo-600 text-white rounded-md z-50"
-        >
-          Skip to main content
-        </a>
+        <ToolProviders>
+          {/* Accessible skip link */}
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 px-4 py-2 bg-indigo-600 text-white rounded-md z-50"
+          >
+            Skip to main content
+          </a>
 
-        {/* Primary navigation */}
-        <Navbar />
+          {/* Primary navigation */}
+          <Navbar />
 
         {/* Main content area */}
         <main
@@ -106,13 +116,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           role="main"
           tabIndex={-1}
           aria-label="Main content"
-          className="flex-grow container-responsive py-8"
+          className="flex-grow container-responsive py-10"
         >
           {children}
         </main>
 
-        {/* Footer */}
-        <Footer />
+          {/* Footer */}
+          <Footer />
+        </ToolProviders>
       </body>
     </html>
   );

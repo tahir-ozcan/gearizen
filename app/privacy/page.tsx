@@ -1,6 +1,7 @@
 // app/privacy/page.tsx
 
 import PrivacyClient from "./privacy-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -46,5 +47,13 @@ export const metadata = {
 };
 
 export default function PrivacyPage() {
-  return <PrivacyClient />;
+  return (
+    <>
+      <BreadcrumbJsonLd
+        pageTitle="Privacy Policy"
+        pageUrl="https://gearizen.com/privacy"
+      />
+      <PrivacyClient />
+    </>
+  );
 }

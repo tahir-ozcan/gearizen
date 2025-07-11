@@ -1,5 +1,6 @@
 export function countWords(text: string): number {
-  return text.trim() ? text.trim().split(/\s+/u).filter(Boolean).length : 0;
+  const trimmed = text.trim();
+  return trimmed ? trimmed.split(/\s+/u).length : 0;
 }
 
 export interface CharacterCountOptions {
@@ -11,6 +12,6 @@ export function countCharacters(
   text: string,
   options: CharacterCountOptions = {}
 ): number {
-  const source = options.ignoreSpaces ? text.replace(/\s+/gu, "") : text;
-  return [...source].length;
+  const source = options.ignoreSpaces ? text.replace(/\s/gu, "") : text;
+  return Array.from(source).length;
 }
