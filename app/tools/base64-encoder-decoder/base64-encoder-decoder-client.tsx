@@ -52,7 +52,7 @@ export default function Base64EncoderDecoderClient() {
     <section
       id="base64-encoder-decoder"
       aria-labelledby="base64-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="base64-heading"
@@ -73,7 +73,7 @@ export default function Base64EncoderDecoderClient() {
         value={input}
         onChange={handleInput}
         placeholder="Enter text or Base64..."
-        className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
+        className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
       />
 
       {/* Controls */}
@@ -81,14 +81,14 @@ export default function Base64EncoderDecoderClient() {
         <button
           type="button"
           onClick={encode}
-          className="px-4 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition text-sm font-medium"
+          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
         >
           Encode
         </button>
         <button
           type="button"
           onClick={decode}
-          className="px-4 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition text-sm font-medium"
+          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
         >
           Decode
         </button>
@@ -119,7 +119,7 @@ export default function Base64EncoderDecoderClient() {
           readOnly
           value={output}
           aria-label="Base64 result"
-          className="mt-6 w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
+          className="mt-6 w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
         />
       )}
     </section>
