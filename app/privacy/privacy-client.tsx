@@ -13,7 +13,7 @@ export default function PrivacyClient() {
     >
       <h1
         id="privacy-heading"
-        className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-8 tracking-tight text-center"
+        className="gradient-text text-4xl sm:text-5xl md:text-6xl font-extrabold mb-8 tracking-tight text-center"
       >
         Privacy Policy
       </h1>

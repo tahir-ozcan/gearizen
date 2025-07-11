@@ -13,7 +13,7 @@ export default function TermsClient() {
     >
       <h1
         id="terms-heading"
-        className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-center mb-8 tracking-tight"
+        className="gradient-text text-4xl sm:text-5xl md:text-6xl font-extrabold text-center mb-8 tracking-tight"
       >
         Terms of Use
       </h1>

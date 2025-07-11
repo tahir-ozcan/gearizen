@@ -7,7 +7,6 @@ import Footer from "@/components/Footer";
 import ToolProviders from "@/components/ToolProviders";
 import AnalyticsLoader from "./components/AnalyticsLoader";
 
-
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: {
@@ -77,6 +76,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
         <link
           rel="preconnect"
           href="https://www.googletagmanager.com"
@@ -85,7 +94,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="google-adsense-account" content="ca-pub-2108375251131552" />
         <AnalyticsLoader />
       </head>
-      <body className="flex min-h-screen flex-col">
+      <body className="font-sans flex min-h-screen flex-col">
         <ToolProviders>
           {/* Accessible skip link */}
           <a
@@ -98,16 +107,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {/* Primary navigation */}
           <Navbar />
 
-        {/* Main content area */}
-        <main
-          id="main-content"
-          role="main"
-          tabIndex={-1}
-          aria-label="Main content"
-          className="flex-grow container-responsive py-12"
-        >
-          {children}
-        </main>
+          {/* Main content area */}
+          <main
+            id="main-content"
+            role="main"
+            tabIndex={-1}
+            aria-label="Main content"
+            className="flex-grow container-responsive py-12"
+          >
+            {children}
+          </main>
 
           {/* Footer */}
           <Footer />
