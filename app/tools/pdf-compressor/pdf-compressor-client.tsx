@@ -39,7 +39,7 @@ export default function PdfCompressorClient() {
     try {
       const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
       const worker = (
-        await import("pdfjs-dist/legacy/build/pdf.worker.entry?url")
+        await import("pdfjs-dist/legacy/build/pdf.worker.mjs?url")
       ).default;
       pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
 
@@ -116,7 +116,7 @@ export default function PdfCompressorClient() {
     <section
       id="pdf-compressor"
       aria-labelledby="pdf-compressor-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="pdf-compressor-heading"
@@ -176,7 +176,7 @@ export default function PdfCompressorClient() {
         <button
           onClick={compressPdf}
           disabled={!file || isCompressing}
-          className={`inline-flex items-center px-8 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium disabled:opacity-60 ${
+          className={`inline-flex items-center px-8 py-3 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium disabled:opacity-60 ${
             isCompressing ? "cursor-not-allowed" : ""
           }`}
         >

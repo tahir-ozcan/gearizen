@@ -1,8 +1,8 @@
 // app/tools/pdf-to-word/pdf-to-word-client.tsx
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
 import { useState, ChangeEvent, useEffect } from "react";
+import PreviewImage from "@/components/PreviewImage";
 import { Document, Packer, Paragraph } from "docx";
 import type {
   PDFDocumentProxy,
@@ -17,6 +17,9 @@ export default function PdfToWordClient() {
   const [error, setError] = useState<string | null>(null);
   const [docUrl, setDocUrl] = useState<string>("");
   const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [previewSize, setPreviewSize] = useState<{ w: number; h: number } | null>(
+    null
+  );
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDocUrl("");
@@ -41,7 +44,7 @@ export default function PdfToWordClient() {
     try {
       const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
       const worker = (
-        await import("pdfjs-dist/legacy/build/pdf.worker.entry?worker&url")
+        await import("pdfjs-dist/legacy/build/pdf.worker.mjs?worker&url")
       ).default;
       pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
 
@@ -81,7 +84,7 @@ export default function PdfToWordClient() {
       try {
         const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
         const worker = (
-          await import("pdfjs-dist/legacy/build/pdf.worker.entry?worker&url")
+          await import("pdfjs-dist/legacy/build/pdf.worker.mjs?worker&url")
         ).default;
         pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
         const arrayBuffer = await readFileAsArrayBuffer(file);
@@ -97,6 +100,7 @@ export default function PdfToWordClient() {
         if (!ctx) return;
         await page.render({ canvasContext: ctx, viewport }).promise;
         setPreviewUrl(canvas.toDataURL());
+        setPreviewSize({ w: canvas.width, h: canvas.height });
       } catch {}
     })();
   }, [file]);
@@ -114,7 +118,7 @@ export default function PdfToWordClient() {
     <section
       id="pdf-to-word"
       aria-labelledby="pdf-to-word-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="pdf-to-word-heading"
@@ -139,9 +143,14 @@ export default function PdfToWordClient() {
         />
       </div>
 
-      {previewUrl && (
+      {previewUrl && previewSize && (
         <div className="max-w-lg mx-auto mb-6 text-center">
-          <img src={previewUrl} alt="PDF preview" className="inline-block border rounded" />
+          <PreviewImage
+            src={previewUrl}
+            alt="PDF preview"
+            width={previewSize.w}
+            height={previewSize.h}
+          />
         </div>
       )}
 
@@ -149,7 +158,7 @@ export default function PdfToWordClient() {
         <button
           onClick={convertPdf}
           disabled={!file || processing}
-          className={`inline-flex items-center px-8 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium ${
+          className={`inline-flex items-center px-8 py-3 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium ${
             processing ? "opacity-60 cursor-not-allowed" : ""
           }`}
         >

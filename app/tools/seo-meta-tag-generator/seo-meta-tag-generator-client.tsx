@@ -58,7 +58,7 @@ export default function SeoMetaTagGeneratorClient() {
     <section
       id="seo-meta-tag-generator"
       aria-labelledby="seo-meta-tag-generator-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="seo-meta-tag-generator-heading"
@@ -82,7 +82,7 @@ export default function SeoMetaTagGeneratorClient() {
             value={title}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
             placeholder="Enter your page title"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
           />
         </div>
 
@@ -97,7 +97,7 @@ export default function SeoMetaTagGeneratorClient() {
             value={description}
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
             placeholder="Enter a concise page description"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition resize-y"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-500 transition resize-y"
           />
         </div>
 
@@ -112,7 +112,7 @@ export default function SeoMetaTagGeneratorClient() {
             value={keywords}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setKeywords(e.target.value)}
             placeholder="keyword1, keyword2"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
           />
         </div>
 
@@ -127,7 +127,7 @@ export default function SeoMetaTagGeneratorClient() {
             value={url}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setUrl(e.target.value)}
             placeholder="https://gearizen.com/your-page"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
           />
         </div>
 
@@ -142,7 +142,7 @@ export default function SeoMetaTagGeneratorClient() {
             value={image}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setImage(e.target.value)}
             placeholder="https://gearizen.com/og-placeholder.svg"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
           />
         </div>
 
@@ -157,7 +157,7 @@ export default function SeoMetaTagGeneratorClient() {
                 value="summary_large_image"
                 checked={twitterCard === "summary_large_image"}
                 onChange={() => setTwitterCard("summary_large_image")}
-                className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                className="h-4 w-4 text-brand-600 border-gray-300 focus:ring-brand-500"
               />
               <span className="text-gray-700">Large Image</span>
             </label>
@@ -168,7 +168,7 @@ export default function SeoMetaTagGeneratorClient() {
                 value="summary"
                 checked={twitterCard === "summary"}
                 onChange={() => setTwitterCard("summary")}
-                className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                className="h-4 w-4 text-brand-600 border-gray-300 focus:ring-brand-500"
               />
               <span className="text-gray-700">Text Only</span>
             </label>
@@ -180,7 +180,7 @@ export default function SeoMetaTagGeneratorClient() {
           <button
             onClick={handleCopy}
             disabled={!title && !description && !url && !image && !keywords}
-            className="inline-flex items-center px-8 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium disabled:opacity-60"
+            className="inline-flex items-center px-8 py-3 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium disabled:opacity-60"
           >
             Copy Meta Tags
           </button>
@@ -195,7 +195,7 @@ export default function SeoMetaTagGeneratorClient() {
           readOnly
           value={generateMetaTags()}
           rows={10}
-          className="w-full font-mono text-sm p-4 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+          className="w-full font-mono text-sm p-4 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
         />
       </div>
     </section>

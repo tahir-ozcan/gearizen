@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, ChangeEvent } from "react";
-import Image from "next/image";
+import PreviewImage from "@/components/PreviewImage";
 
 export default function ImageResizerClient() {
   const [file, setFile] = useState<File | null>(null);
@@ -97,14 +97,13 @@ export default function ImageResizerClient() {
     return () => clearTimeout(t);
   }, [file, originalUrl, width, height, maintainAspect, resizeImage]);
 
-  // next/image blob loader
-  const blobLoader = ({ src }: { src: string }) => src;
+
 
   return (
     <section
       id="image-resizer"
       aria-labelledby="image-resizer-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="image-resizer-heading"
@@ -149,19 +148,16 @@ export default function ImageResizerClient() {
       {originalUrl && (
         <div className="max-w-md mx-auto mb-8">
           <p className="font-medium mb-2">Original Image Preview:</p>
-          <Image
-            loader={blobLoader}
+          <PreviewImage
             src={originalUrl}
             alt="Original upload preview"
             width={naturalSize.current.w || 1}
             height={naturalSize.current.h || 1}
-            unoptimized
             onLoadingComplete={({ naturalWidth, naturalHeight }) => {
               naturalSize.current = { w: naturalWidth, h: naturalHeight };
               setWidth(naturalWidth);
               setHeight(naturalHeight);
             }}
-            className="w-full rounded-lg border border-gray-200"
           />
         </div>
       )}
@@ -180,7 +176,7 @@ export default function ImageResizerClient() {
               value={width}
               onChange={e => setWidth(Number(e.target.value))}
               className="w-24 p-2 border border-gray-300 rounded-lg
-                         focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+                         focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
             />
           </div>
           <div className="flex items-center justify-between">
@@ -195,7 +191,7 @@ export default function ImageResizerClient() {
               onChange={e => setHeight(Number(e.target.value))}
               disabled={maintainAspect}
               className="w-24 p-2 border border-gray-300 rounded-lg
-                         focus:outline-none focus:ring-1 focus:ring-indigo-500 transition disabled:opacity-50"
+                         focus:outline-none focus:ring-1 focus:ring-brand-500 transition disabled:opacity-50"
             />
           </div>
           <div className="flex items-center space-x-2">
@@ -204,7 +200,7 @@ export default function ImageResizerClient() {
               type="checkbox"
               checked={maintainAspect}
               onChange={() => setMaintainAspect(a => !a)}
-              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
             />
             <label htmlFor="maintain-aspect" className="text-gray-700">
               Maintain aspect ratio
@@ -220,8 +216,7 @@ export default function ImageResizerClient() {
       {resizedUrl && (
         <div className="max-w-md mx-auto mt-8 space-y-4 text-center">
           <p className="font-medium">Resized Image Preview:</p>
-          <Image
-            loader={blobLoader}
+          <PreviewImage
             src={resizedUrl}
             alt="Resized result preview"
             width={width}
@@ -230,8 +225,6 @@ export default function ImageResizerClient() {
                 ? Math.round((naturalSize.current.h / naturalSize.current.w) * width)
                 : height
             }
-            unoptimized
-            className="w-full rounded-lg border border-gray-200"
           />
           <button
             onClick={downloadImage}

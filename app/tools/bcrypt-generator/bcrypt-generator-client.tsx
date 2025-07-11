@@ -47,7 +47,7 @@ export default function BcryptGeneratorClient() {
     <section
       id="bcrypt-generator"
       aria-labelledby="bcrypt-generator-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="bcrypt-generator-heading"
@@ -72,7 +72,7 @@ export default function BcryptGeneratorClient() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter password to hash"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
           />
         </div>
 
@@ -104,7 +104,7 @@ export default function BcryptGeneratorClient() {
         <button
           onClick={generateHash}
           disabled={loading}
-          className={`w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium ${
+          className={`w-full py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium ${
             loading ? "opacity-60 cursor-not-allowed" : ""
           }`}
         >
@@ -122,7 +122,7 @@ export default function BcryptGeneratorClient() {
               readOnly
               value={hash}
               rows={4}
-              className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition resize-y"
+              className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-500 transition resize-y"
             />
             <div className="flex justify-end gap-4">
               <button

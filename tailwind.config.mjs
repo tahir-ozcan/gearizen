@@ -20,24 +20,25 @@ export default {
     extend: {
       fontFamily: {
         sans: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],
-        display: ["var(--font-poppins)", ...defaultTheme.fontFamily.sans],
+        display: ["var(--font-montserrat)", ...defaultTheme.fontFamily.sans],
       },
       colors: {
-        indigo: {
-          50: "#f0f4ff",
+        brand: {
+          50: "#eef2ff",
           100: "#e0e7ff",
-          200: "#c7d1ff",
-          300: "#a3b0ff",
-          400: "#8a97ff",
-          500: "#6b7cff",
-          600: "#4f5fd4",
-          700: "#3947a5",
-          800: "#2d3778",
-          900: "#1e244d",
+          200: "#c7d2fe",
+          300: "#a5b4fc",
+          400: "#818cf8",
+          500: "#6366f1",
+          600: "#4f46e5",
+          700: "#4338ca",
+          800: "#3730a3",
+          900: "#312e81",
         },
       },
       spacing: {
         18: "4.5rem",
+        22: "5.5rem",
       },
     },
   },

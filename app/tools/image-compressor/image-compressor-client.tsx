@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect, ChangeEvent } from "react";
-import NextImage from "next/image";  // Next.js Image component
+import PreviewImage from "@/components/PreviewImage";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 
@@ -11,6 +11,9 @@ export default function ImageCompressorClient() {
   const [file, setFile] = useState<File | null>(null);
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [originalSize, setOriginalSize] = useState<number | null>(null);
+  const [dimensions, setDimensions] = useState<{ w: number; h: number } | null>(
+    null
+  );
 
   const [quality, setQuality] = useState(0.8);
   const [compressedUrl, setCompressedUrl] = useState<string | null>(null);
@@ -23,9 +26,15 @@ export default function ImageCompressorClient() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      setOriginalUrl(reader.result as string);
-      setOriginalSize(file.size);
-      setError(null);
+      const result = reader.result as string;
+      const img = new window.Image();
+      img.onload = () => {
+        setOriginalUrl(result);
+        setOriginalSize(file.size);
+        setDimensions({ w: img.naturalWidth, h: img.naturalHeight });
+        setError(null);
+      };
+      img.src = result;
     };
     reader.readAsDataURL(file);
   }, [file]);
@@ -110,7 +119,7 @@ export default function ImageCompressorClient() {
     <section
       id="image-compressor"
       aria-labelledby="image-compressor-heading"
-      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900"
     >
       <h1
         id="image-compressor-heading"
@@ -128,7 +137,7 @@ export default function ImageCompressorClient() {
           type="file"
           accept="image/*"
           onChange={handleFileChange}
-          className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-brand-600 file:text-white hover:file:bg-brand-700 focus-visible:ring-2 focus-visible:ring-brand-500"
         />
       </div>
 
@@ -178,16 +187,14 @@ export default function ImageCompressorClient() {
           <div className="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto mb-8">
             <div className="text-center">
               <p className="font-medium mb-2">Original</p>
-              <div className="relative w-full h-48 mx-auto">
-                <NextImage
+              {dimensions && (
+                <PreviewImage
                   src={originalUrl}
                   alt="Original"
-                  loader={({ src }) => src}
-                  unoptimized
-                  fill
-                  className="object-contain rounded-lg border"
+                  width={dimensions.w}
+                  height={dimensions.h}
                 />
-              </div>
+              )}
               {originalSize != null && (
                 <p className="mt-2 text-sm text-gray-600">
                   {(originalSize / 1024).toFixed(1)} KB
@@ -198,16 +205,14 @@ export default function ImageCompressorClient() {
             {compressedUrl && (
               <div className="text-center">
                 <p className="font-medium mb-2">Compressed</p>
-                <div className="relative w-full h-48 mx-auto">
-                  <NextImage
+                {dimensions && (
+                  <PreviewImage
                     src={compressedUrl}
                     alt="Compressed"
-                    loader={({ src }) => src}
-                    unoptimized
-                    fill
-                    className="object-contain rounded-lg border"
+                    width={dimensions.w}
+                    height={dimensions.h}
                   />
-                </div>
+                )}
                 {compressedSize != null && (
                   <p className="mt-2 text-sm text-gray-600">
                     {(compressedSize / 1024).toFixed(1)} KB
