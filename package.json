@@ -15,6 +15,7 @@
     "postbuild": "next-sitemap"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.6",
     "bcryptjs": "^3.0.2",
     "diff": "^8.0.2",
     "docx": "^9.5.1",

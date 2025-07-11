@@ -59,19 +59,19 @@ const websiteJsonLd = {
 const popularTools = [
   {
     href: "/tools/password-generator",
-    icon: <Key aria-hidden="true" className="w-10 h-10 text-indigo-600" />,
+    icon: <Key aria-hidden="true" className="w-10 h-10 text-brand-600" />,
     title: "Password Generator",
     description: "Generate strong, customizable passwords instantly.",
   },
   {
     href: "/tools/pdf-to-word",
-    icon: <FilePlus aria-hidden="true" className="w-10 h-10 text-indigo-600" />,
+    icon: <FilePlus aria-hidden="true" className="w-10 h-10 text-brand-600" />,
     title: "PDF → Word Converter",
     description: "Convert PDFs to editable Word documents quickly.",
   },
   {
     href: "/tools/qr-code-generator",
-    icon: <QrCode aria-hidden="true" className="w-10 h-10 text-indigo-600" />,
+    icon: <QrCode aria-hidden="true" className="w-10 h-10 text-brand-600" />,
     title: "QR Code Generator",
     description: "Create QR codes for URLs, text, contacts, and more.",
   },
@@ -80,7 +80,7 @@ const popularTools = [
     icon: (
       <ArrowRightLeft
         aria-hidden="true"
-        className="w-10 h-10 text-indigo-600"
+        className="w-10 h-10 text-brand-600"
       />
     ),
     title: "Unit Converter",
@@ -89,7 +89,7 @@ const popularTools = [
   {
     href: "/tools/image-compressor",
     icon: (
-      <ImageIcon aria-hidden="true" className="w-10 h-10 text-indigo-600" />
+      <ImageIcon aria-hidden="true" className="w-10 h-10 text-brand-600" />
     ),
     title: "Image Compressor",
     description: "Reduce image file sizes while preserving quality.",
@@ -98,7 +98,7 @@ const popularTools = [
 
 export default function HomePage() {
   return (
-    <div className="bg-white text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900">
+    <div className="bg-white text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900">
       <JsonLd data={websiteJsonLd} />
       {/* Hero */}
       <section
@@ -117,7 +117,7 @@ export default function HomePage() {
         </p>
         <Link
           href="/tools"
-          className="mt-8 inline-block bg-indigo-600 text-white font-semibold rounded-full px-8 py-3 shadow-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 transition-colors"
+          className="mt-8 inline-block bg-brand-600 text-white font-semibold rounded-full px-8 py-3 shadow-md hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 transition-colors"
         >
           Discover All Tools
         </Link>
@@ -146,7 +146,7 @@ export default function HomePage() {
                 <div className="mb-6 flex items-center justify-center">
                   {icon}
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-indigo-600 transition-colors">
+                <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-brand-600 transition-colors">
                   {title}
                 </h3>
                 <p className="text-gray-600 flex-grow text-center">
