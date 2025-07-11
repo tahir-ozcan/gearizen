@@ -2,7 +2,7 @@
 
 "use client";
 
-import Link from "next/link";
+import CardLink from "@/components/CardLink";
 import { useState } from "react";
 import {
   Key,
@@ -267,49 +267,49 @@ export default function ToolsClient() {
         </p>
       </header>
 
-        {/* Search */}
-        <div className="max-w-md mx-auto">
-          <label htmlFor="tool-search" className="sr-only">
-            Search tools
-          </label>
-          <input
-            id="tool-search"
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search tools..."
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
+      {/* Search */}
+      <div className="max-w-md mx-auto">
+        <label htmlFor="tool-search" className="sr-only">
+          Search tools
+        </label>
+        <input
+          id="tool-search"
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search tools..."
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </div>
 
-        {/* Grid */}
-        <section aria-labelledby="tools-heading">
-          <h2 id="tools-heading" className="sr-only">
-            All Tools
-          </h2>
-          <ul className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {filteredTools.map(({ href, Icon, title, description }) => (
-              <li key={href} className="list-none">
-                <Link
-                  href={href}
-                  aria-label={`Navigate to ${title}`}
-                  className="group flex flex-col h-full bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-colors"
-                >
-                  <Icon
-                    className="w-10 h-10 text-indigo-600 mx-auto mb-4"
-                    aria-hidden="true"
-                  />
-                  <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-indigo-600 transition-colors">
-                    {title}
-                  </h3>
-                  <p className="text-gray-600 text-center flex-grow">
-                    {description}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
+      {/* Grid */}
+      <section aria-labelledby="tools-heading">
+        <h2 id="tools-heading" className="sr-only">
+          All Tools
+        </h2>
+        <ul className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {filteredTools.map(({ href, Icon, title, description }) => (
+            <li key={href} className="list-none">
+              <CardLink
+                href={href}
+                aria-label={`Navigate to ${title}`}
+                className="group flex flex-col h-full"
+              >
+                <Icon
+                  className="w-10 h-10 text-indigo-600 mx-auto mb-4"
+                  aria-hidden="true"
+                />
+                <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-indigo-600 transition-colors">
+                  {title}
+                </h3>
+                <p className="text-gray-600 text-center flex-grow">
+                  {description}
+                </p>
+              </CardLink>
+            </li>
+          ))}
+        </ul>
+      </section>
     </section>
   );
 }
