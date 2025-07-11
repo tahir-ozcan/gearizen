@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, ChangeEvent } from "react";
-import Image from "next/image";
+import PreviewImage from "@/components/PreviewImage";
 
 export default function ImageResizerClient() {
   const [file, setFile] = useState<File | null>(null);
@@ -97,8 +97,7 @@ export default function ImageResizerClient() {
     return () => clearTimeout(t);
   }, [file, originalUrl, width, height, maintainAspect, resizeImage]);
 
-  // next/image blob loader
-  const blobLoader = ({ src }: { src: string }) => src;
+
 
   return (
     <section
@@ -149,19 +148,16 @@ export default function ImageResizerClient() {
       {originalUrl && (
         <div className="max-w-md mx-auto mb-8">
           <p className="font-medium mb-2">Original Image Preview:</p>
-          <Image
-            loader={blobLoader}
+          <PreviewImage
             src={originalUrl}
             alt="Original upload preview"
             width={naturalSize.current.w || 1}
             height={naturalSize.current.h || 1}
-            unoptimized
             onLoadingComplete={({ naturalWidth, naturalHeight }) => {
               naturalSize.current = { w: naturalWidth, h: naturalHeight };
               setWidth(naturalWidth);
               setHeight(naturalHeight);
             }}
-            className="w-full rounded-lg border border-gray-200"
           />
         </div>
       )}
@@ -220,8 +216,7 @@ export default function ImageResizerClient() {
       {resizedUrl && (
         <div className="max-w-md mx-auto mt-8 space-y-4 text-center">
           <p className="font-medium">Resized Image Preview:</p>
-          <Image
-            loader={blobLoader}
+          <PreviewImage
             src={resizedUrl}
             alt="Resized result preview"
             width={width}
@@ -230,8 +225,6 @@ export default function ImageResizerClient() {
                 ? Math.round((naturalSize.current.h / naturalSize.current.w) * width)
                 : height
             }
-            unoptimized
-            className="w-full rounded-lg border border-gray-200"
           />
           <button
             onClick={downloadImage}

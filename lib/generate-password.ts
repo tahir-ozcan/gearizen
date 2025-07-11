@@ -11,8 +11,14 @@ const LOWER = "abcdefghijklmnopqrstuvwxyz";
 const DIGITS = "0123456789";
 const SYMBOLS = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~";
 
+function randomIndex(max: number): number {
+  const arr = new Uint32Array(1);
+  globalThis.crypto.getRandomValues(arr);
+  return arr[0] % max;
+}
+
 function randomChar(set: string): string {
-  return set.charAt(Math.floor(Math.random() * set.length));
+  return set.charAt(randomIndex(set.length));
 }
 
 /**
@@ -30,10 +36,7 @@ export function generatePassword(options: PasswordOptions): string {
   if (options.symbols) pool += SYMBOLS;
   if (!pool) return "";
 
-  const chars = new Array<string>(length);
-  for (let i = 0; i < length; i++) {
-    chars[i] = randomChar(pool);
-  }
+  const chars = Array.from({ length }, () => randomChar(pool));
 
   const required: string[] = [];
   if (options.upper) required.push(randomChar(UPPER));
@@ -41,8 +44,11 @@ export function generatePassword(options: PasswordOptions): string {
   if (options.digits) required.push(randomChar(DIGITS));
   if (options.symbols) required.push(randomChar(SYMBOLS));
 
+  const used = new Set<number>();
   required.forEach((ch) => {
-    const idx = Math.floor(Math.random() * length);
+    let idx = randomIndex(length);
+    while (used.has(idx)) idx = randomIndex(length);
+    used.add(idx);
     chars[idx] = ch;
   });
 

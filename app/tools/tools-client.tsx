@@ -33,6 +33,8 @@ import {
   AlignLeft,
   Type,
   Link as LinkIcon,
+  Hash,
+  Braces,
 } from "lucide-react";
 
 interface Tool {
@@ -73,7 +75,8 @@ const tools: Tool[] = [
     href: "/tools/image-compressor",
     Icon: ImageIcon,
     title: "Image Compressor",
-    description: "Reduce JPEG or PNG file sizes while preserving visual quality.",
+    description:
+      "Reduce JPEG or PNG file sizes while preserving visual quality.",
   },
   {
     href: "/tools/color-contrast-checker",
@@ -224,6 +227,18 @@ const tools: Tool[] = [
     title: "URL Encoder/Decoder",
     description: "Encode or decode URLs and query strings.",
   },
+  {
+    href: "/tools/sha-hash-generator",
+    Icon: Hash,
+    title: "Hash Generator",
+    description: "Create SHA-256, SHA-1 or MD5 hashes for any text.",
+  },
+  {
+    href: "/tools/yaml-json-converter",
+    Icon: Braces,
+    title: "YAML ⇄ JSON Converter",
+    description: "Convert YAML to JSON or JSON to YAML in-browser.",
+  },
 ];
 
 export default function ToolsClient() {
@@ -240,17 +255,17 @@ export default function ToolsClient() {
       aria-labelledby="all-tools-heading"
       className="container-responsive py-20 text-gray-900 antialiased selection:bg-brand-200 selection:text-brand-900 space-y-12"
     >
-        {/* Hero */}
-        <header className="text-center max-w-3xl mx-auto space-y-4">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
-            Free Online Tools
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-700 leading-relaxed">
-            Gearizen offers 100% client-side utilities—generators, converters,
-            compressors, formatters, validators, and more—all free and no signup
-            required.
-          </p>
-        </header>
+      {/* Hero */}
+      <header className="text-center max-w-3xl mx-auto space-y-4">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
+          Free Online Tools
+        </h1>
+        <p className="text-lg sm:text-xl text-gray-700 leading-relaxed">
+          Gearizen offers 100% client-side utilities—generators, converters,
+          compressors, formatters, validators, and more—all free and no signup
+          required.
+        </p>
+      </header>
 
         {/* Search */}
         <div className="max-w-md mx-auto">

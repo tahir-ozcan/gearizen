@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, ChangeEvent } from "react";
-import { generatePassword } from "../../../../lib/generate-password";
+import { generatePassword } from "@/lib/generate-password";
 
 
 export default function PasswordGeneratorClient() {
@@ -14,6 +14,7 @@ export default function PasswordGeneratorClient() {
   const [useSymbols, setUseSymbols] = useState(false);
   const [password, setPassword] = useState("");
   const [copied, setCopied] = useState(false);
+  const [rawMode, setRawMode] = useState(false);
 
   const generate = useCallback(() => {
     const pwd = generatePassword({
@@ -45,6 +46,17 @@ export default function PasswordGeneratorClient() {
   const handleLength = (e: ChangeEvent<HTMLInputElement>) => {
     setLength(Number(e.target.value));
   };
+
+  const cliCommand = [
+    "gearizen-password-generator",
+    `--length ${length}`,
+    useUpper ? "--upper" : "",
+    useLower ? "--lower" : "",
+    useDigits ? "--digits" : "",
+    useSymbols ? "--symbols" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <section
@@ -154,19 +166,26 @@ export default function PasswordGeneratorClient() {
                 className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
               />
               <span className="text-gray-700 select-none">Numbers (0–9)</span>
+
             </label>
-            <label className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 checked={useSymbols}
                 onChange={() => setUseSymbols((s) => !s)}
                 className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
+
               />
-              <span className="text-gray-700 select-none">Symbols (!@#$…)</span>
-            </label>
+              <button
+                type="button"
+                onClick={() => navigator.clipboard.writeText(cliCommand)}
+                className="px-3 py-1 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                Copy
+              </button>
+            </div>
           </div>
         </fieldset>
-
       </form>
     </section>
   );

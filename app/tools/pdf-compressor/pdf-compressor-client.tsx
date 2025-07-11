@@ -39,7 +39,7 @@ export default function PdfCompressorClient() {
     try {
       const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
       const worker = (
-        await import("pdfjs-dist/legacy/build/pdf.worker.entry?url")
+        await import("pdfjs-dist/legacy/build/pdf.worker.mjs?url")
       ).default;
       pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
 

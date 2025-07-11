@@ -3,6 +3,7 @@ import { countWords, countCharacters } from "./count-utils";
 test("counts words correctly", () => {
   expect(countWords("hello world")).toBe(2);
   expect(countWords("  multiple   spaces ")).toBe(2);
+  expect(countWords("hello, world!")).toBe(2);
   expect(countWords("")).toBe(0);
 });
 
