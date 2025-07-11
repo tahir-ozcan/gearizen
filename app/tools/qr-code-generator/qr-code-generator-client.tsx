@@ -58,7 +58,7 @@ export default function QrCodeGeneratorClient() {
     <section
       id="qr-code-generator"
       aria-labelledby="qr-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased"
     >
       <h1
         id="qr-heading"
@@ -84,7 +84,7 @@ export default function QrCodeGeneratorClient() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Enter text or link..."
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
           />
         </div>
 

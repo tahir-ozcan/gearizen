@@ -9,7 +9,7 @@ export default function AboutClient() {
     <section
       id="about-gearizen"
       aria-labelledby="about-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased"
     >
       {/* Heading */}
       <h1
@@ -49,7 +49,7 @@ export default function AboutClient() {
         We value your feedback and suggestions. To get in touch, please visit our{" "}
         <Link
           href="/contact"
-          className="text-indigo-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded transition-colors"
+          className="text-brand-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded transition-colors"
           aria-label="Go to Contact page"
         >
           Contact page

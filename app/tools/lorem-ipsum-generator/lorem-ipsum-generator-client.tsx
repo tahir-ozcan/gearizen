@@ -47,7 +47,7 @@ export default function LoremIpsumGeneratorClient() {
           <select
             value={mode}
             onChange={handleMode}
-            className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="paragraphs">Paragraphs</option>
             <option value="sentences">Sentences</option>
@@ -57,7 +57,7 @@ export default function LoremIpsumGeneratorClient() {
         <button
           type="button"
           onClick={handleGenerate}
-          className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="flex-1 px-4 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
           Generate
         </button>
@@ -65,12 +65,12 @@ export default function LoremIpsumGeneratorClient() {
       <textarea
         readOnly
         value={output}
-        className="w-full h-40 p-3 border border-gray-300 rounded-lg bg-gray-50 resize-y font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="w-full h-40 p-3 border border-gray-300 rounded-lg bg-gray-50 resize-y font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
       />
       <button
         type="button"
         onClick={copy}
-        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="px-4 py-2 bg-brand-600 text-white rounded-md hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
       >
         Copy
       </button>

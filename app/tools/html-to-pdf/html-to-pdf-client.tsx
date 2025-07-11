@@ -51,7 +51,7 @@ export default function HtmlToPdfClient() {
     <section
       id="html-to-pdf"
       aria-labelledby="html-to-pdf-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased"
     >
       <h1
         id="html-to-pdf-heading"
@@ -73,7 +73,7 @@ export default function HtmlToPdfClient() {
         onChange={handleInputChange}
         placeholder="<h1>Hello, world!</h1>"
         rows={10}
-        className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+        className="w-full p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
       />
 
       {error && (
@@ -87,7 +87,7 @@ export default function HtmlToPdfClient() {
           type="button"
           onClick={generatePdf}
           disabled={processing}
-          className={`px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium ${
+          className={`px-6 py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition font-medium ${
             processing ? "opacity-60 cursor-not-allowed" : ""
           }`}
         >

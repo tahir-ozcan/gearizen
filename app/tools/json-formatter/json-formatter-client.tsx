@@ -87,7 +87,7 @@ export default function JsonFormatterClient() {
     <section
       id="json-formatter"
       aria-labelledby="json-formatter-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased"
     >
       <h1
         id="json-formatter-heading"
@@ -106,7 +106,7 @@ export default function JsonFormatterClient() {
           value={input}
           onChange={handleInputChange}
           placeholder="Paste or type your JSON here..."
-          className="w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+          className="w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
         />
 
         {/* Options & Actions */}
@@ -119,7 +119,7 @@ export default function JsonFormatterClient() {
                 disabled={mode === 'minify'}
                 value={indent}
                 onChange={(e) => setIndent(Number(e.target.value))}
-                className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+                className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
               >
                 <option value={0}>0</option>
                 <option value={2}>2</option>
@@ -135,7 +135,7 @@ export default function JsonFormatterClient() {
                 value="beautify"
                 checked={mode === 'beautify'}
                 onChange={() => setMode('beautify')}
-                className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                className="h-4 w-4 text-brand-600 border-gray-300 focus:ring-brand-500"
               />
               <span className="text-sm text-gray-700">Beautify</span>
             </label>
@@ -146,7 +146,7 @@ export default function JsonFormatterClient() {
                 value="minify"
                 checked={mode === 'minify'}
                 onChange={() => setMode('minify')}
-                className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                className="h-4 w-4 text-brand-600 border-gray-300 focus:ring-brand-500"
               />
               <span className="text-sm text-gray-700">Minify</span>
             </label>
@@ -157,7 +157,7 @@ export default function JsonFormatterClient() {
                 value="validate"
                 checked={mode === 'validate'}
                 onChange={() => setMode('validate')}
-                className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                className="h-4 w-4 text-brand-600 border-gray-300 focus:ring-brand-500"
               />
               <span className="text-sm text-gray-700">Validate</span>
             </label>
@@ -167,7 +167,7 @@ export default function JsonFormatterClient() {
                 type="checkbox"
                 checked={sortKeys}
                 onChange={() => setSortKeys((s) => !s)}
-                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
               />
               <span className="text-sm text-gray-700">Sort keys</span>
             </label>
@@ -177,7 +177,7 @@ export default function JsonFormatterClient() {
                 type="checkbox"
                 checked={!strict}
                 onChange={() => setStrict((v) => !v)}
-                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                className="h-4 w-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
               />
               <span className="text-sm text-gray-700">Lenient JSON5</span>
             </label>
@@ -219,7 +219,7 @@ export default function JsonFormatterClient() {
             readOnly
             aria-label="Formatted JSON output"
             value={output}
-            className="w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
           />
         )}
       </div>

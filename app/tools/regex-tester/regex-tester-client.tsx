@@ -63,7 +63,7 @@ export default function RegexTesterClient() {
     <section
       id="regex-tester"
       aria-labelledby="regex-tester-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased"
     >
       <h1
         id="regex-tester-heading"
@@ -88,7 +88,7 @@ export default function RegexTesterClient() {
               value={pattern}
               onChange={handlePatternChange}
               placeholder="e.g. \\b\\w+\\b"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
             />
           </div>
           <div>
@@ -101,7 +101,7 @@ export default function RegexTesterClient() {
               value={flags}
               onChange={handleFlagsChange}
               placeholder="e.g. gmi"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
             />
           </div>
         </div>
@@ -116,7 +116,7 @@ export default function RegexTesterClient() {
             value={testInput}
             onChange={handleInputChange}
             placeholder="Paste or type text to test..."
-            className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
           />
         </div>
 

@@ -119,7 +119,7 @@ export default function ImageCompressorClient() {
     <section
       id="image-compressor"
       aria-labelledby="image-compressor-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 antialiased"
     >
       <h1
         id="image-compressor-heading"
@@ -137,7 +137,7 @@ export default function ImageCompressorClient() {
           type="file"
           accept="image/*"
           onChange={handleFileChange}
-          className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-brand-600 file:text-white hover:file:bg-brand-700 focus-visible:ring-2 focus-visible:ring-brand-500"
         />
       </div>
 
