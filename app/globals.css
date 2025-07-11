@@ -1,11 +1,16 @@
 @import "tailwindcss";
-:root {
-  --tool-font-size: 16px;
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display;
+  }
 }
-input,
-textarea {
-  font-size: var(--tool-font-size);
-}
+
 @layer components {
   .btn-primary {
     @apply px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium;
@@ -17,6 +22,6 @@ textarea {
     @apply w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition;
   }
   .container-responsive {
-    @apply container mx-auto px-4 sm:px-6 md:px-8 lg:px-12;
+    @apply container mx-auto px-6 sm:px-8 md:px-10 lg:px-16;
   }
 }

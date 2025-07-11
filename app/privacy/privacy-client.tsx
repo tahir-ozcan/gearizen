@@ -9,7 +9,7 @@ export default function PrivacyClient() {
     <section
       id="privacy-policy"
       aria-labelledby="privacy-heading"
-      className="container mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="privacy-heading"
@@ -50,8 +50,8 @@ export default function PrivacyClient() {
           </h2>
           <p className="text-lg leading-relaxed">
             We display ads via third-party networks (e.g., Google Ads). Those
-            providers may set their own cookies or trackers; please review
-            their privacy policies. Gearizen does not share any personally
+            providers may set their own cookies or trackers; please review their
+            privacy policies. Gearizen does not share any personally
             identifiable data with advertisers.
           </p>
         </section>
@@ -107,5 +107,5 @@ export default function PrivacyClient() {
         </section>
       </div>
     </section>
-);
+  );
 }

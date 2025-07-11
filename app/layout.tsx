@@ -5,7 +5,15 @@ import { ReactNode } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AnalyticsLoader from "./components/AnalyticsLoader";
-import ToolProviders from "@/components/ToolProviders";
+import { Inter, Poppins } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-poppins",
+  display: "swap",
+});
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -71,7 +79,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className="bg-white text-gray-900 antialiased scroll-smooth"
+      className={`${inter.variable} ${poppins.variable} bg-white text-gray-900 antialiased scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
@@ -102,16 +110,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {/* Primary navigation */}
           <Navbar />
 
-          {/* Main content area */}
-          <main
-            id="main-content"
-            role="main"
-            tabIndex={-1}
-            aria-label="Main content"
-            className="flex-grow container-responsive py-8"
-          >
-            {children}
-          </main>
+        {/* Main content area */}
+        <main
+          id="main-content"
+          role="main"
+          tabIndex={-1}
+          aria-label="Main content"
+          className="flex-grow container-responsive py-10"
+        >
+          {children}
+        </main>
 
           {/* Footer */}
           <Footer />
