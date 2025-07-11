@@ -1,13 +1,22 @@
 "use client";
 
 import { useState, ChangeEvent } from "react";
+import { encodeUrl, decodeUrl } from "../../../lib/urlEncoding";
 
 export default function UrlEncoderDecoderClient() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
 
-  const encode = () => setOutput(encodeURIComponent(input));
-  const decode = () => setOutput(decodeURIComponent(input));
+  const encode = () => {
+    setOutput(encodeUrl(input));
+  };
+  const decode = () => {
+    try {
+      setOutput(decodeUrl(input));
+    } catch {
+      alert("❌ Invalid encoding");
+    }
+  };
 
   const copy = async () => {
     if (!output) return;

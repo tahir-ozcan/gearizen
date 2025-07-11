@@ -3,6 +3,7 @@
 "use client";
 
 import { useState, ChangeEvent } from "react";
+import { encodeBase64, decodeBase64 } from "../../../lib/base64";
 
 export default function Base64EncoderDecoderClient() {
   const [input, setInput] = useState("");
@@ -17,7 +18,7 @@ export default function Base64EncoderDecoderClient() {
 
   const encode = () => {
     try {
-      const encoded = btoa(unescape(encodeURIComponent(input)));
+      const encoded = encodeBase64(input);
       setOutput(encoded);
       setError(null);
     } catch {
@@ -28,7 +29,7 @@ export default function Base64EncoderDecoderClient() {
 
   const decode = () => {
     try {
-      const decoded = decodeURIComponent(escape(atob(input)));
+      const decoded = decodeBase64(input);
       setOutput(decoded);
       setError(null);
     } catch {

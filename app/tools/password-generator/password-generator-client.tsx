@@ -3,15 +3,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, ChangeEvent } from "react";
+import { generatePassword } from "../../../../lib/generate-password";
 
-const UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const LOWER = "abcdefghijklmnopqrstuvwxyz";
-const DIGITS = "0123456789";
-const SYMBOLS = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~";
-
-function getRandomChar(set: string) {
-  return set.charAt(Math.floor(Math.random() * set.length));
-}
 
 export default function PasswordGeneratorClient() {
   const [length, setLength] = useState(16);
@@ -23,30 +16,13 @@ export default function PasswordGeneratorClient() {
   const [copied, setCopied] = useState(false);
 
   const generate = useCallback(() => {
-    let pool = "";
-    if (useUpper) pool += UPPER;
-    if (useLower) pool += LOWER;
-    if (useDigits) pool += DIGITS;
-    if (useSymbols) pool += SYMBOLS;
-    if (!pool) {
-      setPassword("");
-      return;
-    }
-
-    // Initial random pool
-    let pwd = Array.from({ length }, () => getRandomChar(pool)).join("");
-
-    // Ensure at least one of each selected type
-    const guaranteed: string[] = [];
-    if (useUpper) guaranteed.push(getRandomChar(UPPER));
-    if (useLower) guaranteed.push(getRandomChar(LOWER));
-    if (useDigits) guaranteed.push(getRandomChar(DIGITS));
-    if (useSymbols) guaranteed.push(getRandomChar(SYMBOLS));
-    guaranteed.forEach((ch) => {
-      const idx = Math.floor(Math.random() * length);
-      pwd = pwd.slice(0, idx) + ch + pwd.slice(idx + 1);
+    const pwd = generatePassword({
+      length,
+      upper: useUpper,
+      lower: useLower,
+      digits: useDigits,
+      symbols: useSymbols,
     });
-
     setPassword(pwd);
     setCopied(false);
   }, [length, useUpper, useLower, useDigits, useSymbols]);
