@@ -19,8 +19,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],
-        display: ["var(--font-montserrat)", ...defaultTheme.fontFamily.sans],
+        sans: [...defaultTheme.fontFamily.sans],
+        display: [...defaultTheme.fontFamily.sans],
       },
       colors: {
         brand: {

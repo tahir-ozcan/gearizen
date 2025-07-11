@@ -4,16 +4,9 @@ import "./globals.css";
 import { ReactNode } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ToolProviders from "@/components/ToolProviders";
 import AnalyticsLoader from "./components/AnalyticsLoader";
-import { Inter, Montserrat } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-montserrat",
-  display: "swap",
-});
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -79,7 +72,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${montserrat.variable} bg-white text-gray-900 antialiased scroll-smooth`}
+      className="bg-white text-gray-900 antialiased scroll-smooth"
       suppressHydrationWarning
     >
       <head>
@@ -87,11 +80,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link
           rel="preconnect"
           href="https://www.googletagmanager.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
         <meta name="google-adsense-account" content="ca-pub-2108375251131552" />

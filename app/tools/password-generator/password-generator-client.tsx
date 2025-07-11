@@ -16,7 +16,6 @@ export default function PasswordGeneratorClient() {
   const [useSymbols, setUseSymbols] = useState(false);
   const [password, setPassword] = useState("");
   const [copied, setCopied] = useState(false);
-  const [rawMode, setRawMode] = useState(false);
 
   const generate = useCallback(() => {
     const pwd = generatePassword({
