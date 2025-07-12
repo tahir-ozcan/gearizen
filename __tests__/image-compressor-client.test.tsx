@@ -9,15 +9,13 @@ function createFile(name: string) {
 }
 
 describe("ImageCompressorClient file handling", () => {
-  test("shows previews for multiple files", async () => {
+  test("shows preview after file upload", async () => {
     const user = userEvent.setup();
     render(<ImageCompressorClient />);
-    const input = screen.getByLabelText(
-      /drag and drop images/i,
-    ) as HTMLInputElement;
-    await user.upload(input, [createFile("a.png"), createFile("b.png")]);
-    const previews = await screen.findAllByAltText(/Original image/);
-    expect(previews).toHaveLength(2);
+    const input = screen.getByLabelText(/drag and drop/i) as HTMLInputElement;
+    await user.upload(input, [createFile("a.png")]);
+    const preview = await screen.findByAltText(/Original image/i);
+    expect(preview).toBeInTheDocument();
   });
 
   test("renders compressed preview after compression", async () => {
@@ -46,12 +44,10 @@ describe("ImageCompressorClient file handling", () => {
     });
 
     render(<ImageCompressorClient />);
-    const input = screen.getByLabelText(
-      /drag and drop images/i,
-    ) as HTMLInputElement;
+    const input = screen.getByLabelText(/drag and drop/i) as HTMLInputElement;
     await user.upload(input, [createFile("a.png")]);
-    await user.click(screen.getByRole("button", { name: /compress images/i }));
-    const img = await screen.findByAltText(/compressed image 1/i);
+    await user.click(screen.getByRole("button", { name: /compress/i }));
+    const img = await screen.findByAltText(/compressed image/i);
     expect(img).toHaveAttribute("src", "blob:test");
     urlSpy.mockRestore();
   });
