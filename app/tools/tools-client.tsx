@@ -40,6 +40,7 @@ import {
   ListOrdered,
   Link2,
   Search,
+  Radio,
 } from "lucide-react";
 
 interface Tool {
@@ -273,6 +274,12 @@ const tools: Tool[] = [
     Icon: Type,
     title: "Text Case Converter",
     description: "Convert text between upper, lower, camel, snake and more.",
+  },
+  {
+    href: "/tools/morse-code-converter",
+    Icon: Radio,
+    title: "Morse Code Converter",
+    description: "Translate text to and from Morse code instantly.",
   },
   {
     href: "/tools/xml-formatter",
