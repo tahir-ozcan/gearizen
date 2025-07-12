@@ -2,7 +2,7 @@
 
 import "./globals.css";
 import { ReactNode } from "react";
-import Navbar from "@/components/Navbar";
+import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ToolProviders from "@/components/ToolProviders";
 import AnalyticsLoader from "./components/AnalyticsLoader";
@@ -77,6 +77,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preload" href="/favicon.png" as="image" type="image/png" />
         <link
           rel="preconnect"
           href="https://fonts.gstatic.com"
@@ -105,7 +106,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </a>
 
           {/* Primary navigation */}
-          <Navbar />
+          <Header />
 
           {/* Main content area */}
           <main

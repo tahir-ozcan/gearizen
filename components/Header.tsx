@@ -1,4 +1,4 @@
-// components/Navbar.tsx
+// components/Header.tsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -15,7 +15,10 @@ const navLinks = [
   { href: "/privacy", label: "Privacy" },
 ];
 
-export default function Navbar() {
+/**
+ * Global site header with responsive navigation.
+ */
+export default function Header() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -74,31 +77,31 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop navigation */}
-        <nav
-          aria-label="Primary"
-          className="hidden md:flex items-center space-x-6"
-        >
-          {navLinks.map(({ href, label }) => {
-            const active = pathname === href;
-            return (
-              <Link
-                key={href}
-                href={href}
-                aria-current={active ? "page" : undefined}
-                className={`
-                  relative text-sm font-medium transition-colors
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
-                  ${
-                    active
-                      ? "text-indigo-600 after:absolute after:-bottom-1 after:left-0 after:w-full after:h-0.5 after:bg-indigo-600"
-                      : "text-gray-700 hover:text-gray-900"
-                  }
-                `}
-              >
-                {label}
-              </Link>
-            );
-          })}
+        <nav aria-label="Primary" className="hidden md:block">
+          <ul className="flex items-center space-x-6">
+            {navLinks.map(({ href, label }) => {
+              const active = pathname === href;
+              return (
+                <li key={href} className="list-none">
+                  <Link
+                    href={href}
+                    aria-current={active ? "page" : undefined}
+                    className={`
+                      relative text-sm font-medium transition-colors
+                      focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
+                      ${
+                        active
+                          ? "text-indigo-600 after:absolute after:-bottom-1 after:left-0 after:w-full after:h-0.5 after:bg-indigo-600"
+                          : "text-gray-700 hover:text-gray-900"
+                      }
+                    `}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         </nav>
 
         {/* Mobile menu toggle */}
