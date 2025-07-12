@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import PreviewImage from "@/components/PreviewImage";
 import Button from "@/components/Button";
 import DropZone from "@/components/DropZone";
-import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 
 interface Item {
   file: File;
@@ -53,7 +52,7 @@ export default function ImageCompressorClient() {
           };
           reader.onerror = () => reject(new Error("read"));
           reader.readAsDataURL(file);
-        })
+        }),
     );
 
     Promise.all(loadPromises)
@@ -68,7 +67,8 @@ export default function ImageCompressorClient() {
     return () => {
       items.forEach((it) => {
         if (it.compressedUrl) URL.revokeObjectURL(it.compressedUrl);
-        if (it.originalUrl.startsWith("blob:")) URL.revokeObjectURL(it.originalUrl);
+        if (it.originalUrl.startsWith("blob:"))
+          URL.revokeObjectURL(it.originalUrl);
       });
     };
   }, [items]);
@@ -90,7 +90,7 @@ export default function ImageCompressorClient() {
       if (!ctx) throw new Error("Canvas not supported");
       ctx.drawImage(img, 0, 0);
       const blob = await new Promise<Blob | null>((resolve) =>
-        canvas.toBlob(resolve, item.file.type || "image/jpeg", quality)
+        canvas.toBlob(resolve, item.file.type || "image/jpeg", quality),
       );
       if (!blob) throw new Error("Compression failed");
       const copy: Item = { ...item };
@@ -132,7 +132,8 @@ export default function ImageCompressorClient() {
         Image Compressor
       </h1>
       <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-        Upload images, adjust quality and download smaller files. 100% client-side, no signup required.
+        Upload images, adjust quality and download smaller files. 100%
+        client-side, no signup required.
       </p>
 
       <div className="max-w-xl mx-auto mb-8">
@@ -153,8 +154,14 @@ export default function ImageCompressorClient() {
                 </Button>
               ))}
             </div>
-            <label htmlFor="quality" className="block font-medium text-gray-800">
-              Quality: <span className="font-semibold">{Math.round(quality * 100)}%</span>
+            <label
+              htmlFor="quality"
+              className="block font-medium text-gray-800"
+            >
+              Quality:{" "}
+              <span className="font-semibold">
+                {Math.round(quality * 100)}%
+              </span>
             </label>
             <input
               id="quality"
@@ -190,28 +197,22 @@ export default function ImageCompressorClient() {
           <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 max-w-5xl mx-auto mb-8">
             {items.map((item, idx) => (
               <div key={idx} className="text-center space-y-2">
-                {item.compressedUrl ? (
-                  <BeforeAfterSlider
-                    original={item.originalUrl}
-                    compressed={item.compressedUrl}
-                    width={item.width}
-                    height={item.height}
-                    alt={`Compressed image ${idx + 1}`}
-                  />
-                ) : (
-                  <PreviewImage
-                    src={item.originalUrl}
-                    alt={`Original image ${idx + 1}`}
-                    width={item.width}
-                    height={item.height}
-                  />
-                )}
+                <PreviewImage
+                  src={item.compressedUrl ?? item.originalUrl}
+                  alt={`${item.compressedUrl ? "Compressed" : "Original"} image ${idx + 1}`}
+                  width={item.width}
+                  height={item.height}
+                />
                 <p className="text-sm text-gray-600">
                   {(item.originalSize / 1024).toFixed(1)} KB
-                  {item.compressedSize != null && ` → ${(item.compressedSize / 1024).toFixed(1)} KB`}
+                  {item.compressedSize != null &&
+                    ` → ${(item.compressedSize / 1024).toFixed(1)} KB`}
                 </p>
                 {item.compressedUrl && (
-                  <Button onClick={() => download(item)} className="bg-green-600 hover:bg-green-700 focus:ring-green-500">
+                  <Button
+                    onClick={() => download(item)}
+                    className="bg-green-600 hover:bg-green-700 focus:ring-green-500"
+                  >
                     Download
                   </Button>
                 )}
