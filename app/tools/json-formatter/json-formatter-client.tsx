@@ -3,14 +3,14 @@
 
 import { useState, ChangeEvent, useEffect } from "react";
 import useDebounce from "@/lib/useDebounce";
-
-type Mode = "beautify" | "minify" | "validate";
+import type { JsonMode } from "@/lib/format-json";
+import { formatJson } from "@/lib/format-json";
 
 export default function JsonFormatterClient() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [mode, setMode] = useState<Mode>("beautify");
+  const [mode, setMode] = useState<JsonMode>("beautify");
   const [indent, setIndent] = useState(2);
   const [strict, setStrict] = useState(true);
   const [sortKeys, setSortKeys] = useState(false);
@@ -30,31 +30,15 @@ export default function JsonFormatterClient() {
     setError(null);
   }
 
-  function sortObject(obj: unknown): unknown {
-    if (Array.isArray(obj)) return obj.map(sortObject);
-    if (obj && typeof obj === "object") {
-      return Object.keys(obj)
-        .sort()
-        .reduce<Record<string, unknown>>((acc, key) => {
-          acc[key] = sortObject((obj as Record<string, unknown>)[key]);
-          return acc;
-        }, {});
-    }
-    return obj;
-  }
-
   async function processJson(src: string) {
     try {
-      const parser = strict ? JSON : await import("json5");
-      let parsed = parser.parse(src);
-      if (sortKeys) parsed = sortObject(parsed);
-
-      if (mode === "validate") {
-        setOutput("Valid JSON");
-      } else {
-        const space = mode === "minify" ? 0 : indent;
-        setOutput(JSON.stringify(parsed, null, space));
-      }
+      const result = await formatJson(src, {
+        mode,
+        indent,
+        strict,
+        sortKeys,
+      });
+      setOutput(result);
       setError(null);
     } catch (e: unknown) {
       setOutput("");

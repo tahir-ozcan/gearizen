@@ -43,4 +43,15 @@ describe("generatePassword", () => {
     expect(/[0-9]/.test(pwd)).toBe(true);
     expect(/[!@#$%^&*()\-_=+\[\]{}|;:',.<>?/`~]/.test(pwd)).toBe(true);
   });
+
+  test("excludes visually similar characters when requested", () => {
+    const pwd = generatePassword({
+      length: 32,
+      upper: true,
+      lower: true,
+      digits: true,
+      excludeSimilar: true,
+    });
+    expect(/[Il1O0]/.test(pwd)).toBe(false);
+  });
 });

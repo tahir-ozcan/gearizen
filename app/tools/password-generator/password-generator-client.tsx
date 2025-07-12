@@ -14,6 +14,7 @@ export default function PasswordGeneratorClient() {
   const [useLower, setUseLower] = useState(true);
   const [useDigits, setUseDigits] = useState(true);
   const [useSymbols, setUseSymbols] = useState(false);
+  const [excludeSimilar, setExcludeSimilar] = useState(false);
   const [password, setPassword] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -24,10 +25,11 @@ export default function PasswordGeneratorClient() {
       lower: useLower,
       digits: useDigits,
       symbols: useSymbols,
+      excludeSimilar,
     });
     setPassword(pwd);
     setCopied(false);
-  }, [length, useUpper, useLower, useDigits, useSymbols]);
+  }, [length, useUpper, useLower, useDigits, useSymbols, excludeSimilar]);
 
   useEffect(() => {
     generate();
@@ -55,6 +57,7 @@ export default function PasswordGeneratorClient() {
     useLower ? "--lower" : "",
     useDigits ? "--digits" : "",
     useSymbols ? "--symbols" : "",
+    excludeSimilar ? "--exclude-similar" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -177,6 +180,15 @@ export default function PasswordGeneratorClient() {
                 className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
               <span className="text-gray-700 select-none">Symbols (!@#$%)</span>
+            </label>
+            <label className="flex items-center space-x-2 col-span-2">
+              <input
+                type="checkbox"
+                checked={excludeSimilar}
+                onChange={() => setExcludeSimilar((v) => !v)}
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              />
+              <span className="text-gray-700 select-none">Exclude similar characters</span>
             </label>
           </div>
 
