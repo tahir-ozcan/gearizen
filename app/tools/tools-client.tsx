@@ -37,6 +37,7 @@ import {
   Calculator,
   Ampersand,
   Palette,
+  Paintbrush,
   ListOrdered,
   Link2,
   Search,
@@ -167,6 +168,13 @@ const tools: Tool[] = [
     Icon: MessageSquare,
     title: "HTML Formatter",
     description: "Beautify or minify HTML code for readability or compactness.",
+  },
+  {
+    href: "/tools/css-formatter",
+    Icon: Paintbrush,
+    title: "CSS Formatter",
+    description:
+      "Beautify or minify CSS stylesheets instantly in your browser.",
   },
   {
     href: "/tools/seo-meta-tag-generator",

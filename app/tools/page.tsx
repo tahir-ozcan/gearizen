@@ -7,7 +7,7 @@ export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "Free Online Tools",
   description:
-    "Explore Gearizen’s 100% client-side toolbox: password & bcrypt generators, JSON tools, QR code creator, unit converter, image compressor & resizer, contrast checker, Base64 encoding, code & HTML formatters, regex tester, diff checker, timestamp converter, PDF and CSV utilities, SEO & OG tag generators, JWT decoder, and more—all free, no signup.",
+    "Explore Gearizen’s 100% client-side toolbox: password & bcrypt generators, JSON tools, QR code creator, unit converter, image compressor & resizer, contrast checker, Base64 encoding, code plus HTML and CSS formatters, regex tester, diff checker, timestamp converter, PDF and CSV utilities, SEO & OG tag generators, JWT decoder, and more—all free, no signup.",
   keywords: [
     "free online tools",
     "client-side tools",
@@ -30,6 +30,7 @@ export const metadata = {
     "PDF to Word",
     "CSV to JSON",
     "HTML formatter",
+    "CSS formatter",
     "HTML to PDF",
     "URL parser",
     "SEO meta tag generator",
