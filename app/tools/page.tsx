@@ -2,6 +2,8 @@
 
 import ToolsClient from "./tools-client";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
+import JsonLd from "@/app/components/JsonLd";
+import { tools } from "@/lib/tools";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -69,6 +71,26 @@ export const metadata = {
   },
 };
 
+const toolsJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Free Online Tools",
+  url: "https://gearizen.com/tools",
+  description: metadata.description,
+  mainEntity: {
+    "@type": "ItemList",
+    itemListElement: tools.map((t, i) => ({
+      "@type": "SoftwareApplication",
+      name: t.title,
+      operatingSystem: "any",
+      applicationCategory: "UtilitiesApplication",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      url: `https://gearizen.com${t.href}`,
+      position: i + 1,
+    })),
+  },
+};
+
 export default function ToolsPage() {
   return (
     <>
@@ -76,6 +98,7 @@ export default function ToolsPage() {
         pageTitle="Free Online Tools"
         pageUrl="https://gearizen.com/tools"
       />
+      <JsonLd data={toolsJsonLd} />
       <ToolsClient />
     </>
   );
