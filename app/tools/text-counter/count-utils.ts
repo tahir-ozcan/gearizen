@@ -15,3 +15,8 @@ export function countCharacters(
   const source = options.ignoreSpaces ? text.replace(/\s/gu, "") : text;
   return Array.from(source).length;
 }
+
+export function estimateReadingTime(text: string, wordsPerMinute = 200): number {
+  const words = countWords(text);
+  return wordsPerMinute > 0 ? Math.ceil(words / wordsPerMinute) : 0;
+}

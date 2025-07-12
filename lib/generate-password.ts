@@ -4,6 +4,7 @@ export interface PasswordOptions {
   lower?: boolean;
   digits?: boolean;
   symbols?: boolean;
+
   excludeSimilar?: boolean;
 }
 
@@ -11,6 +12,11 @@ const UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const LOWER = "abcdefghijklmnopqrstuvwxyz";
 const DIGITS = "0123456789";
 const SYMBOLS = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~";
+const SIMILAR = "Il1O0";
+
+function filterSet(source: string, exclude: boolean): string {
+  return exclude ? source.replace(new RegExp(`[${SIMILAR}]`, "g"), "") : source;
+}
 
 const SIMILAR_CHARS = /[Il1O0]/g;
 
@@ -37,6 +43,7 @@ export function generatePassword(options: PasswordOptions): string {
   const length = Math.floor(options.length);
   if (length <= 0) return "";
 
+  const exclude = !!options.excludeSimilar;
   let pool = "";
   if (options.upper) pool += UPPER;
   if (options.lower) pool += LOWER;
@@ -45,6 +52,7 @@ export function generatePassword(options: PasswordOptions): string {
   if (options.excludeSimilar) {
     pool = pool.replace(SIMILAR_CHARS, "");
   }
+
   if (!pool) return "";
 
   const chars = Array.from({ length }, () => randomChar(pool));

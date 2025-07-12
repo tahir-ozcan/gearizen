@@ -188,7 +188,7 @@ export default function PasswordGeneratorClient() {
                 onChange={() => setExcludeSimilar((v) => !v)}
                 className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
-              <span className="text-gray-700 select-none">Exclude similar characters</span>
+              <span className="text-gray-700 select-none">Exclude similar characters (1, l, I, O, 0)</span>
             </label>
           </div>
 
