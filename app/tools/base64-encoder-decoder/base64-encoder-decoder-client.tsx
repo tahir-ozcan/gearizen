@@ -61,7 +61,8 @@ export default function Base64EncoderDecoderClient() {
         Base64 Encoder / Decoder
       </h1>
       <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-        Encode text to Base64 or decode Base64 back to text instantly. 100% client-side, no signup required.
+        Encode plain text to Base64 or decode Base64 back to text
+        instantly—fully client-side.
       </p>
 
       {/* Input */}
@@ -72,7 +73,7 @@ export default function Base64EncoderDecoderClient() {
         id="base64-input"
         value={input}
         onChange={handleInput}
-        placeholder="Enter text or Base64..."
+        placeholder="Enter text or Base64 string here..."
         className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
       />
 
@@ -83,14 +84,14 @@ export default function Base64EncoderDecoderClient() {
           onClick={encode}
           className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
         >
-          Encode
+          Encode to Base64
         </button>
         <button
           type="button"
           onClick={decode}
           className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
         >
-          Decode
+          Decode from Base64
         </button>
         <button
           type="button"
@@ -98,7 +99,7 @@ export default function Base64EncoderDecoderClient() {
           disabled={!output}
           className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition text-sm font-medium disabled:opacity-60"
         >
-          Copy Result
+          Copy Output
         </button>
       </div>
 

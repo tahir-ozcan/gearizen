@@ -7,7 +7,7 @@ export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "Base64 Encoder / Decoder | Gearizen",
   description:
-    "Encode text to Base64 or decode Base64 back to text instantly with Gearizen’s free client-side Base64 tool. No signup, no tracking.",
+    "Encode plain text to Base64 or decode Base64 back to text instantly—fully client-side.",
   keywords: [
     "Base64 encoder",
     "Base64 decoder",
@@ -19,11 +19,13 @@ export const metadata = {
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
   robots: { index: true, follow: true },
-  alternates: { canonical: "https://gearizen.com/tools/base64-encoder-decoder" },
+  alternates: {
+    canonical: "https://gearizen.com/tools/base64-encoder-decoder",
+  },
   openGraph: {
     title: "Base64 Encoder / Decoder | Gearizen",
     description:
-      "Instantly encode or decode Base64 strings in your browser with Gearizen’s privacy-focused Base64 tool. 100% client-side, no signup required.",
+      "Encode plain text to Base64 or decode Base64 back to text instantly—fully client-side.",
     url: "https://gearizen.com/tools/base64-encoder-decoder",
     siteName: "Gearizen",
     locale: "en_US",
@@ -41,15 +43,19 @@ export const metadata = {
     card: "summary_large_image",
     title: "Base64 Encoder / Decoder | Gearizen",
     description:
-      "Use Gearizen’s client-side Base64 tool to encode text to Base64 or decode Base64 strings instantly. No login required.",
+      "Encode plain text to Base64 or decode Base64 back to text instantly—fully client-side.",
     creator: "@gearizen",
     images: ["/og-placeholder.svg"],
   },
 };
 
-export default function Base64EncoderDecoderPage() {  return (
+export default function Base64EncoderDecoderPage() {
+  return (
     <>
-      <BreadcrumbJsonLd pageTitle="Base64 Encoder / Decoder" pageUrl="https://gearizen.com/tools/base64-encoder-decoder" />
+      <BreadcrumbJsonLd
+        pageTitle="Base64 Encoder / Decoder"
+        pageUrl="https://gearizen.com/tools/base64-encoder-decoder"
+      />
       <Base64EncoderDecoderClient />
     </>
   );
