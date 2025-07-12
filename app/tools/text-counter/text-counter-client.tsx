@@ -1,14 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { countWords, countCharacters } from "./count-utils";
+import { countWords, countCharacters, estimateReadingTime } from "./count-utils";
 
 export default function TextCounterClient() {
   const [text, setText] = useState("");
   const [ignoreSpaces, setIgnoreSpaces] = useState(false);
+  const [wpm, setWpm] = useState(200);
 
   const words = countWords(text);
   const chars = countCharacters(text, { ignoreSpaces });
+  const reading = estimateReadingTime(text, wpm);
 
   return (
     <section
@@ -41,9 +43,22 @@ export default function TextCounterClient() {
         />
         Ignore spaces in character count
       </label>
+      <label className="mt-4 flex items-center justify-center gap-2 text-sm">
+        <span>Words per minute:</span>
+        <input
+          type="number"
+          min={50}
+          max={500}
+          step={10}
+          value={wpm}
+          onChange={(e) => setWpm(Number(e.target.value))}
+          className="w-20 border border-gray-300 rounded-lg px-2 py-1 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </label>
       <div className="mt-6 flex justify-center gap-8 text-lg font-medium">
         <span>{words} words</span>
         <span>{chars} characters</span>
+        <span>{reading} min read</span>
       </div>
     </section>
   );

@@ -4,12 +4,19 @@ export interface PasswordOptions {
   lower?: boolean;
   digits?: boolean;
   symbols?: boolean;
+  /** Exclude easily confused characters like 1, l, I, O and 0 */
+  excludeSimilar?: boolean;
 }
 
 const UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const LOWER = "abcdefghijklmnopqrstuvwxyz";
 const DIGITS = "0123456789";
 const SYMBOLS = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~";
+const SIMILAR = "Il1O0";
+
+function filterSet(source: string, exclude: boolean): string {
+  return exclude ? source.replace(new RegExp(`[${SIMILAR}]`, "g"), "") : source;
+}
 
 function randomIndex(max: number): number {
   const arr = new Uint32Array(1);
@@ -29,20 +36,21 @@ export function generatePassword(options: PasswordOptions): string {
   const length = Math.floor(options.length);
   if (length <= 0) return "";
 
+  const exclude = !!options.excludeSimilar;
   let pool = "";
-  if (options.upper) pool += UPPER;
-  if (options.lower) pool += LOWER;
-  if (options.digits) pool += DIGITS;
-  if (options.symbols) pool += SYMBOLS;
+  if (options.upper) pool += filterSet(UPPER, exclude);
+  if (options.lower) pool += filterSet(LOWER, exclude);
+  if (options.digits) pool += filterSet(DIGITS, exclude);
+  if (options.symbols) pool += filterSet(SYMBOLS, exclude);
   if (!pool) return "";
 
   const chars = Array.from({ length }, () => randomChar(pool));
 
   const required: string[] = [];
-  if (options.upper) required.push(randomChar(UPPER));
-  if (options.lower) required.push(randomChar(LOWER));
-  if (options.digits) required.push(randomChar(DIGITS));
-  if (options.symbols) required.push(randomChar(SYMBOLS));
+  if (options.upper) required.push(randomChar(filterSet(UPPER, exclude)));
+  if (options.lower) required.push(randomChar(filterSet(LOWER, exclude)));
+  if (options.digits) required.push(randomChar(filterSet(DIGITS, exclude)));
+  if (options.symbols) required.push(randomChar(filterSet(SYMBOLS, exclude)));
 
   const used = new Set<number>();
   required.forEach((ch) => {
