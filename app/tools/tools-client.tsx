@@ -36,6 +36,7 @@ import {
   Braces,
   Calculator,
   Ampersand,
+  RotateCcw,
   Palette,
   ListOrdered,
   Link2,
@@ -280,6 +281,12 @@ const tools: Tool[] = [
     Icon: Type,
     title: "Text Case Converter",
     description: "Convert text between upper, lower, camel, snake and more.",
+  },
+  {
+    href: "/tools/caesar-cipher",
+    Icon: RotateCcw,
+    title: "Caesar Cipher",
+    description: "Encrypt or decrypt text with a custom shift value.",
   },
   {
     href: "/tools/morse-code-converter",
