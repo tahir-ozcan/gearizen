@@ -32,7 +32,7 @@ describe("ColorPaletteGeneratorClient", () => {
     async (count) => {
       const user = userEvent.setup();
       render(<ColorPaletteGeneratorClient />);
-      const slider = screen.getByLabelText(/colors/i);
+      const slider = screen.getByLabelText(/colors/i) as HTMLInputElement;
       fireEvent.change(slider, { target: { value: String(count) } });
       const base = screen.getByLabelText(/base color/i);
       const schemes = [
@@ -44,8 +44,10 @@ describe("ColorPaletteGeneratorClient", () => {
       ];
       for (const scheme of schemes) {
         await user.click(screen.getByRole("radio", { name: scheme }));
+        expect(slider.value).toBe(String(count));
         expect(getSwatches().length).toBe(count);
         fireEvent.change(base, { target: { value: "#00ff00" } });
+        expect(slider.value).toBe(String(count));
         expect(getSwatches().length).toBe(count);
       }
     },
@@ -54,14 +56,16 @@ describe("ColorPaletteGeneratorClient", () => {
   test("integration flow maintains count", async () => {
     const user = userEvent.setup();
     render(<ColorPaletteGeneratorClient />);
-    const slider = screen.getByLabelText(/colors/i);
+    const slider = screen.getByLabelText(/colors/i) as HTMLInputElement;
     fireEvent.change(slider, { target: { value: "5" } });
     expect(getSwatches().length).toBe(5);
     await user.click(screen.getByRole("radio", { name: /triadic/i }));
+    expect(slider.value).toBe("5");
     expect(getSwatches().length).toBe(5);
     fireEvent.change(screen.getByLabelText(/base color/i), {
       target: { value: "#abcdef" },
     });
+    expect(slider.value).toBe("5");
     expect(getSwatches().length).toBe(5);
   });
 });

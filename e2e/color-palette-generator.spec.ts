@@ -28,12 +28,14 @@ test("swatch count persists across interactions", async ({ page }) => {
   });
   await expect(page.locator(".swatch")).toHaveCount(5);
   await page.getByRole("radio", { name: "Triadic" }).click();
+  await expect(slider).toHaveValue("5");
   await expect(page.locator(".swatch")).toHaveCount(5);
   await base.evaluate((el: HTMLInputElement) => {
     el.value = "#00ff00";
     el.dispatchEvent(new Event("input", { bubbles: true }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
   });
+  await expect(slider).toHaveValue("5");
   await expect(page.locator(".swatch")).toHaveCount(5);
 });
 
