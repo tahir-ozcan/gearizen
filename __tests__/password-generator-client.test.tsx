@@ -14,4 +14,16 @@ describe('PasswordGeneratorClient', () => {
     await user.click(button);
     expect(input.value).not.toBe(before);
   });
+
+  test('pattern field disables length slider', async () => {
+    const user = userEvent.setup();
+    render(<PasswordGeneratorClient />);
+    const slider = screen.getByRole('slider');
+    expect(slider).not.toBeDisabled();
+    const patternInput = screen.getByLabelText(/pattern/i);
+    await user.type(patternInput, 'Aa0');
+    expect(slider).toBeDisabled();
+    await user.clear(patternInput);
+    expect(slider).not.toBeDisabled();
+  });
 });

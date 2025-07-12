@@ -22,20 +22,22 @@ export default function PasswordGeneratorClient() {
   const [password, setPassword] = useState("");
   const [copied, setCopied] = useState(false);
 
+  const isPatternMode = pattern.trim().length > 0;
+
   const generate = useCallback(() => {
     const pwd = generatePassword({
       length,
-      upper: useUpper,
-      lower: useLower,
-      digits: useDigits,
-      symbols: useSymbols,
+      upper: isPatternMode ? undefined : useUpper,
+      lower: isPatternMode ? undefined : useLower,
+      digits: isPatternMode ? undefined : useDigits,
+      symbols: isPatternMode ? undefined : useSymbols,
       excludeSimilar,
       pattern: pattern || undefined,
       avoidRepeats,
-      minUpper: useUpper ? minUpper : undefined,
-      minLower: useLower ? minLower : undefined,
-      minDigits: useDigits ? minDigits : undefined,
-      minSymbols: useSymbols ? minSymbols : undefined,
+      minUpper: isPatternMode || !useUpper ? undefined : minUpper,
+      minLower: isPatternMode || !useLower ? undefined : minLower,
+      minDigits: isPatternMode || !useDigits ? undefined : minDigits,
+      minSymbols: isPatternMode || !useSymbols ? undefined : minSymbols,
     });
     setPassword(pwd);
     setCopied(false);
@@ -77,18 +79,18 @@ export default function PasswordGeneratorClient() {
 
   const cliCommand = [
     "gearizen-password-generator",
-    `--length ${length}`,
-    useUpper ? "--upper" : "",
-    useLower ? "--lower" : "",
-    useDigits ? "--digits" : "",
-    useSymbols ? "--symbols" : "",
+    !isPatternMode ? `--length ${length}` : "",
+    !isPatternMode && useUpper ? "--upper" : "",
+    !isPatternMode && useLower ? "--lower" : "",
+    !isPatternMode && useDigits ? "--digits" : "",
+    !isPatternMode && useSymbols ? "--symbols" : "",
     excludeSimilar ? "--exclude-similar" : "",
     pattern ? `--pattern ${pattern}` : "",
     avoidRepeats ? "--avoid-repeats" : "",
-    useUpper ? `--min-upper ${minUpper}` : "",
-    useLower ? `--min-lower ${minLower}` : "",
-    useDigits ? `--min-digits ${minDigits}` : "",
-    useSymbols ? `--min-symbols ${minSymbols}` : "",
+    !isPatternMode && useUpper ? `--min-upper ${minUpper}` : "",
+    !isPatternMode && useLower ? `--min-lower ${minLower}` : "",
+    !isPatternMode && useDigits ? `--min-digits ${minDigits}` : "",
+    !isPatternMode && useSymbols ? `--min-symbols ${minSymbols}` : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -174,6 +176,9 @@ export default function PasswordGeneratorClient() {
             Use A for uppercase, a for lowercase, 0 for numbers, $ for symbols,
             ? for any.
           </p>
+          {isPatternMode && (
+            <p className="text-sm text-gray-500">Pattern overrides length and character settings.</p>
+          )}
         </div>
         {/* Length Slider */}
         <div>
@@ -194,9 +199,9 @@ export default function PasswordGeneratorClient() {
             aria-valuemax={64}
             aria-valuenow={length}
             className="w-full"
-            disabled={pattern !== ""}
+            disabled={isPatternMode}
           />
-          {pattern && (
+          {isPatternMode && (
             <p className="text-sm text-gray-500 mt-1">
               Length is determined by pattern.
             </p>
@@ -208,44 +213,51 @@ export default function PasswordGeneratorClient() {
           <legend className="text-lg font-semibold text-gray-800 mb-2">
             Include Characters
           </legend>
-          <div className="grid grid-cols-2 gap-4">
-            <label className="flex items-center space-x-2 col-span-2">
+          {isPatternMode && (
+            <p className="text-sm text-gray-500">Character options disabled in pattern mode.</p>
+          )}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 checked={useUpper}
                 onChange={() => setUseUpper((u) => !u)}
+                disabled={isPatternMode}
                 className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
               <span className="text-gray-700 select-none">Uppercase (A–Z)</span>
             </label>
-            <label className="flex items-center space-x-2 col-span-2">
+            <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 checked={useLower}
                 onChange={() => setUseLower((u) => !u)}
+                disabled={isPatternMode}
                 className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
               <span className="text-gray-700 select-none">Lowercase (a–z)</span>
             </label>
-            <label className="flex items-center space-x-2 col-span-2">
+            <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 checked={useDigits}
                 onChange={() => setUseDigits((d) => !d)}
+                disabled={isPatternMode}
                 className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
               <span className="text-gray-700 select-none">Numbers (0–9)</span>
             </label>
-            <label className="flex items-center space-x-2 col-span-2">
+            <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 checked={useSymbols}
                 onChange={() => setUseSymbols((s) => !s)}
+                disabled={isPatternMode}
                 className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
               <span className="text-gray-700 select-none">Symbols (!@#$%)</span>
             </label>
-            <label className="flex items-center space-x-2 col-span-2">
+            <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 checked={excludeSimilar}
@@ -285,48 +297,51 @@ export default function PasswordGeneratorClient() {
           <legend className="text-lg font-semibold text-gray-800 mb-2">
             Minimum Counts
           </legend>
-          <div className="grid grid-cols-2 gap-4">
-            <label className="flex items-center space-x-2 col-span-2">
+          {isPatternMode && (
+            <p className="text-sm text-gray-500">Minimum counts disabled in pattern mode.</p>
+          )}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="flex items-center space-x-2">
               <span className="text-gray-700 select-none">Uppercase</span>
               <input
                 type="number"
                 min={0}
                 value={minUpper}
                 onChange={(e) => setMinUpper(Number(e.target.value))}
-                disabled={!useUpper}
+                disabled={!useUpper || isPatternMode}
                 className="w-20 input-base"
               />
             </label>
-            <label className="flex items-center space-x-2 col-span-2">
+            <label className="flex items-center space-x-2">
               <span className="text-gray-700 select-none">Lowercase</span>
               <input
                 type="number"
                 min={0}
                 value={minLower}
                 onChange={(e) => setMinLower(Number(e.target.value))}
-                disabled={!useLower}
+                disabled={!useLower || isPatternMode}
                 className="w-20 input-base"
               />
             </label>
-            <label className="flex items-center space-x-2 col-span-2">
+            <label className="flex items-center space-x-2">
               <span className="text-gray-700 select-none">Digits</span>
               <input
                 type="number"
                 min={0}
                 value={minDigits}
                 onChange={(e) => setMinDigits(Number(e.target.value))}
-                disabled={!useDigits}
+                disabled={!useDigits || isPatternMode}
                 className="w-20 input-base"
               />
             </label>
-            <label className="flex items-center space-x-2 col-span-2">
+            <label className="flex items-center space-x-2">
               <span className="text-gray-700 select-none">Symbols</span>
               <input
                 type="number"
                 min={0}
                 value={minSymbols}
                 onChange={(e) => setMinSymbols(Number(e.target.value))}
-                disabled={!useSymbols}
+                disabled={!useSymbols || isPatternMode}
                 className="w-20 input-base"
               />
             </label>

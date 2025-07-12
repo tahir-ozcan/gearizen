@@ -47,39 +47,43 @@ function randomChar(set: string): string {
 export function generatePassword(options: PasswordOptions): string {
   const excludeSimilar = !!options.excludeSimilar;
 
-  // Pattern mode
+  // Pattern mode ignores other configuration besides excludeSimilar and
+  // avoidRepeats. '?' and '*' pull from the full character pool.
   if (options.pattern) {
     const pattern = options.pattern;
+    const anySet = filterSet(
+      UPPER + LOWER + DIGITS + SYMBOLS,
+      excludeSimilar,
+    );
     const out: string[] = [];
     for (const char of pattern) {
+      let next = char;
       switch (char) {
         case "A":
-          out.push(randomChar(filterSet(UPPER, excludeSimilar)));
+          next = randomChar(filterSet(UPPER, excludeSimilar));
           break;
         case "a":
-          out.push(randomChar(filterSet(LOWER, excludeSimilar)));
+          next = randomChar(filterSet(LOWER, excludeSimilar));
           break;
         case "0":
-          out.push(randomChar(filterSet(DIGITS, excludeSimilar)));
+          next = randomChar(filterSet(DIGITS, excludeSimilar));
           break;
         case "$":
-          out.push(randomChar(filterSet(SYMBOLS, excludeSimilar)));
+          next = randomChar(filterSet(SYMBOLS, excludeSimilar));
           break;
         case "?":
         case "*":
-          out.push(
-            randomChar(
-              (options.upper ? filterSet(UPPER, excludeSimilar) : "") +
-                (options.lower ? filterSet(LOWER, excludeSimilar) : "") +
-                (options.digits ? filterSet(DIGITS, excludeSimilar) : "") +
-                (options.symbols ? filterSet(SYMBOLS, excludeSimilar) : "") ||
-                UPPER + LOWER + DIGITS,
-            ),
-          );
+          next = randomChar(anySet);
           break;
         default:
-          out.push(char);
+          next = char;
       }
+      if (options.avoidRepeats && out[out.length - 1] === next) {
+        let alt = randomChar(anySet);
+        while (alt === next) alt = randomChar(anySet);
+        next = alt;
+      }
+      out.push(next);
     }
     return out.join("");
   }
