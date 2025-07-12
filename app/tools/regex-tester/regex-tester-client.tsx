@@ -1,35 +1,15 @@
 // app/tools/regex-tester/regex-tester-client.tsx
 "use client";
 
-import { useState, ChangeEvent, useEffect } from "react";
-import useDebounce from "@/lib/useDebounce";
+import { useState, ChangeEvent } from "react";
 
 export default function RegexTesterClient() {
   const [pattern, setPattern] = useState("");
-  const [flags, setFlags] = useState("g");
+  const [flags, setFlags] = useState("");
   const [testInput, setTestInput] = useState("");
   const [matches, setMatches] = useState<string[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const debouncedPattern = useDebounce(pattern);
-  const debouncedFlags = useDebounce(flags);
-  const debouncedInput = useDebounce(testInput);
 
-  useEffect(() => {
-    if (!debouncedPattern.trim()) {
-      setError("Please enter a regex pattern.");
-      setMatches([]);
-      return;
-    }
-    try {
-      const regex = new RegExp(debouncedPattern, debouncedFlags);
-      const allMatches = Array.from(debouncedInput.matchAll(regex), (m) => m[0]);
-      setMatches(allMatches);
-      setError(null);
-    } catch (e) {
-      setMatches([]);
-      setError(e instanceof Error ? e.message : "Invalid regex");
-    }
-  }, [debouncedPattern, debouncedFlags, debouncedInput]);
 
   function handlePatternChange(e: ChangeEvent<HTMLInputElement>) {
     setPattern(e.target.value);
@@ -46,6 +26,23 @@ export default function RegexTesterClient() {
   function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
     setTestInput(e.target.value);
     setMatches(null);
+  }
+
+  function runTest() {
+    if (!pattern.trim()) {
+      setError("Please enter a regex pattern.");
+      setMatches([]);
+      return;
+    }
+    try {
+      const regex = new RegExp(pattern, flags);
+      const allMatches = Array.from(testInput.matchAll(regex), (m) => m[0]);
+      setMatches(allMatches);
+      setError(null);
+    } catch (e) {
+      setMatches([]);
+      setError(e instanceof Error ? e.message : "Invalid regex");
+    }
   }
 
 
@@ -72,7 +69,7 @@ export default function RegexTesterClient() {
         Regex Tester
       </h1>
       <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-        Enter a pattern, flags, and test text below to see all matches instantly. 100% client-side, no signup required.
+        Enter a regular expression, optional flags, and your sample text below to highlight all matches instantly.
       </p>
 
       <div className="max-w-2xl mx-auto space-y-6">
@@ -100,7 +97,7 @@ export default function RegexTesterClient() {
               type="text"
               value={flags}
               onChange={handleFlagsChange}
-              placeholder="e.g. gmi"
+              placeholder="e.g. gi"
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             />
           </div>
@@ -115,7 +112,7 @@ export default function RegexTesterClient() {
             id="test-input"
             value={testInput}
             onChange={handleInputChange}
-            placeholder="Paste or type text to test..."
+            placeholder="Paste or type text to test…"
             className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           />
         </div>
@@ -129,11 +126,14 @@ export default function RegexTesterClient() {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap justify-center gap-4">
+          <button type="button" onClick={runTest} className="btn-primary">
+            Run Test
+          </button>
           <button
             type="button"
             onClick={copyMatches}
             disabled={!matches || matches.length === 0}
-            className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition text-sm font-medium disabled:opacity-60"
+            className="btn-secondary disabled:opacity-60"
           >
             Copy Matches
           </button>
