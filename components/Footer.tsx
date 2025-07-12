@@ -2,8 +2,22 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { FaTwitter, FaGithub, FaLinkedin } from "react-icons/fa";
+import dynamic from "next/dynamic";
+import Script from "next/script";
 import { ReactNode } from "react";
+
+// Lazy-load social icons for better performance
+const FaGithub = dynamic(() => import("react-icons/fa").then((m) => m.FaGithub), {
+  ssr: false,
+});
+const FaTwitter = dynamic(
+  () => import("react-icons/fa").then((m) => m.FaTwitter),
+  { ssr: false }
+);
+const FaLinkedin = dynamic(
+  () => import("react-icons/fa").then((m) => m.FaLinkedin),
+  { ssr: false }
+);
 
 interface LinkItem {
   label: string;
@@ -62,12 +76,21 @@ export default function Footer() {
     },
   ];
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Gearizen",
+    url: "https://gearizen.com",
+    logo: "https://gearizen.com/favicon.png",
+    sameAs: socialLinks.map((l) => l.href),
+  };
+
   return (
     <footer role="contentinfo" className="bg-white border-t border-gray-200">
       <div className="container-responsive py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand + Tagline */}
-          <div>
+          <section aria-labelledby="footer-brand">
             <Link
               href="/"
               aria-label="Go to Gearizen homepage"
@@ -78,7 +101,6 @@ export default function Footer() {
                 alt="Gearizen logo"
                 width={32}
                 height={32}
-                priority
               />
               <span className="ml-2 text-xl font-extrabold text-gray-900">
                 Gearizen
@@ -88,21 +110,24 @@ export default function Footer() {
               Fast, free, privacy-first web tools for developers, creators, and
               beyond. No signup. No tracking. 100% client-side.
             </p>
-            <div className="mt-4 flex space-x-4">
-              {socialLinks.map(({ href, label, icon }) => (
-                <a
-                  key={href}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="text-gray-500 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded transition-colors"
-                >
-                  {icon}
-                </a>
-              ))}
-            </div>
-          </div>
+            <nav aria-label="Social links" className="mt-4">
+              <ul className="flex space-x-4">
+                {socialLinks.map(({ href, label, icon }) => (
+                  <li key={href} className="list-none">
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      className="text-gray-500 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded transition-colors"
+                    >
+                      {icon}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </section>
 
           {/* Site Pages */}
           <nav aria-labelledby="footer-site-pages">
@@ -176,6 +201,13 @@ export default function Footer() {
           </p>
         </div>
       </div>
+      {/* Structured data for SEO */}
+      <Script
+        id="ld-json-org"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
     </footer>
   );
 }
