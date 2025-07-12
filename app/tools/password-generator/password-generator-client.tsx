@@ -15,6 +15,10 @@ export default function PasswordGeneratorClient() {
   const [excludeSimilar, setExcludeSimilar] = useState(false);
   const [pattern, setPattern] = useState("");
   const [avoidRepeats, setAvoidRepeats] = useState(false);
+  const [minUpper, setMinUpper] = useState(1);
+  const [minLower, setMinLower] = useState(1);
+  const [minDigits, setMinDigits] = useState(1);
+  const [minSymbols, setMinSymbols] = useState(1);
   const [password, setPassword] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -28,6 +32,10 @@ export default function PasswordGeneratorClient() {
       excludeSimilar,
       pattern: pattern || undefined,
       avoidRepeats,
+      minUpper: useUpper ? minUpper : undefined,
+      minLower: useLower ? minLower : undefined,
+      minDigits: useDigits ? minDigits : undefined,
+      minSymbols: useSymbols ? minSymbols : undefined,
     });
     setPassword(pwd);
     setCopied(false);
@@ -40,6 +48,10 @@ export default function PasswordGeneratorClient() {
     excludeSimilar,
     pattern,
     avoidRepeats,
+    minUpper,
+    minLower,
+    minDigits,
+    minSymbols,
   ]);
 
   // Generate an initial password on mount
@@ -73,6 +85,10 @@ export default function PasswordGeneratorClient() {
     excludeSimilar ? "--exclude-similar" : "",
     pattern ? `--pattern ${pattern}` : "",
     avoidRepeats ? "--avoid-repeats" : "",
+    useUpper ? `--min-upper ${minUpper}` : "",
+    useLower ? `--min-lower ${minLower}` : "",
+    useDigits ? `--min-digits ${minDigits}` : "",
+    useSymbols ? `--min-symbols ${minSymbols}` : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -102,14 +118,14 @@ export default function PasswordGeneratorClient() {
         >
           Your Password
         </label>
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <input
             id="generated-password"
             type="text"
             readOnly
             value={password}
             aria-label="Generated password"
-            className="flex-grow bg-white border border-gray-300 rounded-lg px-4 py-2 font-mono text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="flex-grow bg-white border border-gray-300 rounded-lg px-4 py-2 font-mono text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition overflow-x-auto whitespace-nowrap"
           />
           <button
             type="button"
@@ -255,10 +271,59 @@ export default function PasswordGeneratorClient() {
           </button>
         </fieldset>
 
-        <button
-          type="submit"
-          className="w-full btn-primary"
-        >
+        <fieldset className="space-y-4">
+          <legend className="text-lg font-semibold text-gray-800 mb-2">
+            Minimum Counts
+          </legend>
+          <div className="grid grid-cols-2 gap-4">
+            <label className="flex items-center space-x-2">
+              <span className="text-gray-700 select-none">Uppercase</span>
+              <input
+                type="number"
+                min={0}
+                value={minUpper}
+                onChange={(e) => setMinUpper(Number(e.target.value))}
+                disabled={!useUpper}
+                className="w-20 input-base"
+              />
+            </label>
+            <label className="flex items-center space-x-2">
+              <span className="text-gray-700 select-none">Lowercase</span>
+              <input
+                type="number"
+                min={0}
+                value={minLower}
+                onChange={(e) => setMinLower(Number(e.target.value))}
+                disabled={!useLower}
+                className="w-20 input-base"
+              />
+            </label>
+            <label className="flex items-center space-x-2">
+              <span className="text-gray-700 select-none">Digits</span>
+              <input
+                type="number"
+                min={0}
+                value={minDigits}
+                onChange={(e) => setMinDigits(Number(e.target.value))}
+                disabled={!useDigits}
+                className="w-20 input-base"
+              />
+            </label>
+            <label className="flex items-center space-x-2">
+              <span className="text-gray-700 select-none">Symbols</span>
+              <input
+                type="number"
+                min={0}
+                value={minSymbols}
+                onChange={(e) => setMinSymbols(Number(e.target.value))}
+                disabled={!useSymbols}
+                className="w-20 input-base"
+              />
+            </label>
+          </div>
+        </fieldset>
+
+        <button type="submit" className="w-full btn-primary">
           Generate Password
         </button>
       </form>

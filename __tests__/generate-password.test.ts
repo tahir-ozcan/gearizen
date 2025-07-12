@@ -89,4 +89,40 @@ describe("generatePassword", () => {
     });
     expect(/(.)\1/.test(pwd)).toBe(false);
   });
+
+  test("respects minimum counts", () => {
+    const pwd = generatePassword({
+      length: 8,
+      upper: true,
+      lower: true,
+      digits: true,
+      symbols: true,
+      minUpper: 2,
+      minLower: 2,
+      minDigits: 2,
+      minSymbols: 2,
+    });
+    expect(pwd.match(/[A-Z]/g)?.length ?? 0).toBeGreaterThanOrEqual(2);
+    expect(pwd.match(/[a-z]/g)?.length ?? 0).toBeGreaterThanOrEqual(2);
+    expect(pwd.match(/[0-9]/g)?.length ?? 0).toBeGreaterThanOrEqual(2);
+    expect(
+      pwd.match(/[!@#$%^&*()\-_=+\[\]{}|;:',.<>?/`~]/g)?.length ?? 0,
+    ).toBeGreaterThanOrEqual(2);
+    expect(pwd.length).toBeGreaterThanOrEqual(8);
+  });
+
+  test("length expands to meet minimum counts", () => {
+    const pwd = generatePassword({
+      length: 4,
+      upper: true,
+      lower: true,
+      digits: true,
+      symbols: true,
+      minUpper: 2,
+      minLower: 2,
+      minDigits: 2,
+      minSymbols: 2,
+    });
+    expect(pwd.length).toBe(8);
+  });
 });

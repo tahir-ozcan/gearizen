@@ -10,6 +10,14 @@ export interface PasswordOptions {
   pattern?: string;
   /** Avoid consecutive repeated characters */
   avoidRepeats?: boolean;
+  /** Minimum number of uppercase characters */
+  minUpper?: number;
+  /** Minimum number of lowercase characters */
+  minLower?: number;
+  /** Minimum number of digit characters */
+  minDigits?: number;
+  /** Minimum number of symbol characters */
+  minSymbols?: number;
 }
 
 const UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -22,14 +30,14 @@ function filterSet(source: string, exclude: boolean): string {
   return exclude ? source.replace(new RegExp(`[${SIMILAR}]`, "g"), "") : source;
 }
 
-function randomIndex(max: number): number {
-  const arr = new Uint32Array(1);
+function randomIndices(count: number, max: number): number[] {
+  const arr = new Uint32Array(count);
   globalThis.crypto.getRandomValues(arr);
-  return arr[0] % max;
+  return Array.from(arr, (v) => v % max);
 }
 
 function randomChar(set: string): string {
-  return set.charAt(randomIndex(set.length));
+  return set.charAt(randomIndices(1, set.length)[0]);
 }
 
 /**
@@ -76,8 +84,8 @@ export function generatePassword(options: PasswordOptions): string {
     return out.join("");
   }
 
-  const length = Math.floor(options.length ?? 0);
-  if (length <= 0) return "";
+  const requestedLength = Math.floor(options.length ?? 0);
+  if (requestedLength <= 0) return "";
 
   let pool = "";
   if (options.upper) pool += filterSet(UPPER, excludeSimilar);
@@ -86,23 +94,32 @@ export function generatePassword(options: PasswordOptions): string {
   if (options.symbols) pool += filterSet(SYMBOLS, excludeSimilar);
   if (!pool) return "";
 
-  const chars = Array.from({ length }, () => randomChar(pool));
+  const minUpper = options.upper ? Math.max(options.minUpper ?? 1, 0) : 0;
+  const minLower = options.lower ? Math.max(options.minLower ?? 1, 0) : 0;
+  const minDigits = options.digits ? Math.max(options.minDigits ?? 1, 0) : 0;
+  const minSymbols = options.symbols ? Math.max(options.minSymbols ?? 1, 0) : 0;
 
   const required: string[] = [];
-  if (options.upper)
+  for (let i = 0; i < minUpper; i++)
     required.push(randomChar(filterSet(UPPER, excludeSimilar)));
-  if (options.lower)
+  for (let i = 0; i < minLower; i++)
     required.push(randomChar(filterSet(LOWER, excludeSimilar)));
-  if (options.digits)
+  for (let i = 0; i < minDigits; i++)
     required.push(randomChar(filterSet(DIGITS, excludeSimilar)));
-  if (options.symbols)
+  for (let i = 0; i < minSymbols; i++)
     required.push(randomChar(filterSet(SYMBOLS, excludeSimilar)));
 
+  const finalLength = Math.max(requestedLength, required.length);
+  const chars = Array.from({ length: finalLength }, () => randomChar(pool));
+
   const used = new Set<number>();
-  required.forEach((ch) => {
-    let idx = randomIndex(length);
-    while (used.has(idx)) idx = randomIndex(length);
-    used.add(idx);
+  randomIndices(required.length * 2, finalLength).forEach((pos) => {
+    if (used.size >= required.length) return;
+    if (!used.has(pos)) used.add(pos);
+  });
+  const positions = Array.from(used);
+  required.forEach((ch, i) => {
+    const idx = positions[i] ?? randomIndices(1, finalLength)[0];
     chars[idx] = ch;
   });
 
