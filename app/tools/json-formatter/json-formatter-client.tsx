@@ -1,27 +1,36 @@
 // app/tools/json-formatter/json-formatter-client.tsx
 "use client";
 
-import { useState, ChangeEvent, useEffect } from "react";
+import { useState, ChangeEvent, useEffect, useMemo, useCallback } from "react";
 import useDebounce from "@/lib/useDebounce";
 import { formatJson, JsonMode } from "@/lib/format-json";
 import { highlightJson } from "@/lib/highlight-json";
+import { encodeHtmlEntities } from "@/lib/html-entities";
 
 export default function JsonFormatterClient() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
-  const [highlighted, setHighlighted] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<JsonMode>("beautify");
   const [indent, setIndent] = useState(2);
   const [strict, setStrict] = useState(true);
   const [sortKeys, setSortKeys] = useState(false);
   const [wrapLines, setWrapLines] = useState(true);
+  const [highlight, setHighlight] = useState(true);
+  const [fileName, setFileName] = useState('formatted.json');
   const debouncedInput = useDebounce(input);
+
+  const highlightedOutput = useMemo(
+    () =>
+      highlight
+        ? highlightJson(output)
+        : encodeHtmlEntities(output),
+    [output, highlight]
+  );
 
   useEffect(() => {
     if (!debouncedInput.trim()) {
       setOutput('');
-      setHighlighted('');
       return;
     }
     processJson(debouncedInput);
@@ -43,15 +52,13 @@ export default function JsonFormatterClient() {
       });
       setError(error);
       setOutput(output);
-      setHighlighted(error ? "" : highlightJson(output));
     } catch (e: unknown) {
       setOutput("");
-      setHighlighted("");
       setError(e instanceof Error ? e.message : "Invalid JSON");
     }
   }
 
-  async function copyOutput() {
+  const copyOutput = useCallback(async () => {
     if (!output) return;
     try {
       await navigator.clipboard.writeText(output);
@@ -59,18 +66,18 @@ export default function JsonFormatterClient() {
     } catch {
       alert("❌ Failed to copy JSON.");
     }
-  }
+  }, [output]);
 
-  function downloadJson() {
+  const downloadJson = useCallback(() => {
     if (!output) return;
     const blob = new Blob([output], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "formatted.json";
+    a.download = fileName || "formatted.json";
     a.click();
     URL.revokeObjectURL(url);
-  }
+  }, [output, fileName]);
 
   return (
     <section
@@ -95,7 +102,7 @@ export default function JsonFormatterClient() {
           value={input}
           onChange={handleInputChange}
           placeholder="Paste or type your JSON here..."
-          className="w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+          className="input-base h-48 font-mono text-sm resize-y"
         />
 
         {/* Options & Actions */}
@@ -108,7 +115,7 @@ export default function JsonFormatterClient() {
                 disabled={mode === 'minify'}
                 value={indent}
                 onChange={(e) => setIndent(Number(e.target.value))}
-                className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+                className="input-base w-auto px-2 py-1 text-sm"
               >
                 <option value={0}>0</option>
                 <option value={2}>2</option>
@@ -180,13 +187,34 @@ export default function JsonFormatterClient() {
             />
             <span className="text-sm text-gray-700">Wrap lines</span>
           </label>
+
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={highlight}
+              onChange={() => setHighlight((v) => !v)}
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <span className="text-sm text-gray-700">Syntax highlight</span>
+          </label>
+
+          <label htmlFor="filename" className="flex items-center space-x-2">
+            <span className="text-sm font-medium text-gray-700">File name:</span>
+            <input
+              id="filename"
+              type="text"
+              value={fileName}
+              onChange={(e) => setFileName(e.target.value)}
+              className="input-base w-40 px-2 py-1 text-sm"
+            />
+          </label>
         </div>
 
         <div className="flex flex-wrap gap-3">
           <button
             type="button"
             onClick={() => processJson(input)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
+            className="btn-primary text-sm"
           >
             Format
           </button>
@@ -194,19 +222,19 @@ export default function JsonFormatterClient() {
             type="button"
             onClick={copyOutput}
             disabled={!output}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition text-sm font-medium disabled:opacity-60"
-            >
-              Copy
-            </button>
-            <button
-              type="button"
-              onClick={downloadJson}
-              disabled={!output}
-              className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 transition text-sm font-medium disabled:opacity-60"
-            >
-              Download
-            </button>
-          </div>
+            className="btn-secondary text-sm disabled:opacity-60"
+          >
+            Copy
+          </button>
+          <button
+            type="button"
+            onClick={downloadJson}
+            disabled={!output}
+            className="btn-secondary text-sm disabled:opacity-60"
+          >
+            Download
+          </button>
+        </div>
         </div>
 
         {/* Error */}
@@ -224,7 +252,7 @@ export default function JsonFormatterClient() {
           <pre
             aria-label="Formatted JSON output"
             className={`w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition overflow-auto ${wrapLines ? 'whitespace-pre-wrap break-words' : 'whitespace-pre'}`}
-            dangerouslySetInnerHTML={{ __html: highlighted }}
+            dangerouslySetInnerHTML={{ __html: highlightedOutput }}
           />
         )}
       </div>
