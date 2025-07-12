@@ -3,13 +3,7 @@
 
 import { useState, ChangeEvent, useEffect } from "react";
 import PreviewImage from "@/components/PreviewImage";
-import { Document, Packer, Paragraph } from "docx";
-import type {
-  PDFDocumentProxy,
-  PDFPageProxy,
-  TextContent,
-  TextItem,
-} from "pdfjs-dist/legacy/build/pdf";
+import { pdfToWord } from "@/lib/pdf-to-word";
 
 export default function PdfToWordClient() {
   const [file, setFile] = useState<File | null>(null);
@@ -20,12 +14,22 @@ export default function PdfToWordClient() {
   const [previewSize, setPreviewSize] = useState<{ w: number; h: number } | null>(
     null
   );
+  const [numPages, setNumPages] = useState(0);
+  const [startPage, setStartPage] = useState(1);
+  const [endPage, setEndPage] = useState(1);
+  const [method, setMethod] = useState<'text' | 'image'>("text");
+  const [pageBreaks, setPageBreaks] = useState(true);
+  const [outputName, setOutputName] = useState("");
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDocUrl("");
     setError(null);
     setPreviewUrl("");
-    setFile(e.target.files?.[0] ?? null);
+    const f = e.target.files?.[0] ?? null;
+    setFile(f);
+    if (f) {
+      setOutputName(f.name.replace(/\.pdf$/i, ""));
+    }
   };
 
   const readFileAsArrayBuffer = (file: File) =>
@@ -42,32 +46,15 @@ export default function PdfToWordClient() {
     setError(null);
     setDocUrl("");
     try {
-      const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
-      const worker = (
-        await import("pdfjs-dist/legacy/build/pdf.worker.mjs?worker&url")
-      ).default;
-      pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
-
       const arrayBuffer = await readFileAsArrayBuffer(file);
-      const pdf: PDFDocumentProxy = await pdfjsLib
-        .getDocument({ data: arrayBuffer })
-        .promise;
-      const pageTexts: string[] = [];
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page: PDFPageProxy = await pdf.getPage(i);
-        const content: TextContent = await page.getTextContent();
-        const text = (content.items as TextItem[])
-          .map((item) => item.str)
-          .join(" ");
-        pageTexts.push(text);
-      }
-
-      const doc = new Document({
-        sections: [{ children: pageTexts.map((t) => new Paragraph(t)) }],
+      const blob = await pdfToWord(arrayBuffer, {
+        startPage,
+        endPage,
+        method,
+        pageBreaks,
       });
-
-      const blob = await Packer.toBlob(doc);
-      const url = URL.createObjectURL(blob);
+      const data = blob instanceof Blob ? blob : new Blob([blob]);
+      const url = URL.createObjectURL(data);
       setDocUrl(url);
     } catch (e) {
       setError(
@@ -82,15 +69,13 @@ export default function PdfToWordClient() {
     if (!file) return;
     (async () => {
       try {
-        const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
-        const worker = (
-          await import("pdfjs-dist/legacy/build/pdf.worker.mjs?worker&url")
-        ).default;
-        pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
+        const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
         const arrayBuffer = await readFileAsArrayBuffer(file);
-        const pdf: PDFDocumentProxy = await pdfjsLib
-          .getDocument({ data: arrayBuffer })
-          .promise;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer, disableWorker: true } as any).promise;
+        setNumPages(pdf.numPages);
+        setStartPage(1);
+        setEndPage(pdf.numPages);
         const page = await pdf.getPage(1);
         const viewport = page.getViewport({ scale: 1 });
         const canvas = document.createElement("canvas");
@@ -101,7 +86,9 @@ export default function PdfToWordClient() {
         await page.render({ canvasContext: ctx, viewport }).promise;
         setPreviewUrl(canvas.toDataURL());
         setPreviewSize({ w: canvas.width, h: canvas.height });
-      } catch {}
+      } catch {
+        // ignore errors during preview generation
+      }
     })();
   }, [file]);
 
@@ -109,7 +96,8 @@ export default function PdfToWordClient() {
     if (!docUrl || !file) return;
     const a = document.createElement("a");
     a.href = docUrl;
-    a.download = file.name.replace(/\.pdf$/i, "") + ".docx";
+    const base = outputName || file.name.replace(/\.pdf$/i, "");
+    a.download = base + ".docx";
     a.click();
     URL.revokeObjectURL(docUrl);
   };
@@ -154,10 +142,83 @@ export default function PdfToWordClient() {
         </div>
       )}
 
+      {numPages > 0 && (
+        <div className="max-w-lg mx-auto grid sm:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label htmlFor="start-page" className="block mb-1 font-medium text-gray-800">
+              Start Page
+            </label>
+            <input
+              id="start-page"
+              type="number"
+              min={1}
+              max={numPages}
+              value={startPage}
+              onChange={(e) => setStartPage(Math.max(1, Math.min(numPages, Number(e.target.value))))}
+              className="input-base"
+            />
+          </div>
+          <div>
+            <label htmlFor="end-page" className="block mb-1 font-medium text-gray-800">
+              End Page
+            </label>
+            <input
+              id="end-page"
+              type="number"
+              min={startPage}
+              max={numPages}
+              value={endPage}
+              onChange={(e) => setEndPage(Math.max(startPage, Math.min(numPages, Number(e.target.value))))}
+              className="input-base"
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-lg mx-auto mb-6">
+        <label htmlFor="method" className="block mb-1 font-medium text-gray-800">
+          Conversion Method
+        </label>
+        <select
+          id="method"
+          value={method}
+          onChange={(e) => setMethod(e.target.value as 'text' | 'image')}
+          className="input-base"
+        >
+          <option value="text">Extract Text</option>
+          <option value="image">Preserve Layout (Images)</option>
+        </select>
+      </div>
+
+      <div className="max-w-lg mx-auto mb-6 flex items-center gap-2">
+        <input
+          id="page-breaks"
+          type="checkbox"
+          checked={pageBreaks}
+          onChange={(e) => setPageBreaks(e.target.checked)}
+        />
+        <label htmlFor="page-breaks" className="text-gray-800">
+          Add page breaks
+        </label>
+      </div>
+
+      <div className="max-w-lg mx-auto mb-6">
+        <label htmlFor="output-name" className="block mb-1 font-medium text-gray-800">
+          Output File Name
+        </label>
+        <input
+          id="output-name"
+          type="text"
+          value={outputName}
+          onChange={(e) => setOutputName(e.target.value)}
+          className="input-base"
+        />
+      </div>
+
       <div className="text-center mb-8">
         <button
           onClick={convertPdf}
-          disabled={!file || processing}
+          disabled={!file || processing || startPage > endPage}
           className={`inline-flex items-center px-8 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium ${
             processing ? "opacity-60 cursor-not-allowed" : ""
           }`}
