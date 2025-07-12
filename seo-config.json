@@ -1,0 +1,12 @@
+{
+  "siteUrl": "https://gearizen.com",
+  "organization": {
+    "@type": "Organization",
+    "name": "Gearizen",
+    "url": "https://gearizen.com",
+    "logo": "https://gearizen.com/favicon.png",
+    "sameAs": [
+      "https://twitter.com/gearizen"
+    ]
+  }
+}

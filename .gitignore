@@ -78,6 +78,11 @@ web_modules/
 .next
 out
 
+# Generated SEO files
+public/sitemap*.xml
+public/robots.txt*
+public/sitemap.html
+
 # Nuxt.js build / generate output
 .nuxt
 dist

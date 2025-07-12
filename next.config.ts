@@ -10,6 +10,7 @@ const ContentSecurityPolicy =
   "frame-src https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com;";
 
 const nextConfig: NextConfig = {
+  trailingSlash: false,
   async headers() {
     const securityHeaders = [
       {
@@ -21,6 +22,15 @@ const nextConfig: NextConfig = {
       {
         source: '/:path*',
         headers: securityHeaders,
+      },
+    ];
+  },
+  async redirects() {
+    return [
+      {
+        source: '/:path*/',
+        destination: '/:path*',
+        permanent: true,
       },
     ];
   },

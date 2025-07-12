@@ -12,7 +12,7 @@
     "test": "jest",
     "test:e2e": "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 playwright test",
     "prepare": "husky install",
-    "postbuild": "next-sitemap"
+    "postbuild": "node scripts/seo-postbuild.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -63,6 +63,7 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9.8.0",
     "eslint-config-next": "15.3.5",
+    "fast-xml-parser": "^4.3.5",
     "husky": "^8.0.0",
     "jest": "^30.0.4",
     "lint-staged": "^16.1.2",

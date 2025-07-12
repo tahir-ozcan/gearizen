@@ -1,6 +1,11 @@
 /** @type {import('next-sitemap').IConfig} */
+const seo = require('./seo-config.json');
+
+/** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: "https://gearizen.com",
-  generateRobotsTxt: true,
-  outDir: "./public",
+  siteUrl: seo.siteUrl,
+  generateRobotsTxt: false,
+  outDir: './public',
+  trailingSlash: false,
+  exclude: ['/not-found', '/error'],
 };
