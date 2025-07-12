@@ -26,7 +26,7 @@ export default function PreviewImage({
       width={width}
       height={height}
       unoptimized
-      className={`w-full h-auto object-contain rounded-lg border border-gray-200 shadow-sm ${className}`}
+      className={`w-full h-auto object-contain rounded-lg border border-gray-200 shadow-sm transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-indigo-500 ${className}`}
       {...props}
     />
   );
