@@ -1,19 +1,27 @@
 "use client";
-import { useState, ChangeEvent, useEffect } from 'react';
-import Input from '@/components/Input';
+// On any user interaction (base color or scheme change), generate exactly N colors.
+// N is determined by the current value of the "Colors" control and must persist
+// across interactions without resetting.
+import { useState, ChangeEvent, useEffect } from "react";
+import Input from "@/components/Input";
 import {
   generatePalette,
   PaletteScheme,
   paletteToJson,
   paletteToAse,
-} from '@/lib/color-palette';
-import { hexToRgb, rgbToHsl, formatRgb, formatHsl } from '@/lib/color-conversion';
+} from "@/lib/color-palette";
+import {
+  hexToRgb,
+  rgbToHsl,
+  formatRgb,
+  formatHsl,
+} from "@/lib/color-conversion";
 
 export default function ColorPaletteGeneratorClient() {
-  const [color, setColor] = useState('#ff0000');
-  const [scheme, setScheme] = useState<PaletteScheme>('analogous');
+  const [color, setColor] = useState("#ff0000");
+  const [scheme, setScheme] = useState<PaletteScheme>("analogous");
   const [count, setCount] = useState(5);
-  const [palette, setPalette] = useState<string[]>(generatePalette('#ff0000'));
+  const [palette, setPalette] = useState<string[]>(generatePalette("#ff0000"));
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,23 +43,25 @@ export default function ColorPaletteGeneratorClient() {
   };
 
   const downloadJson = () => {
-    const blob = new Blob([paletteToJson(palette)], { type: 'application/json' });
+    const blob = new Blob([paletteToJson(palette)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
     setDownloadUrl(url);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'palette.json';
+    a.download = "palette.json";
     a.click();
   };
 
   const downloadAse = () => {
     const data = paletteToAse(palette);
-    const blob = new Blob([data], { type: 'application/octet-stream' });
+    const blob = new Blob([data], { type: "application/octet-stream" });
     const url = URL.createObjectURL(blob);
     setDownloadUrl(url);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'palette.ase';
+    a.download = "palette.ase";
     a.click();
   };
 
@@ -69,13 +79,24 @@ export default function ColorPaletteGeneratorClient() {
       </h1>
       <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
         Choose a base color and scheme to instantly generate a matching palette.
+        On any user interaction (base color or scheme change), generate exactly
+        N colors.
       </p>
       <div className="max-w-md mx-auto space-y-6">
         <div>
-          <label htmlFor="base-color" className="block mb-1 font-medium text-gray-800">
+          <label
+            htmlFor="base-color"
+            className="block mb-1 font-medium text-gray-800"
+          >
             Base Color
           </label>
-          <Input id="base-color" type="color" value={color} onChange={handleColor} className="h-10 p-0" />
+          <Input
+            id="base-color"
+            type="color"
+            value={color}
+            onChange={handleColor}
+            className="h-10 p-0"
+          />
         </div>
         <div className="flex flex-wrap gap-4">
           <label className="flex items-center space-x-1">
@@ -83,8 +104,8 @@ export default function ColorPaletteGeneratorClient() {
               type="radio"
               name="scheme"
               value="analogous"
-              checked={scheme === 'analogous'}
-              onChange={() => setScheme('analogous')}
+              checked={scheme === "analogous"}
+              onChange={() => setScheme("analogous")}
               className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
             />
             <span className="text-sm text-gray-700">Analogous</span>
@@ -94,8 +115,8 @@ export default function ColorPaletteGeneratorClient() {
               type="radio"
               name="scheme"
               value="complementary"
-              checked={scheme === 'complementary'}
-              onChange={() => setScheme('complementary')}
+              checked={scheme === "complementary"}
+              onChange={() => setScheme("complementary")}
               className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
             />
             <span className="text-sm text-gray-700">Complementary</span>
@@ -105,8 +126,8 @@ export default function ColorPaletteGeneratorClient() {
               type="radio"
               name="scheme"
               value="triadic"
-              checked={scheme === 'triadic'}
-              onChange={() => setScheme('triadic')}
+              checked={scheme === "triadic"}
+              onChange={() => setScheme("triadic")}
               className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
             />
             <span className="text-sm text-gray-700">Triadic</span>
@@ -116,8 +137,8 @@ export default function ColorPaletteGeneratorClient() {
               type="radio"
               name="scheme"
               value="tetradic"
-              checked={scheme === 'tetradic'}
-              onChange={() => setScheme('tetradic')}
+              checked={scheme === "tetradic"}
+              onChange={() => setScheme("tetradic")}
               className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
             />
             <span className="text-sm text-gray-700">Tetradic</span>
@@ -127,15 +148,18 @@ export default function ColorPaletteGeneratorClient() {
               type="radio"
               name="scheme"
               value="monochromatic"
-              checked={scheme === 'monochromatic'}
-              onChange={() => setScheme('monochromatic')}
+              checked={scheme === "monochromatic"}
+              onChange={() => setScheme("monochromatic")}
               className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
             />
             <span className="text-sm text-gray-700">Monochromatic</span>
           </label>
         </div>
         <div>
-          <label htmlFor="count" className="block mb-1 font-medium text-gray-800">
+          <label
+            htmlFor="count"
+            className="block mb-1 font-medium text-gray-800"
+          >
             Colors: <span className="font-semibold">{count}</span>
           </label>
           <input
@@ -159,7 +183,7 @@ export default function ColorPaletteGeneratorClient() {
                 <button
                   type="button"
                   onClick={() => navigator.clipboard.writeText(hex)}
-                  className="relative w-full h-20 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="swatch relative w-full h-20 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   style={{ backgroundColor: hex }}
                 >
                   <span className="sr-only">Copy {hex}</span>
@@ -167,7 +191,9 @@ export default function ColorPaletteGeneratorClient() {
                     <span>{hex}</span>
                     <span>{formatRgb(rgb)}</span>
                     <span>{formatHsl(hsl)}</span>
-                    <span className="mt-1 px-1.5 py-0.5 bg-indigo-600 text-white rounded">Copy</span>
+                    <span className="mt-1 px-1.5 py-0.5 bg-indigo-600 text-white rounded">
+                      Copy
+                    </span>
                   </div>
                 </button>
               </li>
