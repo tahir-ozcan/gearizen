@@ -168,7 +168,11 @@ export default function ImageCompressorClient() {
               value={sliderValue}
               onChange={(e) => setSliderValue(Number(e.target.value))}
               aria-label="Image quality percentage"
-              className="w-full cursor-pointer"
+              aria-valuemin={1}
+              aria-valuemax={100}
+              aria-valuenow={sliderValue}
+              title={`${sliderValue}%`}
+              className="w-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
