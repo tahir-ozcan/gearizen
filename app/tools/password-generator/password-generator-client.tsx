@@ -147,6 +147,13 @@ export default function PasswordGeneratorClient() {
         className="space-y-8 max-w-2xl mx-auto"
         aria-label="Password options"
       >
+        <button
+          type="submit"
+          aria-label="Generate password with current settings"
+          className="w-full btn-primary"
+        >
+          Generate Password
+        </button>
         {/* Pattern */}
         <div>
           <label
@@ -202,7 +209,7 @@ export default function PasswordGeneratorClient() {
             Include Characters
           </legend>
           <div className="grid grid-cols-2 gap-4">
-            <label className="flex items-center space-x-2">
+            <label className="flex items-center space-x-2 col-span-2">
               <input
                 type="checkbox"
                 checked={useUpper}
@@ -211,7 +218,7 @@ export default function PasswordGeneratorClient() {
               />
               <span className="text-gray-700 select-none">Uppercase (A–Z)</span>
             </label>
-            <label className="flex items-center space-x-2">
+            <label className="flex items-center space-x-2 col-span-2">
               <input
                 type="checkbox"
                 checked={useLower}
@@ -220,7 +227,7 @@ export default function PasswordGeneratorClient() {
               />
               <span className="text-gray-700 select-none">Lowercase (a–z)</span>
             </label>
-            <label className="flex items-center space-x-2">
+            <label className="flex items-center space-x-2 col-span-2">
               <input
                 type="checkbox"
                 checked={useDigits}
@@ -229,7 +236,7 @@ export default function PasswordGeneratorClient() {
               />
               <span className="text-gray-700 select-none">Numbers (0–9)</span>
             </label>
-            <label className="flex items-center space-x-2">
+            <label className="flex items-center space-x-2 col-span-2">
               <input
                 type="checkbox"
                 checked={useSymbols}
@@ -279,7 +286,7 @@ export default function PasswordGeneratorClient() {
             Minimum Counts
           </legend>
           <div className="grid grid-cols-2 gap-4">
-            <label className="flex items-center space-x-2">
+            <label className="flex items-center space-x-2 col-span-2">
               <span className="text-gray-700 select-none">Uppercase</span>
               <input
                 type="number"
@@ -290,7 +297,7 @@ export default function PasswordGeneratorClient() {
                 className="w-20 input-base"
               />
             </label>
-            <label className="flex items-center space-x-2">
+            <label className="flex items-center space-x-2 col-span-2">
               <span className="text-gray-700 select-none">Lowercase</span>
               <input
                 type="number"
@@ -301,7 +308,7 @@ export default function PasswordGeneratorClient() {
                 className="w-20 input-base"
               />
             </label>
-            <label className="flex items-center space-x-2">
+            <label className="flex items-center space-x-2 col-span-2">
               <span className="text-gray-700 select-none">Digits</span>
               <input
                 type="number"
@@ -312,7 +319,7 @@ export default function PasswordGeneratorClient() {
                 className="w-20 input-base"
               />
             </label>
-            <label className="flex items-center space-x-2">
+            <label className="flex items-center space-x-2 col-span-2">
               <span className="text-gray-700 select-none">Symbols</span>
               <input
                 type="number"
@@ -325,14 +332,6 @@ export default function PasswordGeneratorClient() {
             </label>
           </div>
         </fieldset>
-
-        <button
-          type="submit"
-          aria-label="Generate password with current settings"
-          className="w-full btn-primary"
-        >
-          Generate Password
-        </button>
       </form>
     </section>
   );
