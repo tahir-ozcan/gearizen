@@ -5,19 +5,24 @@
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { ReactNode } from "react";
+import contactConfig from "@/lib/contact-config";
 import JsonLd from "@/app/components/JsonLd";
 
-const FaGithub = dynamic(() => import("react-icons/fa").then(m => m.FaGithub), {
-  ssr: false,
-});
-const FaTwitter = dynamic(() => import("react-icons/fa").then(m => m.FaTwitter), {
-  ssr: false,
-});
-const FaLinkedin = dynamic(
-  () => import("react-icons/fa").then(m => m.FaLinkedin),
-  { ssr: false }
-);
+import { LucideProps } from "lucide-react";
+
+const iconCache: Record<string, React.ComponentType<LucideProps>> = {};
+function getIcon(name: string) {
+  if (!iconCache[name]) {
+    iconCache[name] = dynamic<LucideProps>(
+      () =>
+        import("lucide-react").then((m) => ({
+          default: (m as unknown as Record<string, React.ComponentType<LucideProps>>)[name],
+        })),
+      { ssr: false },
+    );
+  }
+  return iconCache[name];
+}
 
 interface LinkItem {
   label: string;
@@ -27,7 +32,7 @@ interface LinkItem {
 interface SocialLink {
   href: string;
   label: string;
-  icon: ReactNode;
+  icon: React.ComponentType<LucideProps>;
 }
 
 export default function Footer() {
@@ -58,23 +63,17 @@ export default function Footer() {
     { label: "Vercel", href: "https://vercel.com" },
   ];
 
-  const socialLinks: SocialLink[] = [
-    {
-      href: "https://github.com/tahir-ozcan/gearizen",
-      label: "GitHub",
-      icon: <FaGithub className="w-6 h-6" aria-hidden="true" />,
-    },
-    {
-      href: "https://twitter.com/gearizen",
-      label: "Twitter",
-      icon: <FaTwitter className="w-6 h-6" aria-hidden="true" />,
-    },
-    {
-      href: "https://linkedin.com/company/gearizen",
-      label: "LinkedIn",
-      icon: <FaLinkedin className="w-6 h-6" aria-hidden="true" />,
-    },
-  ];
+  const socialLinks: SocialLink[] = contactConfig.channels
+    .filter((c) => c.type === "link")
+    .map((c) => ({
+      href: c.href!,
+      label: c.label,
+      icon: getIcon(c.icon),
+    }));
+
+  const emailAddress = contactConfig.channels.find((c) => c.type === "email")?.address
+    ? atob(contactConfig.channels.find((c) => c.type === "email")!.address!)
+    : "";
 
   const organizationJsonLd = {
     "@context": "https://schema.org",
@@ -116,7 +115,7 @@ export default function Footer() {
             </p>
             <nav aria-label="Social links" className="mt-4">
               <ul className="flex space-x-4">
-                {socialLinks.map(({ href, label, icon }) => (
+                {socialLinks.map(({ href, label, icon: Icon }) => (
                   <li key={href}>
                     <a
                       href={href}
@@ -126,7 +125,7 @@ export default function Footer() {
                       className="text-gray-500 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded transition-colors"
                     >
                       <span className="sr-only">{label}</span>
-                      {icon}
+                      <Icon className="w-6 h-6" aria-hidden="true" />
                     </a>
                   </li>
                 ))}
@@ -177,6 +176,26 @@ export default function Footer() {
               ))}
             </ul>
           </nav>
+
+          {/* Contact Info */}
+          <section aria-labelledby="footer-contact">
+            <h3
+              id="footer-contact"
+              className="text-lg font-semibold text-gray-900"
+            >
+              Contact
+            </h3>
+            <address className="mt-4 not-italic text-sm space-y-2 text-gray-600">
+              {emailAddress && (
+                <a
+                  href={`mailto:${emailAddress}`}
+                  className="block hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded"
+                >
+                  {emailAddress}
+                </a>
+              )}
+            </address>
+          </section>
 
           {/* Built With */}
           <nav aria-labelledby="footer-built-with">
