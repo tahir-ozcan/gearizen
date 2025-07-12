@@ -2,120 +2,23 @@
 
 "use client";
 
-import { useState, ChangeEvent, useEffect } from "react";
+import { useState, ChangeEvent, useEffect, useRef } from "react";
+import { CategoryKey, convert, getUnitCategories } from "../../../lib/unit-convert";
+import { motion } from "framer-motion";
 
-type CategoryKey = "length" | "weight" | "temperature" | "volume";
-
-const categories: Record<CategoryKey, {
-  label: string;
-  units: Record<string, string>;
-}> = {
-  length: {
-    label: "Length",
-    units: {
-      m: "Meter (m)",
-      km: "Kilometer (km)",
-      mi: "Mile (mi)",
-      ft: "Foot (ft)",
-      in: "Inch (in)",
-    },
-  },
-  weight: {
-    label: "Weight",
-    units: {
-      g: "Gram (g)",
-      kg: "Kilogram (kg)",
-      lb: "Pound (lb)",
-      oz: "Ounce (oz)",
-    },
-  },
-  temperature: {
-    label: "Temperature",
-    units: {
-      C: "Celsius (°C)",
-      F: "Fahrenheit (°F)",
-      K: "Kelvin (K)",
-    },
-  },
-  volume: {
-    label: "Volume",
-    units: {
-      L: "Liter (L)",
-      mL: "Milliliter (mL)",
-      gal: "Gallon (gal)",
-    },
-  },
-};
-
-const factors: Record<Exclude<CategoryKey, "temperature">, Record<string, number>> = {
-  length: {
-    m: 1,
-    km: 1000,
-    mi: 1609.34,
-    ft: 0.3048,
-    in: 0.0254,
-  },
-  weight: {
-    g: 1,
-    kg: 1000,
-    lb: 453.592,
-    oz: 28.3495,
-  },
-  volume: {
-    L: 1,
-    mL: 0.001,
-    gal: 3.78541,
-  },
-};
-
-export function convert(
-  category: CategoryKey,
-  from: string,
-  to: string,
-  value: number
-): number {
-  if (category === "temperature") {
-    if (from === to) return value;
-    let celsius: number;
-    switch (from) {
-      case "C":
-        celsius = value;
-        break;
-      case "F":
-        celsius = (value - 32) * 5 / 9;
-        break;
-      case "K":
-        celsius = value - 273.15;
-        break;
-      default:
-        celsius = value;
-    }
-    switch (to) {
-      case "C":
-        return celsius;
-      case "F":
-        return celsius * 9 / 5 + 32;
-      case "K":
-        return celsius + 273.15;
-      default:
-        return celsius;
-    }
-  } else {
-    const cat = factors[category];
-    if (!cat) return value;
-    const baseValue = value * (cat[from] ?? 1);
-    const result = baseValue / (cat[to] ?? 1);
-    return result;
-  }
-}
+const categories = getUnitCategories();
 
 export default function UnitConverterClient() {
-  const [category, setCategory] = useState<CategoryKey>("length");
-  const [fromUnit, setFromUnit] = useState<string>("m");
-  const [toUnit, setToUnit] = useState<string>("km");
+  const firstCat = Object.keys(categories)[0] as CategoryKey;
+  const [category, setCategory] = useState<CategoryKey>(firstCat);
+  const initUnits = Object.keys(categories[firstCat].units);
+  const [fromUnit, setFromUnit] = useState<string>(initUnits[0]);
+  const [toUnit, setToUnit] = useState<string>(initUnits[1] || initUnits[0]);
   const [input, setInput] = useState<string>("1");
   const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [swapped, setSwapped] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const onCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const cat = e.target.value as CategoryKey;
@@ -130,8 +33,18 @@ export default function UnitConverterClient() {
   useEffect(() => {
     const t = setTimeout(() => {
       const value = parseFloat(input);
-      if (isNaN(value)) {
+      if (!Number.isFinite(value)) {
         setError("Please enter a valid number.");
+        setOutput("");
+        return;
+      }
+      if (value < 0 && category !== "temperature") {
+        setError("Value must be non-negative.");
+        setOutput("");
+        return;
+      }
+      if (Math.abs(value) > Number.MAX_SAFE_INTEGER) {
+        setError("Value is too large.");
         setOutput("");
         return;
       }
@@ -146,6 +59,8 @@ export default function UnitConverterClient() {
     setFromUnit(toUnit);
     setToUnit(fromUnit);
     setOutput("");
+    setSwapped((s) => !s);
+    inputRef.current?.focus();
   };
 
   return (
@@ -161,16 +76,16 @@ export default function UnitConverterClient() {
         Unit Converter
       </h1>
       <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-        Convert between units of length, weight, temperature, and volume
+        Convert between units of length, weight, volume, temperature, time and data
         instantly. 100% client-side, no signup required.
       </p>
 
       <form
         onSubmit={(e) => e.preventDefault()}
-        className="max-w-lg mx-auto space-y-6"
+        className="max-w-xl mx-auto grid gap-6 sm:grid-cols-2"
         aria-label="Unit converter form"
       >
-        <div>
+        <div className="sm:col-span-2">
           <label htmlFor="category" className="block mb-1 font-medium text-gray-800">
             Category
           </label>
@@ -178,7 +93,7 @@ export default function UnitConverterClient() {
             id="category"
             value={category}
             onChange={onCategoryChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="input-base"
           >
             {Object.entries(categories).map(([key, { label }]) => (
               <option key={key} value={key}>
@@ -188,62 +103,62 @@ export default function UnitConverterClient() {
           </select>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="from-unit" className="block mb-1 font-medium text-gray-800">
-              From
-            </label>
-            <select
-              id="from-unit"
-              value={fromUnit}
-              onChange={e => setFromUnit(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-            >
-              {Object.entries(categories[category].units).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="to-unit" className="block mb-1 font-medium text-gray-800">
-              To
-            </label>
-            <select
-              id="to-unit"
-              value={toUnit}
-              onChange={e => setToUnit(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-            >
-              {Object.entries(categories[category].units).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div>
+          <label htmlFor="from-unit" className="block mb-1 font-medium text-gray-800">
+            From
+          </label>
+          <select
+            id="from-unit"
+            value={fromUnit}
+            onChange={(e) => setFromUnit(e.target.value)}
+            className="input-base"
+          >
+            {Object.entries((categories[category].units as Record<string, string>)).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="to-unit" className="block mb-1 font-medium text-gray-800">
+            To
+          </label>
+          <select
+            id="to-unit"
+            value={toUnit}
+            onChange={(e) => setToUnit(e.target.value)}
+            className="input-base"
+          >
+            {Object.entries((categories[category].units as Record<string, string>)).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
         </div>
 
-        <button
+        <motion.button
           type="button"
           onClick={swapUnits}
-          className="block mx-auto text-indigo-600 hover:underline focus:outline-none transition"
+          animate={{ rotate: swapped ? 180 : 0 }}
+          className="sm:col-span-2 mx-auto text-indigo-600 hover:underline focus:outline-none transition-transform"
         >
           Swap units
-        </button>
+        </motion.button>
 
-        <div>
+        <div className="sm:col-span-2">
           <label htmlFor="input-value" className="block mb-1 font-medium text-gray-800">
             Value
           </label>
           <input
             id="input-value"
+            ref={inputRef}
             type="text"
             value={input}
-            onChange={e => setInput(e.target.value)}
+            onChange={(e) => setInput(e.target.value)}
             placeholder="Enter value"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-mono"
+            className="input-base font-mono"
           />
         </div>
 
@@ -261,7 +176,7 @@ export default function UnitConverterClient() {
             <span className="font-mono text-xl text-indigo-600">
               {output}
             </span>{" "}
-            {categories[category].units[toUnit]}
+            {(categories[category].units as Record<string, string>)[toUnit]}
           </p>
         </div>
       )}

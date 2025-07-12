@@ -7,7 +7,7 @@ export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "Unit Converter",
   description:
-    "Convert units of length, weight, temperature, and volume instantly with Gearizen’s free client-side Unit Converter. No signup required.",
+    "Convert units of length, weight, volume, temperature, time and data instantly with Gearizen’s free client-side Unit Converter. No signup required.",
   keywords: [
     "unit converter",
     "convert units",
@@ -15,6 +15,8 @@ export const metadata = {
     "weight converter",
     "temperature converter",
     "volume converter",
+    "time converter",
+    "data unit converter",
     "client-side unit converter",
     "free online converter",
     "Gearizen unit converter",
@@ -25,7 +27,7 @@ export const metadata = {
   openGraph: {
     title: "Unit Converter | Gearizen",
     description:
-      "Use Gearizen’s client-side Unit Converter to convert between meters, miles, kilograms, pounds, Celsius, Fahrenheit, liters, gallons and more—instantly and free.",
+      "Use Gearizen’s client-side Unit Converter to convert between meters, miles, kilograms, pounds, bytes, seconds and more—instantly and free.",
     url: "https://gearizen.com/tools/unit-converter",
     siteName: "Gearizen",
     locale: "en_US",
@@ -43,16 +45,18 @@ export const metadata = {
     card: "summary_large_image",
     title: "Unit Converter | Gearizen",
     description:
-      "Instantly convert length, weight, temperature & volume units with Gearizen’s client-side Unit Converter. Fast, private, and no login.",
+      "Instantly convert length, weight, volume, temperature, time and data units with Gearizen’s client-side Unit Converter. Fast, private, and no login.",
     creator: "@gearizen",
     images: ["/og-placeholder.svg"],
   },
 };
 
-export default function UnitConverterPage() {  return (
+export default function UnitConverterPage() {
+  return (
     <>
       <BreadcrumbJsonLd pageTitle="Unit Converter" pageUrl="https://gearizen.com/tools/unit-converter" />
       <UnitConverterClient />
     </>
   );
 }
+
