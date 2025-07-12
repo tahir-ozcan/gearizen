@@ -18,6 +18,7 @@ export const metadata = {
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
   robots: { index: true, follow: true },
+  other: { robots: 'noarchive' },
   alternates: { canonical: "https://gearizen.com/privacy" },
   openGraph: {
     title: "Privacy Policy | Gearizen",

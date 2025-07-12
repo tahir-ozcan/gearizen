@@ -1,0 +1,37 @@
+[
+  {
+    "id": "intro",
+    "title": "Privacy Policy",
+    "body": "At **Gearizen**, your privacy is our top priority. All of our tools run **100% client-side**, meaning your data never leaves your device—nothing is transmitted, stored, or tracked on our servers.\n\nYou are never required to create an account or provide any personal information. Feel free to use our password generators, JSON formatters, text converters, QR code tools, and more—completely anonymously."
+  },
+  {
+    "id": "data-we-dont-collect",
+    "title": "Data We Don\u2019t Collect",
+    "body": "- No personal information (name, address, email, etc.)\n- No file uploads or storage on our servers\n- No IP address logging\n- No behavioral analytics or usage tracking"
+  },
+  {
+    "id": "third-party-services",
+    "title": "Advertising & Third-Party Services",
+    "body": "We display ads via third-party networks (e.g., Google Ads). Those providers may set their own cookies or trackers; please review their privacy policies. Gearizen does not share any personally identifiable data with advertisers."
+  },
+  {
+    "id": "cookies",
+    "title": "Cookies",
+    "body": "Gearizen itself does not use cookies. However, third-party ad networks may drop cookies under their own policies. You can manage those through your browser settings."
+  },
+  {
+    "id": "your-rights",
+    "title": "Your Rights",
+    "body": "Since we collect no personal data, there is nothing for you to access, modify, or delete. Your interactions remain private on your device."
+  },
+  {
+    "id": "policy-updates",
+    "title": "Policy Updates",
+    "body": "We may update this policy to reflect changes in our tools or applicable laws. Please revisit this page periodically to stay informed."
+  },
+  {
+    "id": "contact",
+    "title": "Contact Us",
+    "body": "If you have questions about this policy, please [get in touch](/contact)."
+  }
+]
