@@ -69,15 +69,20 @@ describe("generatePassword", () => {
     expect(/[!@#$%^&*()\-_=+\[\]{}|;:',.<>?/`~]/.test(pwd[3])).toBe(true);
   });
 
-  test("pattern '?' respects selected sets", () => {
+  test("pattern overrides length and other settings", () => {
     const pwd = generatePassword({
-      pattern: "???",
-      upper: true,
-      digits: true,
+      pattern: "Aa0",
+      length: 20,
+      upper: false,
       lower: false,
+      digits: false,
       symbols: false,
+      minUpper: 5,
     });
-    expect(/^[A-Z0-9]{3}$/.test(pwd)).toBe(true);
+    expect(pwd).toHaveLength(3);
+    expect(/[A-Z]/.test(pwd[0])).toBe(true);
+    expect(/[a-z]/.test(pwd[1])).toBe(true);
+    expect(/[0-9]/.test(pwd[2])).toBe(true);
   });
 
   test("avoids consecutive repeats", () => {
