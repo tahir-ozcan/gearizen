@@ -1,0 +1,1 @@
+On any user interaction (base color or scheme change), generate exactly N colors. The value N comes from the "Colors" slider and must remain unchanged when the user switches schemes or edits the base color.
