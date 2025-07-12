@@ -131,7 +131,7 @@ export default function PasswordGeneratorClient() {
             type="button"
             onClick={copyPassword}
             aria-label="Copy password to clipboard"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
+            className="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
           >
             {copied ? "Copied!" : "Copy"}
           </button>
@@ -269,6 +269,9 @@ export default function PasswordGeneratorClient() {
           >
             Copy CLI Command
           </button>
+          <pre className="mt-2 p-2 bg-gray-100 rounded text-sm font-mono overflow-x-auto whitespace-nowrap break-normal">
+            {cliCommand}
+          </pre>
         </fieldset>
 
         <fieldset className="space-y-4">
@@ -323,7 +326,11 @@ export default function PasswordGeneratorClient() {
           </div>
         </fieldset>
 
-        <button type="submit" className="w-full btn-primary">
+        <button
+          type="submit"
+          aria-label="Generate password with current settings"
+          className="w-full btn-primary"
+        >
           Generate Password
         </button>
       </form>
