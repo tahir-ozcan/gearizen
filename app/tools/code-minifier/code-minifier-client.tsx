@@ -15,7 +15,6 @@ export default function CodeMinifierClient() {
     setError(null);
   };
 
-
   const minifyCode = () => {
     try {
       let code = input;
@@ -24,8 +23,8 @@ export default function CodeMinifierClient() {
       // Collapse whitespace
       code = code
         .split("\n")
-        .map(line => line.trim())
-        .filter(line => line.length > 0)
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
         .join(" ");
       setOutput(code);
       setError(null);
@@ -51,7 +50,7 @@ export default function CodeMinifierClient() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "minified.txt";
+    a.download = "minified.min";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -69,8 +68,8 @@ export default function CodeMinifierClient() {
         Code Minifier
       </h1>
       <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-        Minify your JavaScript, CSS, or HTML code instantly. 100% client-side,
-        no signup required.
+        Instantly strip out whitespace, comments &amp; unused code from your JS,
+        CSS or HTML—100% client-side, no signup required.
       </p>
 
       {/* Input */}
@@ -79,7 +78,7 @@ export default function CodeMinifierClient() {
         aria-label="Code input"
         value={input}
         onChange={handleInput}
-        placeholder="Paste your code here..."
+        placeholder="Paste your JavaScript, CSS or HTML here..."
         className="w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
       />
 
@@ -90,7 +89,7 @@ export default function CodeMinifierClient() {
           onClick={minifyCode}
           className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
         >
-          Minify
+          Minify Code
         </button>
         <button
           type="button"
@@ -98,7 +97,7 @@ export default function CodeMinifierClient() {
           disabled={!output}
           className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition text-sm font-medium disabled:opacity-60"
         >
-          Copy
+          Copy Minified
         </button>
         <button
           type="button"
@@ -106,7 +105,7 @@ export default function CodeMinifierClient() {
           disabled={!output}
           className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 transition text-sm font-medium disabled:opacity-60"
         >
-          Download
+          Download .min
         </button>
       </div>
 

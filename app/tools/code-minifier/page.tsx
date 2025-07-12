@@ -7,7 +7,7 @@ export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "Code Minifier | Gearizen",
   description:
-    "Minify JavaScript, CSS, or HTML code instantly with Gearizen’s free client-side Code Minifier tool. Copy or download your minified code without signup!",
+    "Instantly strip whitespace, comments & unused code from your JS, CSS or HTML with Gearizen's client-side Code Minifier. No signup required.",
   keywords: [
     "code minifier",
     "JavaScript minify",
@@ -23,7 +23,7 @@ export const metadata = {
   openGraph: {
     title: "Code Minifier | Gearizen",
     description:
-      "Use Gearizen’s client-side Code Minifier to compress JavaScript, CSS, or HTML code instantly. No tracking, no signup—copy or download in your browser.",
+      "Use Gearizen’s client-side Code Minifier to remove whitespace, comments & unused code from JavaScript, CSS or HTML. No tracking, no signup—copy or download in your browser.",
     url: "https://gearizen.com/tools/code-minifier",
     siteName: "Gearizen",
     locale: "en_US",
@@ -41,15 +41,19 @@ export const metadata = {
     card: "summary_large_image",
     title: "Code Minifier | Gearizen",
     description:
-      "Compress your JavaScript, CSS, or HTML code in the browser with Gearizen’s client-side Code Minifier. No account needed.",
+      "Compress your JavaScript, CSS or HTML in the browser by stripping comments and whitespace—no account needed.",
     creator: "@gearizen",
     images: ["/og-placeholder.svg"],
   },
 };
 
-export default function CodeMinifierPage() {  return (
+export default function CodeMinifierPage() {
+  return (
     <>
-      <BreadcrumbJsonLd pageTitle="Code Minifier" pageUrl="https://gearizen.com/tools/code-minifier" />
+      <BreadcrumbJsonLd
+        pageTitle="Code Minifier"
+        pageUrl="https://gearizen.com/tools/code-minifier"
+      />
       <CodeMinifierClient />
     </>
   );
