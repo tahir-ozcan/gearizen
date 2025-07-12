@@ -1,118 +1,101 @@
 // app/tools/image-compressor/image-compressor-client.tsx
-
 "use client";
 
-import { useState, useEffect, ChangeEvent } from "react";
-import PreviewImage from "@/components/PreviewImage";
-import Input from "@/components/Input";
+import { useState, useEffect } from "react";
+import DropZone from "@/components/DropZone";
 import Button from "@/components/Button";
+import BeforeAfterSlider from "@/components/BeforeAfterSlider";
+import { estimateCompressedSize } from "./compress-utils";
+
+interface Item {
+  file: File;
+  url: string;
+  width: number;
+  height: number;
+  originalSize: number;
+  compressedUrl?: string;
+  compressedSize?: number;
+}
+
+const presets = [
+  { label: "Low", value: 0.3 },
+  { label: "Medium", value: 0.6 },
+  { label: "High", value: 0.8 },
+];
 
 export default function ImageCompressorClient() {
-  const [file, setFile] = useState<File | null>(null);
-  const [originalUrl, setOriginalUrl] = useState<string | null>(null);
-  const [originalSize, setOriginalSize] = useState<number | null>(null);
-  const [dimensions, setDimensions] = useState<{ w: number; h: number } | null>(
-    null
-  );
-
+  const [items, setItems] = useState<Item[]>([]);
   const [quality, setQuality] = useState(0.8);
-  const [compressedUrl, setCompressedUrl] = useState<string | null>(null);
-  const [compressedSize, setCompressedSize] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
-
-  // reset preview when file changes
-  useEffect(() => {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      const img = new window.Image();
-      img.onload = () => {
-        setOriginalUrl(result);
-        setOriginalSize(file.size);
-        setDimensions({ w: img.naturalWidth, h: img.naturalHeight });
-        setError(null);
-      };
-      img.src = result;
-    };
-    reader.readAsDataURL(file);
-  }, [file]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     return () => {
-      if (compressedUrl) URL.revokeObjectURL(compressedUrl);
+      items.forEach(i => {
+        URL.revokeObjectURL(i.url);
+        if (i.compressedUrl) URL.revokeObjectURL(i.compressedUrl);
+      });
     };
-  }, [compressedUrl]);
+  }, [items]);
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (compressedUrl) URL.revokeObjectURL(compressedUrl);
-    if (originalUrl && originalUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(originalUrl);
+  const loadFiles = async (files: FileList) => {
+    const list: Item[] = [];
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith("image/")) continue;
+      const url = URL.createObjectURL(file);
+      const img = document.createElement("img");
+      img.src = url;
+      await new Promise<void>((res, rej) => {
+        img.onload = () => res();
+        img.onerror = () => rej();
+      });
+      list.push({
+        file,
+        url,
+        width: img.naturalWidth,
+        height: img.naturalHeight,
+        originalSize: file.size,
+      });
     }
-    setCompressedUrl(null);
-    setCompressedSize(null);
-    setFile(e.target.files?.[0] ?? null);
+    setItems(prev => [...prev, ...list]);
   };
 
-  const compressImage = () => {
-    if (!file || !originalUrl) return;
+  const compressOne = async (item: Item) => {
+    const img = document.createElement("img");
+    img.src = item.url;
+    await new Promise<void>((res, rej) => {
+      img.onload = () => res();
+      img.onerror = () => rej();
+    });
+    const canvas = document.createElement("canvas");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Canvas not supported");
+    ctx.drawImage(img, 0, 0);
+    const blob = await new Promise<Blob | null>(resolve =>
+      canvas.toBlob(resolve, item.file.type || "image/jpeg", quality)
+    );
+    if (!blob) throw new Error("Compression failed");
+    item.compressedUrl = URL.createObjectURL(blob);
+    item.compressedSize = blob.size;
+  };
+
+  const compressImages = async () => {
     setProcessing(true);
     setError(null);
-
-    // Load the image from the selected file
-    const img = new window.Image();
-    img.src = originalUrl;
-
-    img.onload = () => {
+    const newItems = [...items];
+    for (const item of newItems) {
       try {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) throw new Error('Canvas not supported');
-        ctx.drawImage(img, 0, 0);
-
-        if (!canvas.toBlob) {
-          throw new Error('Browser does not support image compression');
-        }
-
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              // Revoke any previous compressed preview to avoid memory leaks
-              if (compressedUrl) {
-                URL.revokeObjectURL(compressedUrl);
-              }
-              const url = URL.createObjectURL(blob);
-              setCompressedUrl(url);
-              setCompressedSize(blob.size);
-            } else {
-              setError("Compression failed.");
-            }
-            setProcessing(false);
-          },
-          file.type || "image/jpeg",
-          quality
-        );
+        await compressOne(item);
       } catch {
         setError("An error occurred during compression.");
-        setProcessing(false);
+        break;
       }
-    };
-
-    img.onerror = () => {
-      setError("Failed to load image for compression.");
-      setProcessing(false);
-    };
-  };
-
-  const downloadCompressed = () => {
-    if (!compressedUrl) return;
-    const a = document.createElement("a");
-    a.href = compressedUrl;
-    a.download = `compressed-${file?.name ?? "image"}`;
-    a.click();
+      await new Promise(r => setTimeout(r, 0));
+    }
+    setItems(newItems);
+    setProcessing(false);
   };
 
   return (
@@ -128,111 +111,105 @@ export default function ImageCompressorClient() {
         Image Compressor
       </h1>
       <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-        Upload an image, adjust quality, and download a smaller file. 100%
-        client-side, no signup required.
+        Upload images, adjust quality, and download smaller files. 100% client-side, no signup required.
       </p>
 
-      <div className="max-w-md mx-auto mb-8">
-        <Input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500"
-        />
+      <div className="max-w-lg mx-auto mb-8">
+        <DropZone onFiles={loadFiles} />
       </div>
 
-      {originalUrl && (
-        <>
-          <div className="max-w-md mx-auto mb-8">
-            <label
-              htmlFor="quality"
-              className="block mb-2 font-medium text-gray-800"
-            >
-              Quality:{" "}
-              <span className="font-semibold">
-                {Math.round(quality * 100)}%
-              </span>
-            </label>
-            <Input
-              id="quality"
-              type="range"
-              min={0.1}
-              max={1}
-              step={0.1}
-              value={quality}
-              onChange={(e) => setQuality(Number(e.target.value))}
-              className="w-full"
-            />
-          </div>
-
-          <div className="text-center mb-8">
-            <Button
-              onClick={compressImage}
-              disabled={processing}
-              className={`${processing ? "opacity-60 cursor-not-allowed" : ""}`}
-            >
-              {processing ? "Compressing..." : "Compress Image"}
-            </Button>
-          </div>
-
-          {error && (
-            <div
-              role="alert"
-              className="max-w-md mx-auto mb-8 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md"
-            >
-              {error}
-            </div>
-          )}
-
-          <div className="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto mb-8">
-            <div className="text-center">
-              <p className="font-medium mb-2">Original</p>
-              {dimensions && (
-                <PreviewImage
-                  src={originalUrl}
-                  alt="Original"
-                  width={dimensions.w}
-                  height={dimensions.h}
-                />
-              )}
-              {originalSize != null && (
-                <p className="mt-2 text-sm text-gray-600">
-                  {(originalSize / 1024).toFixed(1)} KB
-                </p>
-              )}
-            </div>
-
-            {compressedUrl && (
-              <div className="text-center">
-                <p className="font-medium mb-2">Compressed</p>
-                {dimensions && (
-                  <PreviewImage
-                    src={compressedUrl}
-                    alt="Compressed"
-                    width={dimensions.w}
-                    height={dimensions.h}
-                  />
-                )}
-                {compressedSize != null && (
-                  <p className="mt-2 text-sm text-gray-600">
-                    {(compressedSize / 1024).toFixed(1)} KB
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-
-          {compressedUrl && (
-            <div className="text-center">
-              <Button
-                onClick={downloadCompressed}
-                className="bg-green-600 hover:bg-green-700 focus:ring-green-500"
+      {items.length > 0 && (
+        <div className="max-w-lg mx-auto mb-8 space-y-4">
+          <div className="flex items-center space-x-2 justify-center flex-wrap">
+            {presets.map(p => (
+              <button
+                key={p.label}
+                onClick={() => setQuality(p.value)}
+                className="btn-secondary text-sm"
               >
-                Download Compressed Image
-              </Button>
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <label htmlFor="quality" className="block mb-2 font-medium text-gray-800 text-center">
+            Quality: <span className="font-semibold">{Math.round(quality * 100)}%</span>
+          </label>
+          <input
+            id="quality"
+            type="range"
+            min={0.1}
+            max={1}
+            step={0.05}
+            value={quality}
+            onChange={e => setQuality(e.currentTarget.valueAsNumber)}
+            className="w-full"
+          />
+        </div>
+      )}
+
+      {items.length > 0 && (
+        <div className="text-center mb-8">
+          <Button
+            onClick={compressImages}
+            disabled={processing}
+            className={processing ? "opacity-60 cursor-not-allowed" : ""}
+          >
+            {processing ? "Compressing..." : "Compress Images"}
+          </Button>
+        </div>
+      )}
+
+      {error && (
+        <div
+          role="alert"
+          className="max-w-md mx-auto mb-8 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md"
+        >
+          {error}
+        </div>
+      )}
+
+      {items.length > 0 && (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
+          {items.map((item, idx) => (
+            <div key={idx} className="space-y-2 text-center">
+              <p className="font-medium">Original</p>
+              <img
+                src={item.url}
+                alt="Original"
+                width={item.width}
+                height={item.height}
+                className="w-full h-auto rounded-lg border border-gray-200 shadow-sm"
+              />
+              <p className="text-sm text-gray-600">
+                {(item.originalSize / 1024).toFixed(1)} KB → ~{(estimateCompressedSize(item.originalSize, quality) / 1024).toFixed(1)} KB
+              </p>
+              {item.compressedUrl && (
+                <>
+                  <BeforeAfterSlider
+                    original={item.url}
+                    compressed={item.compressedUrl}
+                    width={item.width}
+                    height={item.height}
+                    alt="preview"
+                  />
+                  {item.compressedSize != null && (
+                    <button
+                      onClick={() => {
+                        const a = document.createElement('a');
+                        a.href = item.compressedUrl!;
+                        a.download = `compressed-${item.file.name}`;
+                        a.click();
+                      }}
+                      className="btn-primary text-sm w-full mt-2"
+                    >
+                      Download ({(item.compressedSize / 1024).toFixed(1)} KB)
+                    </button>
+                  )}
+                </>
+              )}
             </div>
-          )}
-        </>
+          ))}
+        </div>
       )}
     </section>
   );
