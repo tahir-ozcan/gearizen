@@ -9,3 +9,10 @@ test('compressBuffer reduces size', async () => {
   const compressed = await compressBuffer(orig, 0.5);
   expect(compressed.length).toBeLessThan(orig.length);
 });
+
+test('lower quality produces smaller output', async () => {
+  const orig = await loadFile(samplePath);
+  const high = await compressBuffer(orig, 0.9);
+  const low = await compressBuffer(orig, 0.3);
+  expect(low.length).toBeLessThan(high.length);
+});
