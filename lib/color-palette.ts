@@ -9,9 +9,10 @@ export type PaletteScheme =
 
 /**
  * Generate a simple color palette from a base HEX color.
+ * Always returns exactly `count` colors regardless of the scheme.
  * @param base - Hex color string like `#ff0000`.
  * @param scheme - Palette type to create.
- * @param count - Number of colors for analogous palettes.
+ * @param count - Desired number of colors.
  */
 export function generatePalette(
   base: string,
