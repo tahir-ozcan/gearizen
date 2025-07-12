@@ -54,4 +54,28 @@ describe("generatePassword", () => {
     });
     expect(/[Il1O0]/.test(pwd)).toBe(false);
   });
+
+  test("generates using pattern", () => {
+    const pwd = generatePassword({
+      pattern: "Aa0$",
+      upper: true,
+      lower: true,
+      digits: true,
+      symbols: true,
+    });
+    expect(/[A-Z]/.test(pwd[0])).toBe(true);
+    expect(/[a-z]/.test(pwd[1])).toBe(true);
+    expect(/[0-9]/.test(pwd[2])).toBe(true);
+    expect(/[!@#$%^&*()\-_=+\[\]{}|;:',.<>?/`~]/.test(pwd[3])).toBe(true);
+  });
+
+  test("avoids consecutive repeats", () => {
+    const pwd = generatePassword({
+      length: 50,
+      upper: true,
+      lower: true,
+      avoidRepeats: true,
+    });
+    expect(/(.)\1/.test(pwd)).toBe(false);
+  });
 });

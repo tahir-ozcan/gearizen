@@ -2,6 +2,7 @@
 
 import PasswordGeneratorClient from "./password-generator-client";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
+import JsonLd from "@/app/components/JsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -46,9 +47,23 @@ export const metadata = {
   },
 };
 
-export default function PasswordGeneratorPage() {  return (
+export default function PasswordGeneratorPage() {
+  return (
     <>
-      <BreadcrumbJsonLd pageTitle="Strong Password Generator" pageUrl="https://gearizen.com/tools/password-generator" />
+      <BreadcrumbJsonLd
+        pageTitle="Strong Password Generator"
+        pageUrl="https://gearizen.com/tools/password-generator"
+      />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "Strong Password Generator",
+          operatingSystem: "any",
+          applicationCategory: "UtilitiesApplication",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        }}
+      />
       <PasswordGeneratorClient />
     </>
   );
