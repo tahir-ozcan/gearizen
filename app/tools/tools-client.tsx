@@ -96,6 +96,12 @@ const tools: Tool[] = [
     description: "Convert colors between HEX, RGB and HSL with preview.",
   },
   {
+    href: "/tools/color-palette-generator",
+    Icon: Palette,
+    title: "Color Palette Generator",
+    description: "Create harmonious color schemes from any base color.",
+  },
+  {
     href: "/tools/base64-encoder-decoder",
     Icon: Paperclip,
     title: "Base64 Encoder/Decoder",
