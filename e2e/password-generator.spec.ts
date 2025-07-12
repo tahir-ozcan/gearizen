@@ -6,4 +6,5 @@ test.skip("password generator generates", async ({ page }) => {
   const before = await input.inputValue();
   await page.getByRole("button", { name: "Generate Password" }).click();
   await expect.poll(() => input.inputValue()).not.toBe(before);
+  await expect(input).toHaveValue(/.+/);
 });

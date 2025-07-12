@@ -113,14 +113,12 @@ export function generatePassword(options: PasswordOptions): string {
   const chars = Array.from({ length: finalLength }, () => randomChar(pool));
 
   const used = new Set<number>();
-  randomIndices(required.length * 2, finalLength).forEach((pos) => {
-    if (used.size >= required.length) return;
-    if (!used.has(pos)) used.add(pos);
-  });
+  while (used.size < required.length) {
+    used.add(randomIndices(1, finalLength)[0]);
+  }
   const positions = Array.from(used);
   required.forEach((ch, i) => {
-    const idx = positions[i] ?? randomIndices(1, finalLength)[0];
-    chars[idx] = ch;
+    chars[positions[i]] = ch;
   });
 
   if (options.avoidRepeats) {
