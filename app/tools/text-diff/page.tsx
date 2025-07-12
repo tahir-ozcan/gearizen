@@ -47,9 +47,13 @@ export const metadata = {
   },
 };
 
-export default function TextDiffPage() {  return (
+export default function TextDiffPage() {
+  return (
     <>
-      <BreadcrumbJsonLd pageTitle="Text Diff Checker" pageUrl="https://gearizen.com/tools/text-diff" />
+      <BreadcrumbJsonLd
+        pageTitle="Text Diff Checker"
+        pageUrl="https://gearizen.com/tools/text-diff"
+      />
       <TextDiffClient />
     </>
   );

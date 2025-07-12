@@ -57,33 +57,39 @@ export default function TextDiffClient() {
         Text Diff Checker
       </h1>
       <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-        Compare two blocks of text and instantly see the differences highlighted.
-        Additions in green, deletions in red—100% client-side, no signup required.
+        Compare two blocks of text side-by-side. Additions appear in green,
+        deletions in red—100% client-side.
       </p>
 
       <form onSubmit={runDiff} className="max-w-4xl mx-auto space-y-6">
         <div className="grid gap-6 lg:grid-cols-2">
           <div>
-            <label htmlFor="original-text" className="block mb-1 font-medium text-gray-800">
+            <label
+              htmlFor="original-text"
+              className="block mb-1 font-medium text-gray-800"
+            >
               Original Text
             </label>
             <textarea
               id="original-text"
               value={original}
               onChange={handleOriginalChange}
-              placeholder="Enter original text..."
+              placeholder="Enter the original text..."
               className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             />
           </div>
           <div>
-            <label htmlFor="modified-text" className="block mb-1 font-medium text-gray-800">
+            <label
+              htmlFor="modified-text"
+              className="block mb-1 font-medium text-gray-800"
+            >
               Modified Text
             </label>
             <textarea
               id="modified-text"
               value={modified}
               onChange={handleModifiedChange}
-              placeholder="Enter modified text..."
+              placeholder="Enter the modified text..."
               className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             />
           </div>
@@ -94,14 +100,16 @@ export default function TextDiffClient() {
             type="submit"
             className="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
           >
-            Compare
+            Compare & Highlight
           </button>
         </div>
       </form>
 
       {diffHtml && (
         <div className="mt-12 max-w-4xl mx-auto">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Differences</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            Differences
+          </h2>
           <div
             className="prose prose-sm max-w-none whitespace-pre-wrap break-words"
             dangerouslySetInnerHTML={{ __html: diffHtml }}
