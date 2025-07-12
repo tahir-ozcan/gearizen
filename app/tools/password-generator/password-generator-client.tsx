@@ -269,7 +269,7 @@ export default function PasswordGeneratorClient() {
           >
             Copy CLI Command
           </button>
-          <pre className="mt-2 p-2 bg-gray-100 rounded text-sm font-mono overflow-x-auto whitespace-nowrap break-normal">
+          <pre className="mt-2 p-2 bg-gray-100 rounded text-sm font-mono whitespace-pre-wrap break-words">
             {cliCommand}
           </pre>
         </fieldset>
