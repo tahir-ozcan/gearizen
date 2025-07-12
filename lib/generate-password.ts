@@ -4,6 +4,7 @@ export interface PasswordOptions {
   lower?: boolean;
   digits?: boolean;
   symbols?: boolean;
+  excludeSimilar?: boolean;
 }
 
 const UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -11,10 +12,17 @@ const LOWER = "abcdefghijklmnopqrstuvwxyz";
 const DIGITS = "0123456789";
 const SYMBOLS = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~";
 
+const SIMILAR_CHARS = /[Il1O0]/g;
+
 function randomIndex(max: number): number {
   const arr = new Uint32Array(1);
-  globalThis.crypto.getRandomValues(arr);
-  return arr[0] % max;
+  const limit = Math.floor(0xffffffff / max) * max;
+  let rand;
+  do {
+    globalThis.crypto.getRandomValues(arr);
+    rand = arr[0];
+  } while (rand >= limit);
+  return rand % max;
 }
 
 function randomChar(set: string): string {
@@ -34,15 +42,30 @@ export function generatePassword(options: PasswordOptions): string {
   if (options.lower) pool += LOWER;
   if (options.digits) pool += DIGITS;
   if (options.symbols) pool += SYMBOLS;
+  if (options.excludeSimilar) {
+    pool = pool.replace(SIMILAR_CHARS, "");
+  }
   if (!pool) return "";
 
   const chars = Array.from({ length }, () => randomChar(pool));
 
   const required: string[] = [];
-  if (options.upper) required.push(randomChar(UPPER));
-  if (options.lower) required.push(randomChar(LOWER));
-  if (options.digits) required.push(randomChar(DIGITS));
-  if (options.symbols) required.push(randomChar(SYMBOLS));
+  const upperSet = options.excludeSimilar
+    ? UPPER.replace(SIMILAR_CHARS, "")
+    : UPPER;
+  const lowerSet = options.excludeSimilar
+    ? LOWER.replace(SIMILAR_CHARS, "")
+    : LOWER;
+  const digitSet = options.excludeSimilar
+    ? DIGITS.replace(SIMILAR_CHARS, "")
+    : DIGITS;
+  const symbolSet = options.excludeSimilar
+    ? SYMBOLS.replace(SIMILAR_CHARS, "")
+    : SYMBOLS;
+  if (options.upper) required.push(randomChar(upperSet));
+  if (options.lower) required.push(randomChar(lowerSet));
+  if (options.digits) required.push(randomChar(digitSet));
+  if (options.symbols) required.push(randomChar(symbolSet));
 
   const used = new Set<number>();
   required.forEach((ch) => {
