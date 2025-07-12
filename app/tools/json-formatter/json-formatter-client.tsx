@@ -3,22 +3,25 @@
 
 import { useState, ChangeEvent, useEffect } from "react";
 import useDebounce from "@/lib/useDebounce";
-
-type Mode = "beautify" | "minify" | "validate";
+import { formatJson, JsonMode } from "@/lib/format-json";
+import { highlightJson } from "@/lib/highlight-json";
 
 export default function JsonFormatterClient() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
+  const [highlighted, setHighlighted] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [mode, setMode] = useState<Mode>("beautify");
+  const [mode, setMode] = useState<JsonMode>("beautify");
   const [indent, setIndent] = useState(2);
   const [strict, setStrict] = useState(true);
   const [sortKeys, setSortKeys] = useState(false);
+  const [wrapLines, setWrapLines] = useState(true);
   const debouncedInput = useDebounce(input);
 
   useEffect(() => {
     if (!debouncedInput.trim()) {
       setOutput('');
+      setHighlighted('');
       return;
     }
     processJson(debouncedInput);
@@ -30,34 +33,20 @@ export default function JsonFormatterClient() {
     setError(null);
   }
 
-  function sortObject(obj: unknown): unknown {
-    if (Array.isArray(obj)) return obj.map(sortObject);
-    if (obj && typeof obj === "object") {
-      return Object.keys(obj)
-        .sort()
-        .reduce<Record<string, unknown>>((acc, key) => {
-          acc[key] = sortObject((obj as Record<string, unknown>)[key]);
-          return acc;
-        }, {});
-    }
-    return obj;
-  }
-
   async function processJson(src: string) {
     try {
-      const parser = strict ? JSON : await import("json5");
-      let parsed = parser.parse(src);
-      if (sortKeys) parsed = sortObject(parsed);
-
-      if (mode === "validate") {
-        setOutput("Valid JSON");
-      } else {
-        const space = mode === "minify" ? 0 : indent;
-        setOutput(JSON.stringify(parsed, null, space));
-      }
-      setError(null);
+      const { output, error } = await formatJson(src, {
+        mode,
+        indent,
+        strict,
+        sortKeys,
+      });
+      setError(error);
+      setOutput(output);
+      setHighlighted(error ? "" : highlightJson(output));
     } catch (e: unknown) {
       setOutput("");
+      setHighlighted("");
       setError(e instanceof Error ? e.message : "Invalid JSON");
     }
   }
@@ -172,23 +161,40 @@ export default function JsonFormatterClient() {
               <span className="text-sm text-gray-700">Sort keys</span>
             </label>
 
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={!strict}
-                onChange={() => setStrict((v) => !v)}
-                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-              />
-              <span className="text-sm text-gray-700">Lenient JSON5</span>
-            </label>
-          </div>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={!strict}
+              onChange={() => setStrict((v) => !v)}
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <span className="text-sm text-gray-700">Lenient JSON5</span>
+          </label>
 
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={copyOutput}
-              disabled={!output}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition text-sm font-medium disabled:opacity-60"
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={wrapLines}
+              onChange={() => setWrapLines((v) => !v)}
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <span className="text-sm text-gray-700">Wrap lines</span>
+          </label>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => processJson(input)}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
+          >
+            Format
+          </button>
+          <button
+            type="button"
+            onClick={copyOutput}
+            disabled={!output}
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition text-sm font-medium disabled:opacity-60"
             >
               Copy
             </button>
@@ -215,11 +221,10 @@ export default function JsonFormatterClient() {
 
         {/* Output */}
         {output && !error && (
-          <textarea
-            readOnly
+          <pre
             aria-label="Formatted JSON output"
-            value={output}
-            className="w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className={`w-full h-48 p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500 transition overflow-auto ${wrapLines ? 'whitespace-pre-wrap break-words' : 'whitespace-pre'}`}
+            dangerouslySetInnerHTML={{ __html: highlighted }}
           />
         )}
       </div>

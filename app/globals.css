@@ -37,4 +37,20 @@
   .card {
     @apply bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-shadow;
   }
+
+  .json-key {
+    @apply text-purple-700;
+  }
+  .json-string {
+    @apply text-green-700;
+  }
+  .json-number {
+    @apply text-blue-700;
+  }
+  .json-boolean {
+    @apply text-red-700;
+  }
+  .json-null {
+    @apply text-gray-500;
+  }
 }
