@@ -1,111 +1,89 @@
 // app/privacy/privacy-client.tsx
-
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { getPolicySections } from "@/lib/privacy-policy";
+import { renderMarkdown } from "@/lib/render-markdown";
+
+const sections = getPolicySections();
 
 export default function PrivacyClient() {
+  const [active, setActive] = useState<string>(sections[0]?.id);
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActive(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -80% 0px" }
+    );
+    sections.forEach(({ id }) => {
+      const el = sectionRefs.current[id];
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section
-      id="privacy-policy"
-      aria-labelledby="privacy-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
-    >
-      <h1
-        id="privacy-heading"
-        className="gradient-text text-4xl sm:text-5xl md:text-6xl font-extrabold mb-8 tracking-tight text-center"
+    <div className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900 flex flex-col lg:flex-row">
+      {/* Skip link */}
+      <a
+        href={`#${sections[0].id}`}
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 px-4 py-2 bg-indigo-600 text-white rounded-md"
       >
-        Privacy Policy
-      </h1>
+        Skip to policy content
+      </a>
 
-      <p className="mb-8 text-lg leading-relaxed max-w-3xl mx-auto">
-        At <strong>Gearizen</strong>, your privacy is our top priority. All of
-        our tools run <strong>100% client-side</strong>, meaning your data never
-        leaves your device—nothing is transmitted, stored, or tracked on our
-        servers.
-      </p>
-
-      <p className="mb-12 text-lg leading-relaxed max-w-3xl mx-auto">
-        You are never required to create an account or provide any personal
-        information. Feel free to use our password generators, JSON formatters,
-        text converters, QR code tools, and more—completely anonymously.
-      </p>
-
-      <div className="space-y-12 max-w-3xl mx-auto">
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Data We Don’t Collect
-          </h2>
-          <ul className="list-disc list-inside space-y-2 text-lg leading-relaxed">
-            <li>No personal information (name, address, email, etc.)</li>
-            <li>No file uploads or storage on our servers</li>
-            <li>No IP address logging</li>
-            <li>No behavioral analytics or usage tracking</li>
+      {/* TOC */}
+      <aside className="lg:w-1/4 lg:pr-8 mb-8 lg:mb-0" aria-label="Table of contents">
+        <nav className="lg:sticky lg:top-24">
+          <ul className="space-y-2 border-l border-gray-200 pl-4">
+            {sections.map(({ id, title }) => (
+              <li key={id} className="list-none">
+                <a
+                  href={`#${id}`}
+                  className={`block text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded ${active === id ? "text-indigo-600" : "text-gray-700 hover:text-gray-900"}`}
+                >
+                  {title}
+                </a>
+              </li>
+            ))}
           </ul>
-        </section>
+        </nav>
+      </aside>
 
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Advertising & Third-Party Services
-          </h2>
-          <p className="text-lg leading-relaxed">
-            We display ads via third-party networks (e.g., Google Ads). Those
-            providers may set their own cookies or trackers; please review their
-            privacy policies. Gearizen does not share any personally
-            identifiable data with advertisers.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Cookies
-          </h2>
-          <p className="text-lg leading-relaxed">
-            Gearizen itself does not use cookies. However, third-party ad
-            networks may drop cookies under their own policies. You can manage
-            those through your browser settings.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Your Rights
-          </h2>
-          <p className="text-lg leading-relaxed">
-            Since we collect no personal data, there is nothing for you to
-            access, modify, or delete. Your interactions remain private on your
-            device.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Policy Updates
-          </h2>
-          <p className="text-lg leading-relaxed">
-            We may update this policy to reflect changes in our tools or
-            applicable laws. Please revisit this page periodically to stay
-            informed.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Contact Us
-          </h2>
-          <p className="text-lg leading-relaxed">
-            If you have questions about this policy, please{" "}
-            <Link
-              href="/contact"
-              className="text-indigo-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded transition-colors"
-              aria-label="Go to Contact page"
+      {/* Content */}
+      <div className="lg:flex-1 space-y-12" id="policy-start">
+        <h1 className="gradient-text text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-center mb-8">
+          Privacy Policy
+        </h1>
+        {sections.map(({ id, title, content }) => (
+          <section
+            key={id}
+            id={id}
+            ref={(el) => (sectionRefs.current[id] = el)}
+            aria-labelledby={`${id}-heading`}
+            className="max-w-3xl mx-auto"
+          >
+            <h2
+              id={`${id}-heading`}
+              className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight"
             >
-              get in touch
-            </Link>
-            .
-          </p>
-        </section>
+              {title}
+            </h2>
+            <div
+              className="prose prose-indigo max-w-none text-lg leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
+            />
+          </section>
+        ))}
       </div>
-    </section>
+    </div>
   );
 }

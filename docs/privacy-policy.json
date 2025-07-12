@@ -1,0 +1,37 @@
+[
+  {
+    "id": "overview",
+    "title": "Overview",
+    "content": "At **Gearizen**, all tools run 100% client-side. Your data never leaves your device."
+  },
+  {
+    "id": "data-we-dont-collect",
+    "title": "Data We Don’t Collect",
+    "content": "- Personal information (name, address, email)\n- File uploads or server storage\n- IP address logging\n- Usage tracking or analytics"
+  },
+  {
+    "id": "third-party-ads",
+    "title": "Third-Party Ads",
+    "content": "We display ads via third-party networks like Google Ads. These providers may use cookies or device identifiers as described in their own policies. **Gearizen does not share any personal data** with advertisers."
+  },
+  {
+    "id": "cookies",
+    "title": "Cookies",
+    "content": "Gearizen itself does not set any cookies. Third-party ad networks may set cookies which you can manage through your browser settings."
+  },
+  {
+    "id": "your-rights",
+    "title": "Your Rights",
+    "content": "Since we collect no personal data, there is nothing for you to access, modify or delete. Your interactions remain on your device."
+  },
+  {
+    "id": "policy-updates",
+    "title": "Policy Updates",
+    "content": "We may update this policy to reflect changes in our tools or legal requirements. Please check back periodically."
+  },
+  {
+    "id": "contact-us",
+    "title": "Contact Us",
+    "content": "If you have any questions, please [contact us](/contact)."
+  }
+]
