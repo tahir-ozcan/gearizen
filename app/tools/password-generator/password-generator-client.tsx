@@ -6,8 +6,6 @@ import { useState, useEffect, useCallback, ChangeEvent } from "react";
 // Correct relative path to the shared password utility
 import { generatePassword } from "../../../lib/generate-password";
 
-
-
 export default function PasswordGeneratorClient() {
   const [length, setLength] = useState(16);
   const [useUpper, setUseUpper] = useState(true);
@@ -15,6 +13,8 @@ export default function PasswordGeneratorClient() {
   const [useDigits, setUseDigits] = useState(true);
   const [useSymbols, setUseSymbols] = useState(false);
   const [excludeSimilar, setExcludeSimilar] = useState(false);
+  const [pattern, setPattern] = useState("");
+  const [avoidRepeats, setAvoidRepeats] = useState(false);
   const [password, setPassword] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -26,10 +26,21 @@ export default function PasswordGeneratorClient() {
       digits: useDigits,
       symbols: useSymbols,
       excludeSimilar,
+      pattern: pattern || undefined,
+      avoidRepeats,
     });
     setPassword(pwd);
     setCopied(false);
-  }, [length, useUpper, useLower, useDigits, useSymbols, excludeSimilar]);
+  }, [
+    length,
+    useUpper,
+    useLower,
+    useDigits,
+    useSymbols,
+    excludeSimilar,
+    pattern,
+    avoidRepeats,
+  ]);
 
   useEffect(() => {
     generate();
@@ -58,6 +69,8 @@ export default function PasswordGeneratorClient() {
     useDigits ? "--digits" : "",
     useSymbols ? "--symbols" : "",
     excludeSimilar ? "--exclude-similar" : "",
+    pattern ? `--pattern ${pattern}` : "",
+    avoidRepeats ? "--avoid-repeats" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -116,6 +129,27 @@ export default function PasswordGeneratorClient() {
         className="space-y-8 max-w-2xl mx-auto"
         aria-label="Password options"
       >
+        {/* Pattern */}
+        <div>
+          <label
+            htmlFor="pattern"
+            className="block mb-2 font-medium text-gray-800"
+          >
+            Pattern (A a 0 $ ?)
+          </label>
+          <input
+            id="pattern"
+            type="text"
+            value={pattern}
+            onChange={(e) => setPattern(e.target.value)}
+            placeholder="e.g. Aa0$?"
+            className="input-base"
+          />
+          <p className="text-sm text-gray-500 mt-1">
+            Use A for uppercase, a for lowercase, 0 for numbers, $ for symbols,
+            ? for any.
+          </p>
+        </div>
         {/* Length Slider */}
         <div>
           <label
@@ -135,7 +169,13 @@ export default function PasswordGeneratorClient() {
             aria-valuemax={64}
             aria-valuenow={length}
             className="w-full"
+            disabled={pattern !== ""}
           />
+          {pattern && (
+            <p className="text-sm text-gray-500 mt-1">
+              Length is determined by pattern.
+            </p>
+          )}
         </div>
 
         {/* Character Sets */}
@@ -170,7 +210,6 @@ export default function PasswordGeneratorClient() {
                 className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
               <span className="text-gray-700 select-none">Numbers (0–9)</span>
-
             </label>
             <label className="flex items-center space-x-2">
               <input
@@ -188,7 +227,20 @@ export default function PasswordGeneratorClient() {
                 onChange={() => setExcludeSimilar((s) => !s)}
                 className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
               />
-              <span className="text-gray-700 select-none">Exclude similar characters (1, l, I, O, 0)</span>
+              <span className="text-gray-700 select-none">
+                Exclude similar characters (1, l, I, O, 0)
+              </span>
+            </label>
+            <label className="flex items-center space-x-2 col-span-2">
+              <input
+                type="checkbox"
+                checked={avoidRepeats}
+                onChange={() => setAvoidRepeats((s) => !s)}
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              />
+              <span className="text-gray-700 select-none">
+                Avoid repeated characters
+              </span>
             </label>
           </div>
 

@@ -9,6 +9,7 @@ module.exports = {
   transformIgnorePatterns: [
     '/node_modules/(?!(marked)/)'
   ],
+  setupFiles: ['./jest.setup.ts'],
   globals: {
     'ts-jest': {
       useESM: true,
