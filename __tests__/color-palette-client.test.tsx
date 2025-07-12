@@ -4,15 +4,15 @@ import userEvent from "@testing-library/user-event";
 import ColorPaletteGeneratorClient from "../app/tools/color-palette-generator/color-palette-generator-client";
 
 function getSwatches() {
-  return screen.getAllByRole("button", { name: /copy/i });
+  return screen.getAllByRole("button", { name: /color/i });
 }
 
 describe("ColorPaletteGeneratorClient", () => {
   test("updates palette count via slider", () => {
     render(<ColorPaletteGeneratorClient />);
     const slider = screen.getByLabelText(/colors/i);
-    fireEvent.change(slider, { target: { value: "4" } });
-    expect(getSwatches().length).toBe(4);
+    fireEvent.change(slider, { target: { value: "7" } });
+    expect(getSwatches().length).toBe(7);
   });
 
   test("download JSON triggers blob URL", async () => {

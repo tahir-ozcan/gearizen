@@ -18,19 +18,17 @@ import {
 } from "@/lib/color-conversion";
 
 export default function ColorPaletteGeneratorClient() {
-  const [color, setColor] = useState("#ff0000");
+  const [baseColor, setBaseColor] = useState("#ff0000");
   const [scheme, setScheme] = useState<PaletteScheme>("analogous");
   const [count, setCount] = useState(5);
-  const [palette, setPalette] = useState<string[]>(generatePalette("#ff0000"));
+  const [palette, setPalette] = useState<string[]>(() =>
+    generatePalette("#ff0000", "analogous", 5),
+  );
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      setPalette(generatePalette(color, scheme, count));
-    } catch {
-      setPalette([]);
-    }
-  }, [color, scheme, count]);
+    setPalette(generatePalette(baseColor, scheme, count));
+  }, [baseColor, scheme, count]);
 
   useEffect(() => {
     return () => {
@@ -39,7 +37,7 @@ export default function ColorPaletteGeneratorClient() {
   }, [downloadUrl]);
 
   const handleColor = (e: ChangeEvent<HTMLInputElement>) => {
-    setColor(e.target.value);
+    setBaseColor(e.target.value);
   };
 
   const downloadJson = () => {
@@ -93,12 +91,12 @@ export default function ColorPaletteGeneratorClient() {
           <Input
             id="base-color"
             type="color"
-            value={color}
+            value={baseColor}
             onChange={handleColor}
             className="h-10 p-0"
           />
         </div>
-        <div className="flex flex-wrap gap-4">
+        <fieldset className="flex flex-wrap gap-4" aria-label="Color scheme">
           <label className="flex items-center space-x-1">
             <input
               type="radio"
@@ -154,7 +152,7 @@ export default function ColorPaletteGeneratorClient() {
             />
             <span className="text-sm text-gray-700">Monochromatic</span>
           </label>
-        </div>
+        </fieldset>
         <div>
           <label
             htmlFor="count"
@@ -169,37 +167,37 @@ export default function ColorPaletteGeneratorClient() {
             max={10}
             value={count}
             onChange={(e) => setCount(Number(e.target.value))}
+            aria-label="Number of colors"
             className="w-full"
           />
         </div>
       </div>
       {palette.length > 0 && (
-        <ul className="mt-12 grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
+        <div className="mt-12 flex flex-wrap justify-center gap-4">
           {palette.map((hex) => {
             const rgb = hexToRgb(hex)!;
             const hsl = rgbToHsl(rgb);
             return (
-              <li key={hex} className="group text-center">
-                <button
-                  type="button"
-                  onClick={() => navigator.clipboard.writeText(hex)}
-                  className="swatch relative w-full h-20 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  style={{ backgroundColor: hex }}
-                >
-                  <span className="sr-only">Copy {hex}</span>
-                  <div className="absolute inset-0 hidden flex-col items-center justify-center bg-white/80 text-xs font-mono group-hover:flex group-focus:flex">
-                    <span>{hex}</span>
-                    <span>{formatRgb(rgb)}</span>
-                    <span>{formatHsl(hsl)}</span>
-                    <span className="mt-1 px-1.5 py-0.5 bg-indigo-600 text-white rounded">
-                      Copy
-                    </span>
-                  </div>
-                </button>
-              </li>
+              <div
+                key={hex}
+                role="button"
+                aria-label={`Color ${hex}`}
+                onClick={() => navigator.clipboard.writeText(hex)}
+                className="group swatch relative w-20 h-20 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                style={{ backgroundColor: hex }}
+              >
+                <div className="absolute inset-0 hidden flex-col items-center justify-center bg-white/80 text-xs font-mono group-hover:flex group-focus:flex">
+                  <span>{hex}</span>
+                  <span>{formatRgb(rgb)}</span>
+                  <span>{formatHsl(hsl)}</span>
+                  <span className="mt-1 px-1.5 py-0.5 bg-indigo-600 text-white rounded">
+                    Copy
+                  </span>
+                </div>
+              </div>
             );
           })}
-        </ul>
+        </div>
       )}
       <div className="mt-8 flex flex-wrap justify-center gap-4">
         <button type="button" onClick={downloadJson} className="btn-secondary">
