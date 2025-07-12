@@ -41,6 +41,7 @@ import {
   ListOrdered,
   Link2,
   Search,
+  Radio,
 } from "lucide-react";
 
 interface Tool {
@@ -95,6 +96,12 @@ const tools: Tool[] = [
     Icon: Palette,
     title: "Color Converter",
     description: "Convert colors between HEX, RGB and HSL with preview.",
+  },
+  {
+    href: "/tools/color-palette-generator",
+    Icon: Palette,
+    title: "Color Palette Generator",
+    description: "Create harmonious color schemes from any base color.",
   },
   {
     href: "/tools/base64-encoder-decoder",
@@ -280,6 +287,12 @@ const tools: Tool[] = [
     Icon: RotateCcw,
     title: "Caesar Cipher",
     description: "Encrypt or decrypt text with a custom shift value.",
+  },
+  {
+    href: "/tools/morse-code-converter",
+    Icon: Radio,
+    title: "Morse Code Converter",
+    description: "Translate text to and from Morse code instantly.",
   },
   {
     href: "/tools/xml-formatter",
