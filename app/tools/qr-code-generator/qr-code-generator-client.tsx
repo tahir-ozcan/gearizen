@@ -2,18 +2,41 @@
 
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import useDebounce from "@/lib/useDebounce";
-import QRCode from "qrcode";
+import {
+  generateQrCanvas,
+  generateQrDataUrl,
+  embedPngMetadata,
+  ErrorCorrectionLevel,
+} from "@/lib/generate-qr";
 
 export default function QrCodeGeneratorClient() {
   const [text, setText] = useState("");
   const [size, setSize] = useState(256);
+  const [margin, setMargin] = useState(1);
+  const [darkColor, setDarkColor] = useState("#000000");
+  const [lightColor, setLightColor] = useState("#ffffff");
+  const [ecLevel, setEcLevel] = useState<ErrorCorrectionLevel>("M");
+  const [logo, setLogo] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const debouncedText = useDebounce(text);
+
+  const options = useMemo(
+    () => ({
+      text: debouncedText,
+      width: size,
+      margin,
+      darkColor,
+      lightColor,
+      errorCorrectionLevel: ecLevel,
+      logoDataUrl: logo || undefined,
+    }),
+    [debouncedText, size, margin, darkColor, lightColor, ecLevel, logo],
+  );
 
   useEffect(() => {
     if (!debouncedText.trim()) {
@@ -21,20 +44,31 @@ export default function QrCodeGeneratorClient() {
       setError(null);
       return;
     }
-    const opts = { width: size, margin: 1 };
-    QRCode.toDataURL(debouncedText, opts)
-      .then(setQrUrl)
+    let cancelled = false;
+    generateQrDataUrl(options)
+      .then((url) => {
+        if (!cancelled) setQrUrl(url);
+      })
       .catch(() => setError("Failed to generate QR code. Try different input."));
-  }, [debouncedText, size]);
+    return () => {
+      cancelled = true;
+    };
+  }, [options, debouncedText]);
 
   // Draw to canvas whenever qrUrl updates
   useEffect(() => {
     if (!qrUrl || !canvasRef.current) return;
-    const opts = { width: size, margin: 1 };
-    QRCode.toCanvas(canvasRef.current, text, opts).catch(() => {
-      setError("Failed to render QR code");
-    });
-  }, [qrUrl, size, text]);
+    generateQrCanvas(options)
+      .then((canvas) => {
+        const ctx = canvasRef.current!.getContext("2d");
+        if (!ctx) return;
+        canvasRef.current!.width = canvas.width;
+        canvasRef.current!.height = canvas.height;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(canvas, 0, 0);
+      })
+      .catch(() => setError("Failed to render QR code"));
+  }, [qrUrl, options]);
 
   const copyQr = async () => {
     if (!qrUrl) return;
@@ -48,10 +82,28 @@ export default function QrCodeGeneratorClient() {
 
   const downloadQr = () => {
     if (!qrUrl) return;
+    const dataWithMeta = embedPngMetadata(qrUrl, {
+      url: text,
+      ecLevel,
+      margin: String(margin),
+      darkColor,
+      lightColor,
+    });
     const a = document.createElement("a");
-    a.href = qrUrl;
+    a.href = dataWithMeta;
     a.download = "qr-code.png";
     a.click();
+  };
+
+  const handleLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setLogo(null);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setLogo(reader.result as string);
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -89,11 +141,8 @@ export default function QrCodeGeneratorClient() {
         </div>
 
         <div>
-          <label
-            htmlFor="qr-size"
-            className="block mb-1 font-medium text-gray-800"
-          >
-            Size: <span className="font-semibold">{size}×{size}px</span>
+          <label htmlFor="qr-size" className="block mb-1 font-medium text-gray-800">
+            Size: <span className="font-semibold">{size}px</span>
           </label>
           <input
             id="qr-size"
@@ -105,6 +154,75 @@ export default function QrCodeGeneratorClient() {
             onChange={(e) => setSize(parseInt(e.target.value, 10))}
             className="w-full"
           />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="qr-margin" className="block mb-1 font-medium text-gray-800">
+              Margin
+            </label>
+            <input
+              id="qr-margin"
+              type="number"
+              min={0}
+              max={10}
+              value={margin}
+              onChange={(e) => setMargin(parseInt(e.target.value, 10))}
+              className="input-base w-full"
+            />
+          </div>
+          <div>
+            <label htmlFor="qr-ec" className="block mb-1 font-medium text-gray-800">
+              Error Correction
+            </label>
+            <select
+              id="qr-ec"
+              value={ecLevel}
+              onChange={(e) => setEcLevel(e.target.value as ErrorCorrectionLevel)}
+              className="input-base w-full"
+            >
+              <option value="L">L - 7%</option>
+              <option value="M">M - 15%</option>
+              <option value="Q">Q - 25%</option>
+              <option value="H">H - 30%</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="qr-dark" className="block mb-1 font-medium text-gray-800">
+              Foreground
+            </label>
+            <input
+              id="qr-dark"
+              type="color"
+              value={darkColor}
+              onChange={(e) => setDarkColor(e.target.value)}
+              className="h-10 w-full rounded"
+            />
+          </div>
+          <div>
+            <label htmlFor="qr-light" className="block mb-1 font-medium text-gray-800">
+              Background
+            </label>
+            <input
+              id="qr-light"
+              type="color"
+              value={lightColor}
+              onChange={(e) => setLightColor(e.target.value)}
+              className="h-10 w-full rounded"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label htmlFor="qr-logo" className="block mb-1 font-medium text-gray-800">
+              Logo (optional)
+            </label>
+            <input
+              id="qr-logo"
+              type="file"
+              accept="image/*"
+              onChange={handleLogo}
+              className="input-base w-full"
+            />
+          </div>
         </div>
 
         {error && (
@@ -123,19 +241,22 @@ export default function QrCodeGeneratorClient() {
             ref={canvasRef}
             width={size}
             height={size}
+            aria-label="QR code preview"
             className="border rounded-md w-full h-auto"
-            style={{ maxWidth: size }}
+            style={{ maxWidth: size, transition: 'width 0.2s,height 0.2s' }}
           />
           <div className="flex justify-center gap-4">
             <button
               onClick={copyQr}
-              className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition text-sm font-medium"
+              aria-label="Copy QR code image URL"
+              className="btn-primary"
             >
               Copy URL
             </button>
             <button
               onClick={downloadQr}
-              className="px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 transition text-sm font-medium"
+              aria-label="Download QR code as PNG"
+              className="btn-secondary"
             >
               Download PNG
             </button>
