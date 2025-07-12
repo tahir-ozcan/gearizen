@@ -24,6 +24,31 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  trailingSlash: false,
+  async redirects() {
+    return [
+      {
+        source: '/:path*/',
+        destination: '/:path*',
+        permanent: true,
+      },
+    ];
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/:path*',
+        destination: '/:path*',
+        has: [
+          {
+            type: 'header',
+            key: 'x-lowercase',
+            value: '(?<lower>.*)',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

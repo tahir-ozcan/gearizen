@@ -2,12 +2,12 @@
 
 import AboutClient from "./about-client";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
+import seo from "@/seo-config.json";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
-  title: "About Us | Gearizen",
-  description:
-    "Learn about Gearizen — a platform offering free, privacy-first client-side tools like password generators, JSON formatters, text converters, QR code generators, and more. No signup or personal data collection.",
+  title: seo.about.title,
+  description: seo.about.description,
   keywords: [
     "Gearizen about",
     "free online tools platform",
@@ -20,12 +20,11 @@ export const metadata = {
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
   robots: { index: true, follow: true },
-  alternates: { canonical: "https://gearizen.com/about" },
+  alternates: { canonical: seo.about.canonical },
   openGraph: {
-    title: "About Us | Gearizen",
-    description:
-      "Discover Gearizen’s mission and vision—providing free, privacy-first client-side tools for developers, creators, and everyone. No signup required.",
-    url: "https://gearizen.com/about",
+    title: seo.about.title,
+    description: seo.about.description,
+    url: seo.about.canonical,
     siteName: "Gearizen",
     locale: "en_US",
     type: "article",

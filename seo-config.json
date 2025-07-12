@@ -1,0 +1,17 @@
+{
+  "home": {
+    "title": "Home | Gearizen – Free Client-Side Digital Tools",
+    "description": "Discover Gearizen’s most in-demand, privacy-first web tools: password generator, PDF to Word converter, QR code generator, unit converter and image compressor—100% client-side, no signup required.",
+    "canonical": "https://gearizen.com"
+  },
+  "about": {
+    "title": "About Us | Gearizen",
+    "description": "Learn about Gearizen — a platform offering free, privacy-first client-side tools with no signup or tracking.",
+    "canonical": "https://gearizen.com/about"
+  },
+  "tools": {
+    "title": "Free Online Tools | Gearizen",
+    "description": "Explore Gearizen’s client-side toolbox: password & bcrypt generators, JSON tools, QR code creator, and more—all free.",
+    "canonical": "https://gearizen.com/tools"
+  }
+}
