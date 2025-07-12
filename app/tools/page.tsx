@@ -2,6 +2,7 @@
 
 import ToolsClient from "./tools-client";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
+import JsonLd from "@/app/components/JsonLd";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -75,6 +76,16 @@ export default function ToolsPage() {
       <BreadcrumbJsonLd
         pageTitle="Free Online Tools"
         pageUrl="https://gearizen.com/tools"
+      />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          name: "Free Online Tools",
+          description:
+            "Explore Gearizen’s 100% client-side toolbox of utilities.",
+          url: "https://gearizen.com/tools",
+        }}
       />
       <ToolsClient />
     </>

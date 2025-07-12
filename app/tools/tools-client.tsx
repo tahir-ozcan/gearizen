@@ -2,52 +2,12 @@
 
 "use client";
 
-import CardLink from "@/components/CardLink";
 import { useState } from "react";
-import {
-  Key,
-  Code,
-  QrCode,
-  ArrowRightLeft,
-  ImageIcon,
-  Eye,
-  Paperclip,
-  Cpu,
-  FileCode,
-  Scissors,
-  CalendarCheck2,
-  FileText,
-  FileKey,
-  File,
-  FilePlus,
-  FileDown,
-  FileArchive,
-  MessageSquare,
-  Tag,
-  Globe,
-  Shield,
-  ImagePlus,
-  BookOpen,
-  Fingerprint,
-  AlignLeft,
-  Type,
-  Link as LinkIcon,
-  Hash,
-  Braces,
-  Calculator,
-  Ampersand,
-  RotateCcw,
-  Palette,
-  Paintbrush,
-  ListOrdered,
-  Link2,
-  Search,
-  Radio,
-} from "lucide-react";
+import ToolCard from "@/components/ToolCard";
 
 interface Tool {
   href: string;
-  Icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  icon: string;
   title: string;
   description: string;
 }
@@ -55,256 +15,256 @@ interface Tool {
 const tools: Tool[] = [
   {
     href: "/tools/password-generator",
-    Icon: Key,
+    icon: "Key",
     title: "Password Generator",
     description:
       "Generate strong, secure passwords with customizable length and character sets.",
   },
   {
     href: "/tools/json-formatter",
-    Icon: Code,
+    icon: "Code",
     title: "JSON Formatter",
     description: "Validate, beautify, or minify JSON entirely in your browser.",
   },
   {
     href: "/tools/qr-code-generator",
-    Icon: QrCode,
+    icon: "QrCode",
     title: "QR Code Generator",
     description: "Produce QR codes for URLs, text, contacts, and more.",
   },
   {
     href: "/tools/unit-converter",
-    Icon: ArrowRightLeft,
+    icon: "ArrowRightLeft",
     title: "Unit Converter",
     description:
       "Convert between metric and imperial units: length, weight, volume, and more.",
   },
   {
     href: "/tools/image-compressor",
-    Icon: ImageIcon,
+    icon: "ImageIcon",
     title: "Image Compressor",
     description:
       "Reduce JPEG or PNG file sizes while preserving visual quality.",
   },
   {
     href: "/tools/color-contrast-checker",
-    Icon: Eye,
+    icon: "Eye",
     title: "Contrast Checker",
     description: "Ensure your text meets WCAG accessibility contrast ratios.",
   },
   {
     href: "/tools/color-converter",
-    Icon: Palette,
+    icon: "Palette",
     title: "Color Converter",
     description: "Convert colors between HEX, RGB and HSL with preview.",
   },
   {
     href: "/tools/color-palette-generator",
-    Icon: Palette,
+    icon: "Palette",
     title: "Color Palette Generator",
     description: "Create harmonious color schemes from any base color.",
   },
   {
     href: "/tools/base64-encoder-decoder",
-    Icon: Paperclip,
+    icon: "Paperclip",
     title: "Base64 Encoder/Decoder",
     description: "Encode or decode text and files to Base64 format rapidly.",
   },
   {
     href: "/tools/code-minifier",
-    Icon: Cpu,
+    icon: "Cpu",
     title: "Code Minifier",
     description: "Minify HTML, CSS, and JavaScript to boost page load speeds.",
   },
   {
     href: "/tools/regex-tester",
-    Icon: Scissors,
+    icon: "Scissors",
     title: "Regex Tester",
     description:
       "Build and debug regular expressions with real-time match highlighting.",
   },
   {
     href: "/tools/text-diff",
-    Icon: FileText,
+    icon: "FileText",
     title: "Text Diff Checker",
     description:
       "Compare two blocks of text and highlight additions, deletions, and changes.",
   },
   {
     href: "/tools/unix-timestamp-converter",
-    Icon: CalendarCheck2,
+    icon: "CalendarCheck2",
     title: "Timestamp Converter",
     description: "Convert UNIX timestamps to human-readable dates and back.",
   },
   {
     href: "/tools/pdf-compressor",
-    Icon: FileArchive,
+    icon: "FileArchive",
     title: "PDF Compressor",
     description:
       "Compress PDFs client-side to reduce file size without losing clarity.",
   },
   {
     href: "/tools/pdf-to-word",
-    Icon: FilePlus,
+    icon: "FilePlus",
     title: "PDF → Word Converter",
     description:
       "Extract text from PDFs and download as Word-compatible DOC files.",
   },
   {
     href: "/tools/image-resizer",
-    Icon: FileDown,
+    icon: "FileDown",
     title: "Image Resizer",
     description:
       "Resize images, maintain or override aspect ratio, then download.",
   },
   {
     href: "/tools/csv-to-json",
-    Icon: File,
+    icon: "File",
     title: "CSV → JSON Converter",
     description:
       "Transform CSV data into JSON arrays quickly, entirely in-browser.",
   },
   {
     href: "/tools/html-to-pdf",
-    Icon: Globe,
+    icon: "Globe",
     title: "HTML → PDF Converter",
     description:
       "Render HTML pages as PDFs completely client-side, no server needed.",
   },
   {
     href: "/tools/html-formatter",
-    Icon: MessageSquare,
+    icon: "MessageSquare",
     title: "HTML Formatter",
     description: "Beautify or minify HTML code for readability or compactness.",
   },
   {
     href: "/tools/css-formatter",
-    Icon: Paintbrush,
+    icon: "Paintbrush",
     title: "CSS Formatter",
     description:
       "Beautify or minify CSS stylesheets instantly in your browser.",
   },
   {
     href: "/tools/seo-meta-tag-generator",
-    Icon: Tag,
+    icon: "Tag",
     title: "SEO Meta Tag Generator",
     description:
       "Generate optimized `<title>`, `<meta>` and social tags for any page.",
   },
   {
     href: "/tools/jwt-decoder",
-    Icon: Shield,
+    icon: "Shield",
     title: "JWT Decoder",
     description:
       "Decode and inspect JWT header, payload & signature client-side.",
   },
   {
     href: "/tools/bcrypt-generator",
-    Icon: FileKey,
+    icon: "FileKey",
     title: "bcrypt Hash Generator",
     description:
       "Generate bcrypt hashes for passwords with adjustable salt rounds.",
   },
   {
     href: "/tools/image-to-base64",
-    Icon: ImagePlus,
+    icon: "ImagePlus",
     title: "Image → Base64",
     description: "Turn images into Base64 data URIs in-browser.",
   },
   {
     href: "/tools/markdown-converter",
-    Icon: BookOpen,
+    icon: "BookOpen",
     title: "Markdown Converter",
     description: "Edit Markdown, preview live, and copy clean HTML.",
   },
   {
     href: "/tools/uuid-generator",
-    Icon: Fingerprint,
+    icon: "Fingerprint",
     title: "UUID Generator",
     description: "Create RFC4122 UUIDs instantly.",
   },
   {
     href: "/tools/lorem-ipsum-generator",
-    Icon: AlignLeft,
+    icon: "AlignLeft",
     title: "Lorem Ipsum Generator",
     description: "Generate placeholder text paragraphs.",
   },
   {
     href: "/tools/text-counter",
-    Icon: Type,
+    icon: "Type",
     title: "Word & Character Counter",
     description: "Count words and characters in any text.",
   },
   {
     href: "/tools/text-sorter",
-    Icon: ListOrdered,
+    icon: "ListOrdered",
     title: "Text Sorter",
     description: "Sort lines alphabetically and remove duplicates.",
   },
   {
     href: "/tools/url-encoder-decoder",
-    Icon: LinkIcon,
+    icon: "Link",
     title: "URL Encoder/Decoder",
     description: "Encode or decode URLs and query strings.",
   },
   {
     href: "/tools/html-entity-encoder-decoder",
-    Icon: Ampersand,
+    icon: "Ampersand",
     title: "HTML Entity Encoder/Decoder",
     description: "Convert characters to HTML entities or decode them back.",
   },
   {
     href: "/tools/slug-generator",
-    Icon: Link2,
+    icon: "Link2",
     title: "URL Slug Generator",
     description: "Slugify text into SEO-friendly URLs quickly.",
   },
   {
     href: "/tools/url-parser",
-    Icon: Search,
+    icon: "Search",
     title: "URL Parser",
     description:
       "Break down URLs to view protocol, host, path and query parameters.",
   },
   {
     href: "/tools/base-converter",
-    Icon: Calculator,
+    icon: "Calculator",
     title: "Number Base Converter",
     description: "Convert numbers between binary, decimal, hex and more.",
   },
   {
     href: "/tools/sha-hash-generator",
-    Icon: Hash,
+    icon: "Hash",
     title: "Hash Generator",
     description: "Create SHA-256, SHA-1 or MD5 hashes for any text.",
   },
   {
     href: "/tools/yaml-json-converter",
-    Icon: Braces,
+    icon: "Braces",
     title: "YAML ⇄ JSON Converter",
     description: "Convert YAML to JSON or JSON to YAML in-browser.",
   },
   {
     href: "/tools/text-case-converter",
-    Icon: Type,
+    icon: "Type",
     title: "Text Case Converter",
     description: "Convert text between upper, lower, camel, snake and more.",
   },
   {
     href: "/tools/caesar-cipher",
-    Icon: RotateCcw,
+    icon: "RotateCcw",
     title: "Caesar Cipher",
     description: "Encrypt or decrypt text with a custom shift value.",
   },
   {
     href: "/tools/morse-code-converter",
-    Icon: Radio,
+    icon: "Radio",
     title: "Morse Code Converter",
     description: "Translate text to and from Morse code instantly.",
   },
   {
     href: "/tools/xml-formatter",
-    Icon: FileCode,
+    icon: "FileCode",
     title: "XML Formatter",
     description: "Beautify or minify XML documents instantly.",
   },
@@ -337,45 +297,40 @@ export default function ToolsClient() {
       </header>
 
       {/* Search */}
-      <div className="max-w-md mx-auto">
+      <form
+        role="search"
+        className="max-w-md mx-auto"
+        onSubmit={(e) => e.preventDefault()}
+      >
         <label htmlFor="tool-search" className="sr-only">
           Search tools
         </label>
         <input
           id="tool-search"
           type="search"
+          aria-label="Search tools"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search tools..."
-          className="w-full border border-gray-300 rounded-lg px-4 py-2 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="input-base"
         />
-      </div>
+      </form>
 
       {/* Grid */}
       <section aria-labelledby="tools-heading">
         <h2 id="tools-heading" className="sr-only">
           All Tools
         </h2>
-        <ul className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {filteredTools.map(({ href, Icon, title, description }) => (
-            <li key={href} className="list-none">
-              <CardLink
-                href={href}
-                aria-label={`Navigate to ${title}`}
-                className="group flex flex-col h-full"
-              >
-                <Icon
-                  className="w-10 h-10 text-indigo-600 mx-auto mb-4"
-                  aria-hidden="true"
-                />
-                <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-indigo-600 transition-colors">
-                  {title}
-                </h3>
-                <p className="text-gray-600 text-center flex-grow">
-                  {description}
-                </p>
-              </CardLink>
-            </li>
+        <ul className="grid auto-rows-fr gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {filteredTools.map(({ href, icon, title, description }) => (
+            <ToolCard
+              key={href}
+              href={href}
+              icon={icon}
+              title={title}
+              description={description}
+              className="group"
+            />
           ))}
         </ul>
       </section>
