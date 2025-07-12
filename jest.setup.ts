@@ -4,3 +4,11 @@ if (typeof globalThis.crypto === 'undefined') {
   // @ts-ignore
   globalThis.crypto = webcrypto;
 }
+
+if (typeof globalThis.TextEncoder === 'undefined') {
+  const { TextEncoder, TextDecoder } = require('util');
+  // @ts-ignore
+  globalThis.TextEncoder = TextEncoder;
+  // @ts-ignore
+  globalThis.TextDecoder = TextDecoder;
+}
