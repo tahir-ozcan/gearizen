@@ -2,15 +2,44 @@
 
 "use client";
 
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import { renderMarkdown } from "@/lib/render-markdown";
+import { getPrivacyPolicySections } from "@/lib/privacyPolicy";
 
 export default function PrivacyClient() {
+  const sections = getPrivacyPolicySections();
+  const [active, setActive] = useState<string>(sections[0]?.id);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActive(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px" }
+    );
+    sections.forEach((s) => {
+      const el = document.getElementById(s.id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [sections]);
+
   return (
     <section
       id="privacy-policy"
       aria-labelledby="privacy-heading"
       className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
+      <a
+        href={`#${sections[0]?.id}`}
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 px-4 py-2 bg-indigo-600 text-white rounded-md z-40"
+      >
+        Skip to policy
+      </a>
       <h1
         id="privacy-heading"
         className="gradient-text text-4xl sm:text-5xl md:text-6xl font-extrabold mb-8 tracking-tight text-center"
@@ -31,80 +60,45 @@ export default function PrivacyClient() {
         text converters, QR code tools, and more—completely anonymously.
       </p>
 
-      <div className="space-y-12 max-w-3xl mx-auto">
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Data We Don’t Collect
-          </h2>
-          <ul className="list-disc list-inside space-y-2 text-lg leading-relaxed">
-            <li>No personal information (name, address, email, etc.)</li>
-            <li>No file uploads or storage on our servers</li>
-            <li>No IP address logging</li>
-            <li>No behavioral analytics or usage tracking</li>
+      <div className="md:grid md:grid-cols-[200px_1fr] md:gap-12">
+        {/* Table of contents */}
+        <nav
+          aria-label="On this page"
+          className="hidden md:block sticky top-24 self-start"
+        >
+          <ul className="space-y-2 border-l border-gray-200 pl-4 text-sm">
+            {sections.map((s) => (
+              <li key={s.id}>
+                <a
+                  href={`#${s.id}`}
+                  className={`transition-colors hover:text-gray-900 ${
+                    active === s.id
+                      ? "text-indigo-600 font-semibold"
+                      : "text-gray-700"
+                  }`}
+                >
+                  {s.title}
+                </a>
+              </li>
+            ))}
           </ul>
-        </section>
+        </nav>
 
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Advertising & Third-Party Services
-          </h2>
-          <p className="text-lg leading-relaxed">
-            We display ads via third-party networks (e.g., Google Ads). Those
-            providers may set their own cookies or trackers; please review their
-            privacy policies. Gearizen does not share any personally
-            identifiable data with advertisers.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Cookies
-          </h2>
-          <p className="text-lg leading-relaxed">
-            Gearizen itself does not use cookies. However, third-party ad
-            networks may drop cookies under their own policies. You can manage
-            those through your browser settings.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Your Rights
-          </h2>
-          <p className="text-lg leading-relaxed">
-            Since we collect no personal data, there is nothing for you to
-            access, modify, or delete. Your interactions remain private on your
-            device.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Policy Updates
-          </h2>
-          <p className="text-lg leading-relaxed">
-            We may update this policy to reflect changes in our tools or
-            applicable laws. Please revisit this page periodically to stay
-            informed.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Contact Us
-          </h2>
-          <p className="text-lg leading-relaxed">
-            If you have questions about this policy, please{" "}
-            <Link
-              href="/contact"
-              className="text-indigo-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded transition-colors"
-              aria-label="Go to Contact page"
-            >
-              get in touch
-            </Link>
-            .
-          </p>
-        </section>
+        <article className="space-y-12 max-w-3xl mx-auto md:mx-0">
+          {sections.map((section) => (
+            <section id={section.id} key={section.id}>
+              <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight text-gray-900">
+                {section.title}
+              </h2>
+              <div
+                className="prose prose-indigo text-lg leading-relaxed policy-text"
+                dangerouslySetInnerHTML={{
+                  __html: renderMarkdown(section.content),
+                }}
+              />
+            </section>
+          ))}
+        </article>
       </div>
     </section>
   );

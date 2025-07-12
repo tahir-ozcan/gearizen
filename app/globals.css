@@ -53,4 +53,12 @@
   .json-null {
     @apply text-gray-500;
   }
+
+  .policy-list {
+    @apply list-disc list-inside space-y-2;
+  }
+
+  .policy-text a {
+    @apply text-indigo-600 underline hover:text-indigo-800;
+  }
 }
