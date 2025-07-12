@@ -42,9 +42,11 @@ export default function PasswordGeneratorClient() {
     avoidRepeats,
   ]);
 
+  // Generate an initial password on mount
   useEffect(() => {
     generate();
-  }, [generate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const copyPassword = async () => {
     if (!password) return;
@@ -252,6 +254,13 @@ export default function PasswordGeneratorClient() {
             Copy CLI Command
           </button>
         </fieldset>
+
+        <button
+          type="submit"
+          className="w-full btn-primary"
+        >
+          Generate Password
+        </button>
       </form>
     </section>
   );

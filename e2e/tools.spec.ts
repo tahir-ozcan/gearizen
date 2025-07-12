@@ -10,7 +10,7 @@ test.describe('tool pages', () => {
     if (fs.existsSync(pagePath)) {
       test(`${dir} page renders`, async ({ page }) => {
         await page.goto(`/tools/${dir}`);
-        await expect(page.locator('h1')).toBeVisible();
+        await expect(page.locator('h1').first()).toBeVisible();
       });
     }
   });
