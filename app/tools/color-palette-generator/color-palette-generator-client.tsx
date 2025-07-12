@@ -1,13 +1,20 @@
 "use client";
 import { useState, ChangeEvent, useEffect } from 'react';
 import Input from '@/components/Input';
-import { generatePalette, PaletteScheme } from '@/lib/color-palette';
+import {
+  generatePalette,
+  PaletteScheme,
+  paletteToJson,
+  paletteToAse,
+} from '@/lib/color-palette';
+import { hexToRgb, rgbToHsl, formatRgb, formatHsl } from '@/lib/color-conversion';
 
 export default function ColorPaletteGeneratorClient() {
   const [color, setColor] = useState('#ff0000');
   const [scheme, setScheme] = useState<PaletteScheme>('analogous');
   const [count, setCount] = useState(5);
   const [palette, setPalette] = useState<string[]>(generatePalette('#ff0000'));
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -17,8 +24,35 @@ export default function ColorPaletteGeneratorClient() {
     }
   }, [color, scheme, count]);
 
+  useEffect(() => {
+    return () => {
+      if (downloadUrl) URL.revokeObjectURL(downloadUrl);
+    };
+  }, [downloadUrl]);
+
   const handleColor = (e: ChangeEvent<HTMLInputElement>) => {
     setColor(e.target.value);
+  };
+
+  const downloadJson = () => {
+    const blob = new Blob([paletteToJson(palette)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    setDownloadUrl(url);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'palette.json';
+    a.click();
+  };
+
+  const downloadAse = () => {
+    const data = paletteToAse(palette);
+    const blob = new Blob([data], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    setDownloadUrl(url);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'palette.ase';
+    a.click();
   };
 
   return (
@@ -43,7 +77,7 @@ export default function ColorPaletteGeneratorClient() {
           </label>
           <Input id="base-color" type="color" value={color} onChange={handleColor} className="h-10 p-0" />
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-wrap gap-4">
           <label className="flex items-center space-x-1">
             <input
               type="radio"
@@ -77,40 +111,78 @@ export default function ColorPaletteGeneratorClient() {
             />
             <span className="text-sm text-gray-700">Triadic</span>
           </label>
-        </div>
-        {scheme === 'analogous' && (
-          <div>
-            <label htmlFor="count" className="block mb-1 font-medium text-gray-800">
-              Colors
-            </label>
-            <Input
-              id="count"
-              type="number"
-              min={3}
-              max={9}
-              value={count}
-              onChange={(e) => setCount(Number(e.target.value))}
-              className="w-24"
+          <label className="flex items-center space-x-1">
+            <input
+              type="radio"
+              name="scheme"
+              value="tetradic"
+              checked={scheme === 'tetradic'}
+              onChange={() => setScheme('tetradic')}
+              className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
             />
-          </div>
-        )}
+            <span className="text-sm text-gray-700">Tetradic</span>
+          </label>
+          <label className="flex items-center space-x-1">
+            <input
+              type="radio"
+              name="scheme"
+              value="monochromatic"
+              checked={scheme === 'monochromatic'}
+              onChange={() => setScheme('monochromatic')}
+              className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+            />
+            <span className="text-sm text-gray-700">Monochromatic</span>
+          </label>
+        </div>
+        <div>
+          <label htmlFor="count" className="block mb-1 font-medium text-gray-800">
+            Colors: <span className="font-semibold">{count}</span>
+          </label>
+          <input
+            id="count"
+            type="range"
+            min={2}
+            max={10}
+            value={count}
+            onChange={(e) => setCount(Number(e.target.value))}
+            className="w-full"
+          />
+        </div>
       </div>
       {palette.length > 0 && (
         <ul className="mt-12 grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
-          {palette.map((hex) => (
-            <li key={hex} className="text-center space-y-2">
-              <div className="h-16 rounded" style={{ backgroundColor: hex }} />
-              <button
-                type="button"
-                onClick={() => navigator.clipboard.writeText(hex)}
-                className="text-sm font-mono px-2 py-1 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
-              >
-                {hex}
-              </button>
-            </li>
-          ))}
+          {palette.map((hex) => {
+            const rgb = hexToRgb(hex)!;
+            const hsl = rgbToHsl(rgb);
+            return (
+              <li key={hex} className="group text-center">
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard.writeText(hex)}
+                  className="relative w-full h-20 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  style={{ backgroundColor: hex }}
+                >
+                  <span className="sr-only">Copy {hex}</span>
+                  <div className="absolute inset-0 hidden flex-col items-center justify-center bg-white/80 text-xs font-mono group-hover:flex group-focus:flex">
+                    <span>{hex}</span>
+                    <span>{formatRgb(rgb)}</span>
+                    <span>{formatHsl(hsl)}</span>
+                    <span className="mt-1 px-1.5 py-0.5 bg-indigo-600 text-white rounded">Copy</span>
+                  </div>
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
+      <div className="mt-8 flex flex-wrap justify-center gap-4">
+        <button type="button" onClick={downloadJson} className="btn-secondary">
+          Download JSON
+        </button>
+        <button type="button" onClick={downloadAse} className="btn-secondary">
+          Download ASE
+        </button>
+      </div>
     </section>
   );
 }

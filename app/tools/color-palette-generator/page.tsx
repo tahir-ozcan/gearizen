@@ -5,7 +5,8 @@ import BreadcrumbJsonLd from '@/app/components/BreadcrumbJsonLd';
 export const metadata: Metadata = {
   metadataBase: new URL('https://gearizen.com'),
   title: 'Color Palette Generator',
-  description: 'Create harmonious color palettes from any base color directly in your browser.',
+  description:
+    'Create harmonious color palettes from any base color directly in your browser. Choose harmony rules and export as JSON or ASE.',
   keywords: ['color palette', 'palette generator', 'color scheme', 'design tool', 'Gearizen tools'],
   authors: [{ name: 'Gearizen Team', url: 'https://gearizen.com/about' }],
   robots: { index: true, follow: true },
