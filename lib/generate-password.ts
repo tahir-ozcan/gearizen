@@ -36,21 +36,21 @@ export function generatePassword(options: PasswordOptions): string {
   const length = Math.floor(options.length);
   if (length <= 0) return "";
 
-  const exclude = !!options.excludeSimilar;
+  const excludeSimilar = !!options.excludeSimilar;
   let pool = "";
-  if (options.upper) pool += filterSet(UPPER, exclude);
-  if (options.lower) pool += filterSet(LOWER, exclude);
-  if (options.digits) pool += filterSet(DIGITS, exclude);
-  if (options.symbols) pool += filterSet(SYMBOLS, exclude);
+  if (options.upper) pool += filterSet(UPPER, excludeSimilar);
+  if (options.lower) pool += filterSet(LOWER, excludeSimilar);
+  if (options.digits) pool += filterSet(DIGITS, excludeSimilar);
+  if (options.symbols) pool += filterSet(SYMBOLS, excludeSimilar);
   if (!pool) return "";
 
   const chars = Array.from({ length }, () => randomChar(pool));
 
   const required: string[] = [];
-  if (options.upper) required.push(randomChar(filterSet(UPPER, exclude)));
-  if (options.lower) required.push(randomChar(filterSet(LOWER, exclude)));
-  if (options.digits) required.push(randomChar(filterSet(DIGITS, exclude)));
-  if (options.symbols) required.push(randomChar(filterSet(SYMBOLS, exclude)));
+  if (options.upper) required.push(randomChar(filterSet(UPPER, excludeSimilar)));
+  if (options.lower) required.push(randomChar(filterSet(LOWER, excludeSimilar)));
+  if (options.digits) required.push(randomChar(filterSet(DIGITS, excludeSimilar)));
+  if (options.symbols) required.push(randomChar(filterSet(SYMBOLS, excludeSimilar)));
 
   const used = new Set<number>();
   required.forEach((ch) => {
