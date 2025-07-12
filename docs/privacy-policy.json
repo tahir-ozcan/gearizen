@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Data We Don’t Collect",
+    "markdown": "- No personal information (name, address, email, etc.)\n- No file uploads or storage on our servers\n- No IP address logging\n- No behavioral analytics or usage tracking"
+  },
+  {
+    "title": "Third-Party Ads",
+    "markdown": "We display ads via third-party networks (e.g., Google Ads). Those providers may set their own cookies or trackers; please review their privacy policies. Gearizen does not share any personally identifiable data with advertisers."
+  },
+  {
+    "title": "Cookies",
+    "markdown": "Gearizen itself does not use cookies. However, third-party ad networks may drop cookies under their own policies. You can manage those through your browser settings."
+  },
+  {
+    "title": "Your Rights",
+    "markdown": "Since we collect no personal data, there is nothing for you to access, modify, or delete. Your interactions remain private on your device."
+  },
+  {
+    "title": "Policy Updates",
+    "markdown": "We may update this policy to reflect changes in our tools or applicable laws. Please revisit this page periodically to stay informed."
+  },
+  {
+    "title": "Contact Us",
+    "markdown": "If you have questions about this policy, please [contact us](/contact)."
+  }
+]

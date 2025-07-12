@@ -2,14 +2,45 @@
 
 "use client";
 
-import Link from "next/link";
+import { useEffect, useState, useCallback } from "react";
+import { getPrivacySections } from "@/lib/privacy";
+import { renderMarkdown } from "@/lib/render-markdown";
+
+const sections = getPrivacySections();
 
 export default function PrivacyClient() {
+  const [activeId, setActiveId] = useState<string>(sections[0].id);
+  const [tocOpen, setTocOpen] = useState(false);
+
+  const handleScroll = useCallback(() => {
+    let current = sections[0].id;
+    for (const { id } of sections) {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top <= 100) {
+        current = id;
+      }
+    }
+    setActiveId(current);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+  useEffect(() => {
+    document.body.style.overflow = tocOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [tocOpen]);
+
   return (
     <section
       id="privacy-policy"
       aria-labelledby="privacy-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive py-20 text-gray-900 selection:bg-indigo-200 selection:text-indigo-900"
     >
       <h1
         id="privacy-heading"
@@ -18,94 +49,75 @@ export default function PrivacyClient() {
         Privacy Policy
       </h1>
 
-      <p className="mb-8 text-lg leading-relaxed max-w-3xl mx-auto">
-        At <strong>Gearizen</strong>, your privacy is our top priority. All of
-        our tools run <strong>100% client-side</strong>, meaning your data never
-        leaves your device—nothing is transmitted, stored, or tracked on our
-        servers.
-      </p>
+      <div className="lg:grid lg:grid-cols-[1fr_minmax(0,240px)] lg:gap-12">
+        <div className="prose prose-gray max-w-none text-lg leading-relaxed">
+          {sections.map((sec) => (
+            <section id={sec.id} key={sec.id} className="mb-12 scroll-mt-24">
+              <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-gray-900">
+                {sec.title}
+              </h2>
+              <div
+                className="mt-4"
+                dangerouslySetInnerHTML={{ __html: renderMarkdown(sec.markdown) }}
+              />
+            </section>
+          ))}
+        </div>
 
-      <p className="mb-12 text-lg leading-relaxed max-w-3xl mx-auto">
-        You are never required to create an account or provide any personal
-        information. Feel free to use our password generators, JSON formatters,
-        text converters, QR code tools, and more—completely anonymously.
-      </p>
-
-      <div className="space-y-12 max-w-3xl mx-auto">
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Data We Don’t Collect
-          </h2>
-          <ul className="list-disc list-inside space-y-2 text-lg leading-relaxed">
-            <li>No personal information (name, address, email, etc.)</li>
-            <li>No file uploads or storage on our servers</li>
-            <li>No IP address logging</li>
-            <li>No behavioral analytics or usage tracking</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Advertising & Third-Party Services
-          </h2>
-          <p className="text-lg leading-relaxed">
-            We display ads via third-party networks (e.g., Google Ads). Those
-            providers may set their own cookies or trackers; please review their
-            privacy policies. Gearizen does not share any personally
-            identifiable data with advertisers.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Cookies
-          </h2>
-          <p className="text-lg leading-relaxed">
-            Gearizen itself does not use cookies. However, third-party ad
-            networks may drop cookies under their own policies. You can manage
-            those through your browser settings.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Your Rights
-          </h2>
-          <p className="text-lg leading-relaxed">
-            Since we collect no personal data, there is nothing for you to
-            access, modify, or delete. Your interactions remain private on your
-            device.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Policy Updates
-          </h2>
-          <p className="text-lg leading-relaxed">
-            We may update this policy to reflect changes in our tools or
-            applicable laws. Please revisit this page periodically to stay
-            informed.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
-            Contact Us
-          </h2>
-          <p className="text-lg leading-relaxed">
-            If you have questions about this policy, please{" "}
-            <Link
-              href="/contact"
-              className="text-indigo-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded transition-colors"
-              aria-label="Go to Contact page"
-            >
-              get in touch
-            </Link>
-            .
-          </p>
-        </section>
+        <aside className="hidden lg:block">
+          <nav aria-label="Table of contents" className="sticky top-20">
+            <ul className="space-y-2 text-sm">
+              {sections.map((sec) => (
+                <li key={sec.id} className="list-none">
+                  <a
+                    href={`#${sec.id}`}
+                    className={`block px-2 py-1 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-colors ${activeId === sec.id ? "text-indigo-600 font-semibold" : "text-gray-700 hover:text-gray-900"}`}
+                  >
+                    {sec.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </aside>
       </div>
+
+      <button
+        type="button"
+        className="fixed bottom-4 right-4 lg:hidden btn-primary"
+        onClick={() => setTocOpen(true)}
+        aria-label="Open contents"
+      >
+        Contents
+      </button>
+      {tocOpen && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-end" role="dialog" aria-modal="true">
+          <div className="bg-white w-full rounded-t-2xl p-6 max-h-[75vh] overflow-y-auto">
+            <button
+              type="button"
+              onClick={() => setTocOpen(false)}
+              className="float-right mb-4 text-sm text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            >
+              Close
+            </button>
+            <nav aria-label="Mobile table of contents">
+              <ul className="space-y-3">
+                {sections.map((sec) => (
+                  <li key={sec.id} className="list-none">
+                    <a
+                      href={`#${sec.id}`}
+                      onClick={() => setTocOpen(false)}
+                      className={`block px-2 py-1 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${activeId === sec.id ? "text-indigo-600 font-semibold" : "text-gray-700 hover:text-gray-900"}`}
+                    >
+                      {sec.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
