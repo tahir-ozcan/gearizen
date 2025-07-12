@@ -2,6 +2,8 @@
 
 import AboutClient from "./about-client";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
+import JsonLd from "@/app/components/JsonLd";
+import { loadAboutData } from "@/lib/aboutData";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -48,14 +50,21 @@ export const metadata = {
   },
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const data = await loadAboutData();
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    url: "https://gearizen.com",
+    name: "Gearizen",
+    logo: "https://gearizen.com/favicon.png",
+  };
+
   return (
     <>
-      <BreadcrumbJsonLd
-        pageTitle="About Us"
-        pageUrl="https://gearizen.com/about"
-      />
-      <AboutClient />
+      <BreadcrumbJsonLd pageTitle="About Us" pageUrl="https://gearizen.com/about" />
+      <JsonLd data={orgJsonLd} />
+      <AboutClient blocks={data.blocks} />
     </>
   );
 }

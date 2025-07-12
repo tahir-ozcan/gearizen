@@ -1,0 +1,42 @@
+{
+  "blocks": [
+    {
+      "type": "hero",
+      "heading": "About Gearizen",
+      "paragraphs": [
+        "Gearizen is a free, client-side digital tools platform built for web developers, content creators, and everyday users. We deliver essential utilities—password generators, JSON formatters, text converters, QR code generators, and more—without requiring signup or collecting any personal data.",
+        "Powered entirely by client-side technologies, Gearizen guarantees privacy and security while providing fast, reliable tools accessible from anywhere in the world.",
+        "Our mission is to foster a growing ecosystem through SEO-optimized content and intuitive tools, turning organic traffic into sustainable ad revenue that fuels continuous improvement and expansion."
+      ]
+    },
+    {
+      "type": "bullets",
+      "heading": "Why Choose Gearizen?",
+      "items": [
+        "No signup or login required",
+        "100% client-side & privacy-focused",
+        "Fast, reliable & completely free",
+        "SEO-optimized for maximum discoverability",
+        "Wide range of essential developer & creator tools"
+      ]
+    },
+    {
+      "type": "team",
+      "heading": "Meet the Team",
+      "members": [
+        {
+          "name": "Tahir Ozcan",
+          "role": "Founder & Developer",
+          "avatar": "https://avatars.githubusercontent.com/u/26418043?v=4",
+          "bio": "Tahir crafts every Gearizen tool with a focus on speed, privacy, and accessibility."
+        }
+      ]
+    },
+    {
+      "type": "cta",
+      "text": "We value your feedback and suggestions. To get in touch, please visit our",
+      "linkText": "Contact page",
+      "href": "/contact"
+    }
+  ]
+}
