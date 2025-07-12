@@ -3,13 +3,11 @@
 
 import { useState, ChangeEvent, useEffect } from "react";
 import PreviewImage from "@/components/PreviewImage";
-import { Document, Packer, Paragraph } from "docx";
 import type {
   PDFDocumentProxy,
   PDFPageProxy,
-  TextContent,
-  TextItem,
 } from "pdfjs-dist/legacy/build/pdf";
+import { pdfToDocx } from "@/lib/pdf-to-docx";
 
 export default function PdfToWordClient() {
   const [file, setFile] = useState<File | null>(null);
@@ -17,9 +15,15 @@ export default function PdfToWordClient() {
   const [error, setError] = useState<string | null>(null);
   const [docUrl, setDocUrl] = useState<string>("");
   const [previewUrl, setPreviewUrl] = useState<string>("");
-  const [previewSize, setPreviewSize] = useState<{ w: number; h: number } | null>(
-    null
-  );
+  const [previewSize, setPreviewSize] = useState<{
+    w: number;
+    h: number;
+  } | null>(null);
+  const [options, setOptions] = useState({
+    mode: "text" as "text" | "image",
+    includeImages: false,
+    orientation: "portrait" as "portrait" | "landscape",
+  });
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDocUrl("");
@@ -42,36 +46,13 @@ export default function PdfToWordClient() {
     setError(null);
     setDocUrl("");
     try {
-      const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
-      const worker = (
-        await import("pdfjs-dist/legacy/build/pdf.worker.mjs?worker&url")
-      ).default;
-      pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
-
       const arrayBuffer = await readFileAsArrayBuffer(file);
-      const pdf: PDFDocumentProxy = await pdfjsLib
-        .getDocument({ data: arrayBuffer })
-        .promise;
-      const pageTexts: string[] = [];
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page: PDFPageProxy = await pdf.getPage(i);
-        const content: TextContent = await page.getTextContent();
-        const text = (content.items as TextItem[])
-          .map((item) => item.str)
-          .join(" ");
-        pageTexts.push(text);
-      }
-
-      const doc = new Document({
-        sections: [{ children: pageTexts.map((t) => new Paragraph(t)) }],
-      });
-
-      const blob = await Packer.toBlob(doc);
+      const blob = await pdfToDocx(arrayBuffer, options);
       const url = URL.createObjectURL(blob);
       setDocUrl(url);
     } catch (e) {
       setError(
-        e instanceof Error ? e.message : "An error occurred during conversion."
+        e instanceof Error ? e.message : "An error occurred during conversion.",
       );
     } finally {
       setProcessing(false);
@@ -88,10 +69,10 @@ export default function PdfToWordClient() {
         ).default;
         pdfjsLib.GlobalWorkerOptions.workerSrc = worker;
         const arrayBuffer = await readFileAsArrayBuffer(file);
-        const pdf: PDFDocumentProxy = await pdfjsLib
-          .getDocument({ data: arrayBuffer })
-          .promise;
-        const page = await pdf.getPage(1);
+        const pdf: PDFDocumentProxy = await pdfjsLib.getDocument({
+          data: arrayBuffer,
+        }).promise;
+        const page: PDFPageProxy = await pdf.getPage(1);
         const viewport = page.getViewport({ scale: 1 });
         const canvas = document.createElement("canvas");
         canvas.width = viewport.width;
@@ -127,11 +108,15 @@ export default function PdfToWordClient() {
         PDF to Word Converter
       </h1>
       <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-        Upload a PDF and convert its text to a Word document—all right in your browser.
+        Upload a PDF and convert its text to a Word document—all right in your
+        browser.
       </p>
 
       <div className="max-w-lg mx-auto mb-6">
-        <label htmlFor="pdf-upload" className="block mb-2 font-medium text-gray-800">
+        <label
+          htmlFor="pdf-upload"
+          className="block mb-2 font-medium text-gray-800"
+        >
           Choose PDF File
         </label>
         <input
@@ -141,6 +126,62 @@ export default function PdfToWordClient() {
           onChange={handleFileChange}
           className="block w-full text-sm text-gray-700 file:border file:border-gray-300 file:rounded-lg file:px-4 file:py-2 file:bg-white hover:file:bg-gray-50 transition"
         />
+      </div>
+
+      <div className="max-w-lg mx-auto mb-6 space-y-4">
+        <fieldset>
+          <legend className="font-medium mb-2">Mode</legend>
+          <label className="mr-4 inline-flex items-center">
+            <input
+              type="radio"
+              name="mode"
+              value="text"
+              checked={options.mode === "text"}
+              onChange={() => setOptions({ ...options, mode: "text" })}
+              className="mr-1"
+            />
+            Text Only
+          </label>
+          <label className="inline-flex items-center">
+            <input
+              type="radio"
+              name="mode"
+              value="image"
+              checked={options.mode === "image"}
+              onChange={() => setOptions({ ...options, mode: "image" })}
+              className="mr-1"
+            />
+            Page Images
+          </label>
+        </fieldset>
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            className="mr-2"
+            disabled={options.mode !== "text"}
+            checked={options.includeImages}
+            onChange={(e) =>
+              setOptions({ ...options, includeImages: e.target.checked })
+            }
+          />
+          Include page snapshots
+        </label>
+        <label className="block">
+          <span className="block mb-1 font-medium">Orientation</span>
+          <select
+            value={options.orientation}
+            onChange={(e) =>
+              setOptions({
+                ...options,
+                orientation: e.target.value as "portrait" | "landscape",
+              })
+            }
+            className="input-base"
+          >
+            <option value="portrait">Portrait</option>
+            <option value="landscape">Landscape</option>
+          </select>
+        </label>
       </div>
 
       {previewUrl && previewSize && (
