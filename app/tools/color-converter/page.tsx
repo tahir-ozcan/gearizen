@@ -7,11 +7,12 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "Color Converter",
   description:
-    "Translate colors between HEX, RGB, and HSL instantly. 100% client-side with a live preview.",
+    "Translate colors between HEX, RGB(A), HSL(A), and CMYK instantly. 100% client-side with a live preview.",
   keywords: [
     "color converter",
     "hex to rgb",
     "rgb to hsl",
+    "cmyk to rgb",
     "color tools",
     "Gearizen color",
   ],
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Color Converter | Gearizen",
     description:
-      "Convert any color code between HEX, RGB, and HSL formats with instant preview.",
+      "Convert any color code between HEX, RGB(A), HSL(A), and CMYK with instant preview.",
     url: "https://gearizen.com/tools/color-converter",
     siteName: "Gearizen",
     locale: "en_US",
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Color Converter | Gearizen",
     description:
-      "Quickly convert colors between HEX, RGB, and HSL using Gearizen’s browser-based tool.",
+      "Quickly convert colors between HEX, RGB(A), HSL(A), and CMYK using Gearizen’s browser-based tool.",
     creator: "@gearizen",
     images: ["/og-placeholder.svg"],
   },
