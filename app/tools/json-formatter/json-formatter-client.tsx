@@ -106,22 +106,20 @@ export default function JsonFormatterClient() {
         />
 
         {/* Options & Actions */}
-        <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 space-y-4 sm:space-y-0">
+        <div className="flex flex-col md:flex-row md:justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <label htmlFor="indent" className="flex items-center space-x-2">
               <span className="text-sm font-medium text-gray-700">Indent:</span>
-              <select
+              <input
                 id="indent"
+                type="number"
+                min={0}
+                max={8}
                 disabled={mode === 'minify'}
                 value={indent}
-                onChange={(e) => setIndent(Number(e.target.value))}
-                className="input-base w-auto px-2 py-1 text-sm"
-              >
-                <option value={0}>0</option>
-                <option value={2}>2</option>
-                <option value={4}>4</option>
-                <option value={8}>8</option>
-              </select>
+                onChange={(e) => setIndent(Math.min(8, Math.max(0, Number(e.target.value))))}
+                className="input-base w-20 px-2 py-1 text-sm"
+              />
             </label>
 
             <label className="flex items-center space-x-1">

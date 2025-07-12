@@ -1,8 +1,7 @@
+/** @jest-environment jsdom */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import PasswordGeneratorClient from '../app/tools/password-generator/password-generator-client';
-
-/** @jest-environment jsdom */
 
 describe('PasswordGeneratorClient', () => {
   test('generates a new password when button is clicked', async () => {

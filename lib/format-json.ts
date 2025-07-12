@@ -1,4 +1,4 @@
-import jsonlint from 'jsonlint-mod';
+let jsonlint: typeof import('jsonlint-mod') | null = null;
 let json5: typeof import('json5') | null = null;
 
 export type JsonMode = 'beautify' | 'minify' | 'validate';
@@ -24,7 +24,12 @@ function sortObject(obj: unknown): unknown {
 }
 
 async function parse(src: string, strict: boolean) {
-  if (strict) return jsonlint.parse(src);
+  if (strict) {
+    if (!jsonlint) {
+      jsonlint = await import('jsonlint-mod');
+    }
+    return jsonlint.parse(src);
+  }
   if (!json5) {
     json5 = await import('json5');
   }
