@@ -1,7 +1,7 @@
 "use client";
 // On any user interaction (base color or scheme change), generate exactly N colors.
-// This is a hard requirement: N comes from the "Colors" control and must persist
-// across interactions without resetting.
+// N is set by the "Colors" slider and must never reset when switching schemes or
+// editing the base color.
 import { useState, ChangeEvent, useEffect } from "react";
 import Input from "@/components/Input";
 import {
