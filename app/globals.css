@@ -54,3 +54,22 @@
     @apply text-gray-500;
   }
 }
+
+/* styles/globals.css */
+
+.gradient-bg {
+  background: linear-gradient(
+    90deg,
+    #7c3aed 0%,
+    #ec4899 50%,
+    #fbbf24 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient-anim 15s ease-in-out infinite;
+}
+
+@keyframes gradient-anim {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

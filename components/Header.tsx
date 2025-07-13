@@ -1,163 +1,269 @@
 // components/Header.tsx
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import {
+  Menu,
+  X,
+  Home,
+  Info,
+  Settings,
+  Mail,
+  Lock,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/tools", label: "Tools" },
-  { href: "/contact", label: "Contact" },
-  { href: "/privacy", label: "Privacy" },
+interface NavItem {
+  href: string;
+  label: string;
+  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+}
+
+const CORE_NAV: NavItem[] = [
+  { href: "/",        label: "Home",          Icon: Home     },
+  { href: "/about",   label: "About Us",      Icon: Info     },
+  { href: "/tools",   label: "All Tools",     Icon: Settings },
+  { href: "/contact", label: "Contact Us",    Icon: Mail     },
 ];
 
-/**
- * Global site header with responsive navigation.
- */
+// LEGAL_NAV içine Icon da dahil edildi
+const LEGAL_NAV: NavItem[] = [
+  { href: "/privacy", label: "Privacy Policy",   Icon: Lock },
+  { href: "/cookies", label: "Cookie Policy",    Icon: Lock },
+  { href: "/terms",   label: "Terms of Service", Icon: Info },
+];
+
 export default function Header() {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
 
-  // Lock scroll when mobile menu is open
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [desktopMoreOpen, setDesktopMoreOpen] = useState(false);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  // Close on Esc
+  const desktopMoreRef = useRef<HTMLDivElement>(null);
+
+  // Scroll’a göre gölge
   useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        setIsOpen(false);
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll);
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Desktop “More” dışına tıklanınca kapat
+  useEffect(() => {
+    if (!desktopMoreOpen) return;
+    const onClickOutside = (e: MouseEvent) => {
+      if (
+        desktopMoreRef.current &&
+        !desktopMoreRef.current.contains(e.target as Node)
+      ) {
+        setDesktopMoreOpen(false);
       }
     };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [isOpen]);
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [desktopMoreOpen]);
 
-  const toggleMenu = useCallback(() => {
-    setIsOpen((v) => !v);
+  // Mobil açıkken body scroll engelle
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
+  // Handler’lar
+  const handleDesktopMore = useCallback(() => {
+    setDesktopMoreOpen(open => !open);
+  }, []);
+  const handleMobileToggle = useCallback(() => {
+    setMobileOpen(open => !open);
+    if (mobileMoreOpen) setMobileMoreOpen(false);
+  }, [mobileMoreOpen]);
+  const handleMobileMore = useCallback(() => {
+    setMobileMoreOpen(open => !open);
+  }, []);
+  const closeMobile = useCallback(() => {
+    setMobileOpen(false);
+    setMobileMoreOpen(false);
   }, []);
 
   return (
     <header
-      className="sticky top-0 z-50 bg-white border-b border-gray-200"
+      className={`
+        sticky top-0 inset-x-0 z-50
+        gradient-bg text-white
+        ${scrolled ? "shadow-2xl" : ""}
+        transition-shadow duration-300
+      `}
       role="banner"
     >
-      {/* Skip link */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 px-4 py-2 bg-indigo-600 text-white rounded-md"
-      >
-        Skip to main content
-      </a>
-
-      <div className="container-responsive flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-4 md:px-6">
         {/* Logo */}
-        <Link
-          href="/"
-          aria-label="Go to Gearizen homepage"
-          aria-current={pathname === "/" ? "page" : undefined}
-          className="flex items-center"
-        >
+        <Link href="/" className="flex items-center gap-2 shrink-0">
           <Image
             src="/favicon.png"
             alt="Gearizen logo"
-            width={32}
-            height={32}
+            width={40}
+            height={40}
             priority
+            className="rounded-full"
           />
-          <span className="sr-only">Gearizen</span>
+          <span className="text-2xl font-bold tracking-tight">Gearizen</span>
         </Link>
 
-        {/* Desktop navigation */}
-        <nav aria-label="Primary" className="hidden md:block">
-          <ul className="flex items-center space-x-6">
-            {navLinks.map(({ href, label }) => {
-              const active = pathname === href;
-              return (
-                <li key={href} className="list-none">
-                  <Link
-                    href={href}
-                    aria-current={active ? "page" : undefined}
-                    className={`
-                      relative text-sm font-medium transition-colors
-                      focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
-                      ${
-                        active
-                          ? "text-indigo-600 after:absolute after:-bottom-1 after:left-0 after:w-full after:h-0.5 after:bg-indigo-600"
-                          : "text-gray-700 hover:text-gray-900"
-                      }
-                    `}
-                  >
-                    {label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+        {/* Desktop Menü */}
+        <nav className="hidden lg:flex items-center space-x-6">
+          {CORE_NAV.map(({ href, label, Icon }) => {
+            const active = pathname === href;
+            return (
+              <Link
+                key={href}
+                href={href}
+                onClick={closeMobile}
+                aria-current={active ? "page" : undefined}
+                className={`
+                  flex items-center gap-1 text-base font-medium whitespace-nowrap
+                  ${active
+                    ? "underline underline-offset-4 decoration-white"
+                    : "hover:underline hover:underline-offset-4"}
+                  transition-colors duration-200
+                `}
+              >
+                <Icon className="w-5 h-5" aria-hidden="true" />
+                <span>{label}</span>
+              </Link>
+            );
+          })}
+
+          {/* Desktop “More” */}
+          <div ref={desktopMoreRef} className="relative">
+            <button
+              onClick={handleDesktopMore}
+              aria-expanded={desktopMoreOpen}
+              aria-haspopup="true"
+              className="flex items-center gap-1 text-base font-medium focus:outline-none"
+            >
+              More
+              {desktopMoreOpen
+                ? <ChevronUp   className="w-4 h-4" aria-hidden="true" />
+                : <ChevronDown className="w-4 h-4" aria-hidden="true" />
+              }
+            </button>
+            {desktopMoreOpen && (
+              <ul className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden z-50">
+                {LEGAL_NAV.map(({ href, label, Icon }) => {
+                  const active = pathname === href;
+                  return (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        onClick={() => setDesktopMoreOpen(false)}
+                        aria-current={active ? "page" : undefined}
+                        className={`
+                          flex items-center gap-2 px-4 py-2 text-sm
+                          ${active ? "bg-gray-100 font-semibold" : "hover:bg-gray-50"}
+                          transition-colors duration-150
+                        `}
+                      >
+                        <Icon className="w-4 h-4 text-gray-500" aria-hidden="true" />
+                        <span>{label}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
         </nav>
 
-        {/* Mobile menu toggle */}
+        {/* Mobile Menü Butonu */}
         <button
-          type="button"
-          onClick={toggleMenu}
-          aria-label={isOpen ? "Close menu" : "Open menu"}
-          aria-expanded={isOpen}
-          aria-controls="mobile-menu"
-          className="md:hidden p-2 rounded-md text-gray-800 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 transition"
+          onClick={handleMobileToggle}
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          className="lg:hidden p-2 rounded-md hover:bg-white/20 focus:outline-none transition"
         >
-          {isOpen ? (
-            <X className="w-6 h-6" aria-hidden="true" />
-          ) : (
-            <Menu className="w-6 h-6" aria-hidden="true" />
-          )}
+          {mobileOpen
+            ? <X className="w-6 h-6" aria-hidden="true" />
+            : <Menu className="w-6 h-6" aria-hidden="true" />
+          }
         </button>
       </div>
 
-      {/* Mobile navigation panel (overlay under header) */}
-      <nav
-        id="mobile-menu"
-        aria-label="Mobile"
-        className={`
-          absolute inset-x-0 top-full bg-white shadow-lg transform origin-top transition-transform duration-200 ease-out
-          ${isOpen ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0 pointer-events-none"}
-        `}
-      >
-        <div className="container-responsive py-4">
-          <ul className="flex flex-col space-y-2">
-            {navLinks.map(({ href, label }) => {
-              const active = pathname === href;
-              return (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    onClick={() => setIsOpen(false)}
-                    aria-current={active ? "page" : undefined}
-                    className={`
-                      block w-full px-4 py-2 text-base font-medium rounded-md transition-colors
-                      focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
-                      ${
-                        active
-                          ? "bg-indigo-50 text-indigo-600"
-                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                      }
-                    `}
-                  >
-                    {label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+      {/* Mobile Menü Paneli */}
+      {mobileOpen && (
+        <div className="lg:hidden fixed inset-x-0 top-16 z-50 bg-white text-gray-800 shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
+          <nav aria-label="Mobile">
+            <ul className="space-y-1 p-4">
+              {CORE_NAV.map(({ href, label, Icon }) => {
+                const active = pathname === href;
+                return (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      onClick={closeMobile}
+                      aria-current={active ? "page" : undefined}
+                      className={`
+                        flex items-center gap-3 px-3 py-2 rounded-lg font-medium
+                        ${active ? "bg-gray-100" : "hover:bg-gray-50"}
+                        transition-colors duration-200
+                      `}
+                    >
+                      <Icon className="w-5 h-5" aria-hidden="true" />
+                      <span>{label}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+
+              {/* Mobile “More” */}
+              <li className="border-t border-gray-200 mt-2 pt-2">
+                <button
+                  onClick={handleMobileMore}
+                  aria-expanded={mobileMoreOpen}
+                  aria-haspopup="true"
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200 focus:outline-none"
+                >
+                  <span>More</span>
+                  {mobileMoreOpen
+                    ? <ChevronUp   className="w-5 h-5" aria-hidden="true" />
+                    : <ChevronDown className="w-5 h-5" aria-hidden="true" />
+                  }
+                </button>
+                {mobileMoreOpen && (
+                  <ul className="mt-1 space-y-1 bg-white">
+                    {LEGAL_NAV.map(({ href, label, Icon }) => {
+                      const active = pathname === href;
+                      return (
+                        <li key={href}>
+                          <Link
+                            href={href}
+                            onClick={closeMobile}
+                            aria-current={active ? "page" : undefined}
+                            className={`
+                              flex items-center gap-3 px-5 py-2 rounded-lg font-medium
+                              ${active ? "bg-gray-100" : "hover:bg-gray-50"}
+                              transition-colors duration-200
+                            `}
+                          >
+                            <Icon className="w-5 h-5 text-gray-600" aria-hidden="true" />
+                            <span>{label}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </li>
+            </ul>
+          </nav>
         </div>
-      </nav>
+      )}
     </header>
   );
 }
