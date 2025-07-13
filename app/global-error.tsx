@@ -7,12 +7,13 @@ export default function GlobalError({ reset }: { reset: () => void }) {
   return (
     <section
       role="alert"
-      className="flex flex-col items-center justify-center min-h-screen text-center text-gray-900 antialiased"
+      className="flex flex-col items-center justify-center text-center text-gray-900 antialiased"
     >
       <h1
         className="
           gradient-text text-5xl sm:text-6xl md:text-7xl
-          font-extrabold tracking-tight mb-4
+          font-extrabold tracking-tight mb-4 bg-clip-text text-transparent
+          bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
         "
       >
         Something went wrong

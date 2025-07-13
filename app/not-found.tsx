@@ -14,19 +14,21 @@ export default function NotFoundClient() {
     <section
       id="notfound-section"
       aria-labelledby="notfound-title"
-      className="flex flex-col items-center justify-center min-h-screen text-center text-gray-900 antialiased"
+      className="flex flex-col items-center justify-center text-center text-gray-900 antialiased"
     >
       <h1
         id="notfound-title"
         tabIndex={-1}
-        className="text-7xl sm:text-8xl font-extrabold text-indigo-600 mb-2 tracking-tight"
+        className="text-7xl sm:text-8xl font-extrabold bg-clip-text text-transparent
+                   bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] mb-2 tracking-tight"
       >
         404
       </h1>
       <h2
         className="
           gradient-text text-3xl sm:text-4xl
-          font-semibold mb-6
+          font-semibold mb-6 bg-clip-text text-transparent
+          bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
         "
       >
         Page Not Found
