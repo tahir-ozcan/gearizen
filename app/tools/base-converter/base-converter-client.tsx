@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
-import Link from "next/link";
 import {
   ChevronDown,
   ChevronUp,
@@ -11,9 +10,7 @@ import {
 } from "lucide-react";
 
 export default function BaseConverterClient() {
-  // ————————————————————————————————————————————————————————————————————
-  // State
-  // ————————————————————————————————————————————————————————————————————
+  // ─── State ──────────────────────────────────────────────────────────────────
   const [inputValue, setInputValue] = useState("");
   const [fromBase, setFromBase] = useState(10);
   const [toBase, setToBase] = useState(2);
@@ -28,7 +25,7 @@ export default function BaseConverterClient() {
   const [prefix, setPrefix] = useState("");
   const [suffix, setSuffix] = useState("");
 
-  // Auto-focus on input
+  // Auto-focus input on mount
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     inputRef.current?.focus();
@@ -40,9 +37,7 @@ export default function BaseConverterClient() {
     []
   );
 
-  // ————————————————————————————————————————————————————————————————————
-  // Conversion & Formatting Effect
-  // ————————————————————————————————————————————————————————————————————
+  // ─── Conversion & Formatting ────────────────────────────────────────────────
   useEffect(() => {
     setErrorMessage(null);
 
@@ -59,7 +54,7 @@ export default function BaseConverterClient() {
     );
     for (const ch of trimmed.toUpperCase()) {
       if (!validChars.includes(ch)) {
-        setErrorMessage(`Invalid “${ch}” for base ${fromBase}.`);
+        setErrorMessage(`Invalid character “${ch}” for base ${fromBase}.`);
         setOutputValue("");
         return;
       }
@@ -67,28 +62,27 @@ export default function BaseConverterClient() {
 
     // Parse to BigInt
     let decimalValue = BigInt(0);
-    const bigBase = BigInt(fromBase);
+    const bigFrom = BigInt(fromBase);
     for (const ch of trimmed.toUpperCase()) {
       decimalValue =
-        decimalValue * bigBase + BigInt(validChars.indexOf(ch));
+        decimalValue * bigFrom + BigInt(validChars.indexOf(ch));
     }
 
-    // Zero shortcut
+    // Convert to target base
     let core: string;
     if (decimalValue === 0n) {
       core = "0";
     } else {
-      // Convert to target base
-      const bigTarget = BigInt(toBase);
+      const bigTo = BigInt(toBase);
       let current = decimalValue < 0n ? -decimalValue : decimalValue;
-      const outChars: string[] = [];
+      const digits: string[] = [];
       while (current > 0n) {
-        const rem = Number(current % bigTarget);
-        outChars.push(validChars[rem]);
-        current = current / bigTarget;
+        const rem = Number(current % bigTo);
+        digits.push(validChars[rem]);
+        current = current / bigTo;
       }
-      if (decimalValue < 0n) outChars.push("-");
-      core = outChars.reverse().join("");
+      if (decimalValue < 0n) digits.push("-");
+      core = digits.reverse().join("");
       if (toBase === 16 && !uppercaseHex) {
         core = core.toLowerCase();
       }
@@ -99,21 +93,18 @@ export default function BaseConverterClient() {
       core = core.padStart(fixedWidth, "0");
     }
 
-    // Inline formatting: grouping, prefix, suffix
-    let formatted = core;
+    // Group every three characters
+    let grouped = core;
     if (groupDigits) {
-      const sign = formatted.startsWith("-") ? "-" : "";
-      const body = sign ? formatted.slice(1) : formatted;
-      formatted =
+      const sign = grouped.startsWith("-") ? "-" : "";
+      const body = sign ? grouped.slice(1) : grouped;
+      grouped =
         sign +
         body.replace(/\B(?=(\w{3})+(?!\w))/g, "_");
     }
-    if (prefix) {
-      formatted = prefix + formatted;
-    }
-    if (suffix) {
-      formatted = formatted + suffix;
-    }
+
+    // Compose final with prefix/suffix
+    const formatted = prefix + grouped + suffix;
 
     setOutputValue(formatted);
   }, [
@@ -127,16 +118,14 @@ export default function BaseConverterClient() {
     suffix,
   ]);
 
-  // ————————————————————————————————————————————————————————————————————
-  // Handlers
-  // ————————————————————————————————————————————————————————————————————
+  // ─── Handlers ────────────────────────────────────────────────────────────────
   const copyToClipboard = async () => {
     if (!outputValue) return;
     try {
       await navigator.clipboard.writeText(outputValue);
-      alert("✅ Copied!");
+      alert("✅ Copied to clipboard!");
     } catch {
-      alert("❌ Copy failed");
+      alert("❌ Copy failed.");
     }
   };
 
@@ -161,7 +150,7 @@ export default function BaseConverterClient() {
       aria-labelledby="base-converter-heading"
       className="space-y-16 text-gray-900 antialiased"
     >
-      {/* Hero / Title */}
+      {/* Heading & Intro */}
       <div className="text-center space-y-4 sm:px-0">
         <h1
           id="base-converter-heading"
@@ -174,30 +163,15 @@ export default function BaseConverterClient() {
         >
           Base Converter
         </h1>
+        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="text-lg sm:text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed">
-          Convert numbers between bases (2–36) right here in your browser — no
-          servers, no tracking, instant.
+          Convert numbers between bases (2–36) instantly in your browser—no servers, no tracking.
         </p>
-        <div className="flex justify-center gap-3">
-          <Link
-            href="/tools"
-            className="text-indigo-600 hover:text-indigo-800 font-medium transition"
-          >
-            ← All Tools
-          </Link>
-          <button
-            onClick={resetAll}
-            aria-label="Reset converter"
-            className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
-          >
-            <RefreshCcw className="w-5 h-5" aria-hidden="true" /> Reset
-          </button>
-        </div>
       </div>
 
-      {/* Main Form */}
+      {/* Tools UI */}
       <div className="max-w-xl mx-auto space-y-8 sm:px-0">
-        {/* Input Field */}
+        {/* Input Box */}
         <div>
           <label
             htmlFor="input-value"
@@ -212,7 +186,11 @@ export default function BaseConverterClient() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="e.g. FF, 1010, 123"
-            className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 font-mono transition"
+            className="
+              block w-full px-4 py-3 border border-gray-300 rounded-lg
+              focus:ring-2 focus:ring-indigo-500 placeholder-gray-400
+              font-mono transition
+            "
           />
         </div>
 
@@ -229,7 +207,10 @@ export default function BaseConverterClient() {
               id="from-base"
               value={fromBase}
               onChange={(e) => setFromBase(Number(e.target.value))}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              className="
+                block w-full px-3 py-2 border border-gray-300 rounded-lg
+                focus:ring-2 focus:ring-indigo-500 transition
+              "
             >
               {baseOptions.map((b) => (
                 <option key={b} value={b}>
@@ -249,7 +230,10 @@ export default function BaseConverterClient() {
               id="to-base"
               value={toBase}
               onChange={(e) => setToBase(Number(e.target.value))}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              className="
+                block w-full px-3 py-2 border border-gray-300 rounded-lg
+                focus:ring-2 focus:ring-indigo-500 transition
+              "
             >
               {baseOptions.map((b) => (
                 <option key={b} value={b}>
@@ -260,7 +244,7 @@ export default function BaseConverterClient() {
           </div>
         </div>
 
-        {/* Output Field */}
+        {/* Output Box */}
         <div>
           <label
             htmlFor="output-value"
@@ -274,14 +258,22 @@ export default function BaseConverterClient() {
               type="text"
               readOnly
               value={outputValue}
-              placeholder="—"
-              className="block w-full pr-12 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 font-mono text-gray-900"
+              placeholder="Result appears here"
+              className="
+                block w-full pr-12 px-4 py-3 border border-gray-300 rounded-lg
+                bg-gray-50 font-mono text-gray-900 transition
+              "
             />
             <button
               onClick={copyToClipboard}
-              aria-label="Copy result"
               disabled={!outputValue}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none transition disabled:opacity-50"
+              className="
+                absolute inset-y-0 right-0 pr-3 flex items-center
+                text-gray-500 hover:text-indigo-600
+                disabled:opacity-50 disabled:cursor-not-allowed
+                focus:outline-none transition
+              "
+              aria-label="Copy result"
             >
               <ClipboardCopy className="w-5 h-5" aria-hidden="true" />
             </button>
@@ -295,11 +287,24 @@ export default function BaseConverterClient() {
           </p>
         )}
 
-        {/* Advanced Options */}
-        <div>
+        {/* Controls */}
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <button
+            onClick={resetAll}
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
+          >
+            <RefreshCcw className="w-5 h-5" aria-hidden="true" />
+            Reset
+          </button>
+
+          <button
+            type="button"
             onClick={() => setShowAdvanced((v) => !v)}
-            className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
+            className="
+              inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800
+              focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500
+              transition text-sm font-medium
+            "
           >
             Advanced
             {showAdvanced ? (
@@ -308,96 +313,100 @@ export default function BaseConverterClient() {
               <ChevronDown className="w-4 h-4" aria-hidden="true" />
             )}
           </button>
-
-          {showAdvanced && (
-            <div className="mt-4 space-y-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-              {/* Uppercase Hex */}
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={uppercaseHex}
-                  onChange={(e) => setUppercaseHex(e.target.checked)}
-                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                />
-                <span className="text-gray-700 text-sm">
-                  Uppercase Hex (A–F)
-                </span>
-              </label>
-
-              {/* Fixed Width */}
-              <div>
-                <label
-                  htmlFor="fixed-width"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Fixed Width
-                </label>
-                <input
-                  id="fixed-width"
-                  type="number"
-                  min={0}
-                  placeholder="Auto"
-                  value={fixedWidth}
-                  onChange={(e) =>
-                    setFixedWidth(
-                      e.target.value === "" ? "" : Number(e.target.value)
-                    )
-                  }
-                  className="block w-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                />
-              </div>
-
-              {/* Group Digits */}
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={groupDigits}
-                  onChange={(e) => setGroupDigits(e.target.checked)}
-                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                />
-                <span className="text-gray-700 text-sm">
-                  Group digits with “_”
-                </span>
-              </label>
-
-              {/* Prefix */}
-              <div>
-                <label
-                  htmlFor="prefix"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Prefix
-                </label>
-                <input
-                  id="prefix"
-                  type="text"
-                  placeholder="e.g. 0x"
-                  value={prefix}
-                  onChange={(e) => setPrefix(e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                />
-              </div>
-
-              {/* Suffix */}
-              <div>
-                <label
-                  htmlFor="suffix"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Suffix
-                </label>
-                <input
-                  id="suffix"
-                  type="text"
-                  placeholder="e.g. h"
-                  value={suffix}
-                  onChange={(e) => setSuffix(e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                />
-              </div>
-            </div>
-          )}
         </div>
+
+        {/* Advanced Settings Panel */}
+        {showAdvanced && (
+          <div className="mt-4 space-y-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={uppercaseHex}
+                onChange={(e) => setUppercaseHex(e.target.checked)}
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              />
+              <span className="text-gray-700 text-sm">Uppercase Hex (A–F)</span>
+            </label>
+
+            <div>
+              <label
+                htmlFor="fixed-width"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Fixed Width (zero-pad)
+              </label>
+              <input
+                id="fixed-width"
+                type="number"
+                min={0}
+                placeholder="Auto"
+                value={fixedWidth}
+                onChange={(e) =>
+                  setFixedWidth(
+                    e.target.value === "" ? "" : Number(e.target.value)
+                  )
+                }
+                className="
+                  block w-24 px-3 py-2 border border-gray-300 rounded-lg
+                  focus:outline-none focus:ring-2 focus:ring-indigo-500
+                  transition
+                "
+              />
+            </div>
+
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={groupDigits}
+                onChange={(e) => setGroupDigits(e.target.checked)}
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              />
+              <span className="text-gray-700 text-sm">Group digits with “_”</span>
+            </label>
+
+            <div>
+              <label
+                htmlFor="prefix"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Prefix
+              </label>
+              <input
+                id="prefix"
+                type="text"
+                placeholder="e.g. 0x"
+                value={prefix}
+                onChange={(e) => setPrefix(e.target.value)}
+                className="
+                  block w-full px-3 py-2 border border-gray-300 rounded-lg
+                  focus:outline-none focus:ring-2 focus:ring-indigo-500
+                  transition
+                "
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="suffix"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Suffix
+              </label>
+              <input
+                id="suffix"
+                type="text"
+                placeholder="e.g. h"
+                value={suffix}
+                onChange={(e) => setSuffix(e.target.value)}
+                className="
+                  block w-full px-3 py-2 border border-gray-300 rounded-lg
+                  focus:outline-none focus:ring-2 focus:ring-indigo-500
+                  transition
+                "
+              />
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

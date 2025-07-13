@@ -152,10 +152,10 @@ export default function Base64EncoderDecoderClient() {
         >
           Base64 Encoder / Decoder
         </h1>
-        {/* gradient underline, matches other pages */}
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Instantly encode text to Base64 or decode Base64 back to text—all in your browser, with optional URL-safe mode, padding control, and drag-and-drop support.
+          Instantly encode text to Base64 or decode Base64 back to text—all in your
+          browser, with optional URL-safe mode, padding control, and drag-and-drop support.
         </p>
       </div>
 
@@ -164,7 +164,7 @@ export default function Base64EncoderDecoderClient() {
         onSubmit={handleSubmit}
         className="max-w-3xl mx-auto space-y-8 sm:px-0"
       >
-        {/* Input & Output Panes */}
+        {/* Input & Output */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Input */}
           <div className="flex flex-col">
@@ -186,13 +186,10 @@ export default function Base64EncoderDecoderClient() {
               }
               className="
                 w-full h-48 p-4 border border-gray-300 rounded-md bg-white
-                focus:ring-2 focus:ring-indigo-500 font-mono resize-y
-                transition
+                focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition
               "
             />
-            <p className="mt-1 text-xs text-gray-500">
-              {inputLength} characters
-            </p>
+            <p className="mt-1 text-xs text-gray-500">{inputLength} characters</p>
           </div>
 
           {/* Output */}
@@ -207,31 +204,30 @@ export default function Base64EncoderDecoderClient() {
             >
               {mode === "encode" ? "Base64 Output" : "Decoded Text"}
             </label>
-            <textarea
-              id="base64-output"
-              value={output}
-              readOnly
-              placeholder="Result will appear here…"
-              className="
-                w-full h-48 p-4 border border-gray-300 rounded-md bg-gray-50
-                focus:ring-2 focus:ring-indigo-500 font-mono resize-y
-                transition
-              "
-            />
-            {/* copy button */}
-            <button
-              type="button"
-              onClick={copyOutput}
-              disabled={!output}
-              className="
-                absolute top-2 right-2 p-1 text-gray-500 hover:text-indigo-600
-                disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none
-                transition
-              "
-              aria-label="Copy output"
-            >
-              <ClipboardCopy className="w-5 h-5" aria-hidden="true" />
-            </button>
+            <div className="relative">
+              <textarea
+                id="base64-output"
+                value={output}
+                readOnly
+                placeholder="Result will appear here…"
+                className="
+                  w-full h-48 pl-4 pr-12 py-4 border border-gray-300 rounded-md bg-gray-50
+                  focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition
+                "
+              />
+              <button
+                type="button"
+                onClick={copyOutput}
+                disabled={!output}
+                className="
+                  absolute top-2 right-2 p-2 text-gray-500 hover:text-indigo-600
+                  disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition
+                "
+                aria-label="Copy output"
+              >
+                <ClipboardCopy className="w-6 h-6" aria-hidden="true" />
+              </button>
+            </div>
             {previewSrc && (
               <Image
                 src={previewSrc}
@@ -242,9 +238,7 @@ export default function Base64EncoderDecoderClient() {
                 unoptimized
               />
             )}
-            <p className="mt-1 text-xs text-gray-500">
-              {outputLength} characters
-            </p>
+            <p className="mt-1 text-xs text-gray-500">{outputLength} characters</p>
           </div>
         </div>
 
@@ -257,7 +251,6 @@ export default function Base64EncoderDecoderClient() {
 
         {/* Controls */}
         <div className="flex flex-wrap items-center justify-between gap-4">
-          {/* primary */}
           <button
             type="submit"
             className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
@@ -265,17 +258,15 @@ export default function Base64EncoderDecoderClient() {
             {mode === "encode" ? "Encode →" : "Decode →"}
           </button>
 
-          {/* clear */}
           <button
             type="button"
             onClick={clearAll}
             className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 transition"
           >
-            <Trash2 className="w-4 h-4" aria-hidden="true" />
+            <Trash2 className="w-5 h-5" aria-hidden="true" />
             Clear All
           </button>
 
-          {/* switch */}
           <button
             type="button"
             onClick={() =>
@@ -283,7 +274,7 @@ export default function Base64EncoderDecoderClient() {
             }
             className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition text-sm font-medium"
           >
-            <Settings className="w-4 h-4" aria-hidden="true" />
+            <Settings className="w-5 h-5" aria-hidden="true" />
             Switch to {mode === "encode" ? "Decode" : "Encode"}
           </button>
         </div>
