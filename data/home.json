@@ -13,28 +13,28 @@
       "description": "Format, validate, and beautify JSON data instantly—no external dependencies."
     },
     {
-      "href": "/tools/url-shortener",
+      "href": "/tools/slug-generator",
       "icon": "Link2",
-      "title": "URL Shortener",
-      "description": "Trim long URLs down to size and share them with ease."
+      "title": "URL Slug Generator",
+      "description": "Slugify text into SEO-friendly URLs quickly."
     },
     {
-      "href": "/tools/lorem-ipsum",
-      "icon": "Type",
+      "href": "/tools/lorem-ipsum-generator",
+      "icon": "AlignLeft",
       "title": "Lorem Ipsum Generator",
-      "description": "Produce realistic placeholder text for mockups and wireframes."
+      "description": "Produce realistic placeholder text of any length."
     },
     {
-      "href": "/tools/color-picker",
+      "href": "/tools/color-converter",
       "icon": "Droplet",
-      "title": "Color Picker",
-      "description": "Select, preview, and copy colors in HEX, RGB, or HSL formats."
+      "title": "Color Converter",
+      "description": "Translate colors between HEX, RGB(A), HSL(A), and CMYK instantly."
     },
     {
-      "href": "/tools/markdown-editor",
-      "icon": "FileCode",
-      "title": "Markdown Editor",
-      "description": "Write and preview Markdown in real time with live syntax highlighting."
+      "href": "/tools/markdown-converter",
+      "icon": "BookOpen",
+      "title": "Markdown Converter",
+      "description": "Live-edit Markdown and copy clean HTML output."
     },
     {
       "href": "/contact",
