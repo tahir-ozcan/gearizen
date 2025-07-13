@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { SearchIcon } from "@heroicons/react/outline";
+import { SearchIcon } from "@heroicons/react/24/outline";
 import Input from "@/components/Input";
 import ToolCard from "@/components/ToolCard";
 import { getHomeData } from "@/lib/home-data";
