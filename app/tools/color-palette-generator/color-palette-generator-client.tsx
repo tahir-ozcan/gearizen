@@ -174,12 +174,12 @@ export default function ColorPaletteGeneratorClient() {
       </div>
       {palette.length > 0 && (
         <div className="mt-12 flex flex-wrap justify-center gap-4">
-          {palette.map((hex) => {
+          {palette.map((hex, idx) => {
             const rgb = hexToRgb(hex)!;
             const hsl = rgbToHsl(rgb);
             return (
               <div
-                key={hex}
+                key={`${hex}-${idx}`}
                 role="button"
                 aria-label={`Color ${hex}`}
                 onClick={() => navigator.clipboard.writeText(hex)}
