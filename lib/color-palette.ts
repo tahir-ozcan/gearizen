@@ -19,6 +19,7 @@ export function generatePalette(
   scheme: PaletteScheme = 'analogous',
   count = 5,
 ): string[] {
+  const n = Math.max(1, Math.round(count));
   const rgb = hexToRgb(base);
   if (!rgb) throw new Error('Invalid hex color');
   const { h, s, l } = rgbToHsl(rgb);
@@ -29,16 +30,16 @@ export function generatePalette(
   const buildOffsets = (offsets: number[]): number[] => {
     const out = [...offsets];
     let delta = 30;
-    while (out.length < count) {
+    while (out.length < n) {
       for (const baseOff of offsets) {
-        if (out.length >= count) break;
+        if (out.length >= n) break;
         out.push(baseOff + delta);
-        if (out.length >= count) break;
+        if (out.length >= n) break;
         out.push(baseOff - delta);
       }
       delta += 30;
     }
-    return out.slice(0, count);
+    return out.slice(0, n);
   };
 
   switch (scheme) {
@@ -51,17 +52,17 @@ export function generatePalette(
     case 'monochromatic': {
       const start = Math.max(0, l - 40);
       const end = Math.min(100, l + 40);
-      return Array.from({ length: count }, (_, i) => {
-        const t = count === 1 ? 0 : i / (count - 1);
+      return Array.from({ length: n }, (_, i) => {
+        const t = n === 1 ? 0 : i / (n - 1);
         const light = start + (end - start) * t;
         return toHex(h, s, light);
       });
     }
     case 'analogous':
     default: {
-      const half = Math.floor(count / 2);
+      const half = Math.floor(n / 2);
       const step = 30;
-      return Array.from({ length: count }, (_, i) => toHex(h + (i - half) * step));
+      return Array.from({ length: n }, (_, i) => toHex(h + (i - half) * step));
     }
   }
 }
