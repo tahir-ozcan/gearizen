@@ -57,19 +57,24 @@
 
 /* styles/globals.css */
 
+/* components/globals.css (or wherever you keep your shared styles) */
+
 .gradient-bg {
+  /* A wide gradient stripe of harmonious hues */
   background: linear-gradient(
     90deg,
-    #7c3aed 0%,
-    #ec4899 50%,
-    #fbbf24 100%
+    /* Purple */    #7c3aed 0%,
+    /* Pink */      #ec4899 25%,
+    /* Amber */     #fbbf24 50%,
+    /* Pink */      #ec4899 75%,
+    /* Purple */    #7c3aed 100%
   );
-  background-size: 400% 400%;
-  animation: gradient-anim 15s ease-in-out infinite;
+  background-size: 200% 200%;
+  animation: gradient-slow 60s ease infinite;
 }
 
-@keyframes gradient-anim {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+@keyframes gradient-slow {
+  /* Slowly pan the gradient horizontally */
+  0%   { background-position: 0%   50%; }
+  100% { background-position: 100% 50%; }
 }

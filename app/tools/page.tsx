@@ -3,43 +3,37 @@
 import ToolsClient from "./tools-client";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 import JsonLd from "@/app/components/JsonLd";
-import { tools } from "@/lib/tools";
+// artık "tools" değil, getToolsData fonksiyonunu import ediyoruz
+import { getToolsData } from "@/lib/tools-data";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
-  title: "Free Online Tools",
+  title: "Free Online Tools | Gearizen",
   description:
-    "Explore Gearizen’s 100% client-side toolbox: password & bcrypt generators, JSON tools, QR code creator, unit converter, image compressor & resizer, contrast checker, Base64 encoding, code plus HTML and CSS formatters, regex tester, diff checker, timestamp converter, PDF and CSV utilities, SEO & OG tag generators, JWT decoder, and more—all free, no signup.",
+    "Explore Gearizen’s 100% client-side toolbox: password & bcrypt generators, JSON formatter, QR code generator, unit converter, image compressor & resizer, contrast checker, Base64 encoder, code and HTML/CSS formatters, regex tester, diff checker, timestamp converter, PDF & CSV utilities, SEO & OG tag generators, JWT decoder and more—all free, no signup.",
   keywords: [
     "free online tools",
     "client-side tools",
     "password generator",
     "bcrypt generator",
     "JSON formatter",
-    "JSON tools",
     "QR code generator",
     "unit converter",
     "image compressor",
     "image resizer",
     "contrast checker",
-    "base64 encoder",
-    "code minifier",
-    "markdown to html",
+    "Base64 encoder",
+    "code formatter",
+    "HTML formatter",
+    "CSS formatter",
     "regex tester",
     "text diff checker",
     "timestamp converter",
     "PDF compressor",
-    "PDF to Word",
-    "CSV to JSON",
-    "HTML formatter",
-    "CSS formatter",
-    "HTML to PDF",
-    "URL parser",
+    "CSV converter",
     "SEO meta tag generator",
     "JWT decoder",
-    "word counter",
-    "character counter",
-    "slug generator",
+    "no signup",
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
   robots: { index: true, follow: true },
@@ -47,7 +41,7 @@ export const metadata = {
   openGraph: {
     title: "Free Online Tools | Gearizen",
     description:
-      "Access Gearizen’s extended suite of privacy-focused, client-side web tools—security, formatting, conversion, compression, validation, and more without signup.",
+      "Access Gearizen’s full suite of privacy-first, client-side tools—security, conversion, compression, formatting, validation and more without signup.",
     url: "https://gearizen.com/tools",
     siteName: "Gearizen",
     locale: "en_US",
@@ -71,34 +65,33 @@ export const metadata = {
   },
 };
 
+// Burada getToolsData ile araçları alıyoruz
+const { tools } = getToolsData();
+
 const toolsJsonLd = {
   "@context": "https://schema.org",
-  "@type": "WebPage",
-  name: "Free Online Tools",
-  url: "https://gearizen.com/tools",
-  description: metadata.description,
-  mainEntity: {
-    "@type": "ItemList",
-    itemListElement: tools.map((t, i) => ({
-      "@type": "SoftwareApplication",
-      name: t.title,
-      operatingSystem: "any",
-      applicationCategory: "UtilitiesApplication",
-      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      url: `https://gearizen.com${t.href}`,
-      position: i + 1,
-    })),
-  },
+  "@type": "ItemList",
+  itemListElement: tools.map((t, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    url: `https://gearizen.com${t.href}`,
+    name: t.title,
+  })),
 };
 
 export default function ToolsPage() {
   return (
     <>
+      {/* Breadcrumb yapısı */}
       <BreadcrumbJsonLd
         pageTitle="Free Online Tools"
         pageUrl="https://gearizen.com/tools"
       />
+
+      {/* Sayfa seviyesinde JSON-LD */}
       <JsonLd data={toolsJsonLd} />
+
+      {/* Devamında client-side component */}
       <ToolsClient />
     </>
   );

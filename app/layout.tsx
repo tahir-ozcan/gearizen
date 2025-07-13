@@ -4,15 +4,13 @@ import { ReactNode } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AnalyticsLoader from "./components/AnalyticsLoader";
-
-// 1. next/font/google’dan Inter fontunu içe aktarın ve yapılandırın
 import { Inter } from "next/font/google";
 
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
   display: "swap",
-  variable: "--font-inter", // istersen CSS değişkeni olarak da kullanabilirsin
+  variable: "--font-inter",
 });
 
 export const metadata = {
@@ -79,26 +77,32 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      // 2. next/font'un ürettiği className'i ekleyin
       className={`${inter.className} bg-white text-gray-900 antialiased scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
+        <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         {/* Favicon preload */}
         <link rel="preload" href="/favicon.png" as="image" type="image/png" />
 
-        {/* Font ön yüklemesi artık next/font ile otomatik */}
-        {/* Google Analytics / Ads */}
-        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
-        <meta name="google-adsense-account" content="ca-pub-2108375251131552" />
+        {/* Preconnects */}
+        <link
+          rel="preconnect"
+          href="https://www.googletagmanager.com"
+          crossOrigin="anonymous"
+        />
+        <meta
+          name="google-adsense-account"
+          content="ca-pub-2108375251131552"
+        />
 
         {/* Analytics Loader */}
         <AnalyticsLoader />
       </head>
       <body className="flex min-h-screen flex-col">
-        {/* Accessible skip link */}
+        {/* Skip link */}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 px-4 py-2 bg-indigo-600 text-white rounded-md z-50"
@@ -106,7 +110,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to main content
         </a>
 
-        {/* Primary navigation */}
+        {/* Header */}
         <Header />
 
         {/* Main content area */}
@@ -115,9 +119,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           role="main"
           tabIndex={-1}
           aria-label="Main content"
-          className="flex-grow container-responsive py-12"
+          className="flex-grow"
         >
-          {children}
+          {/* Top and bottom padding increased for clear separation from header/footer */}
+          <div className="max-w-7xl mx-auto px-4 md:px-6 pt-16 pb-20 lg:pt-24 lg:pb-28">
+            {children}
+          </div>
         </main>
 
         {/* Footer */}

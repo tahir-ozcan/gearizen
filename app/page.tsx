@@ -1,18 +1,33 @@
 // app/page.tsx
-
 import JsonLd from "./components/JsonLd";
+import BreadcrumbJsonLd from "./components/BreadcrumbJsonLd";
 import HomeClient from "./home-client";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
-  alternates: { canonical: "https://gearizen.com" },
-  title: "Home | Gearizen – Free Client-Side Digital Tools",
+  title: {
+    default: "Gearizen – Free Client-Side Digital Tools",
+    template: "%s | Gearizen",
+  },
   description:
-    "Discover Gearizen’s most in-demand, privacy-first web tools: password generator, PDF to Word converter, QR code generator, unit converter and image compressor—100% client-side, no signup required.",
+    "Discover Gearizen’s most in-demand, privacy-first web tools: password generator, PDF→Word converter, QR code generator, unit converter and image compressor—100% client-side, no signup required.",
+  keywords: [
+    "Gearizen",
+    "free online tools",
+    "client-side tools",
+    "password generator",
+    "pdf to word",
+    "qr code generator",
+    "unit converter",
+    "image compressor",
+    "privacy-first",
+    "no signup",
+  ],
+  alternates: { canonical: "https://gearizen.com" },
   openGraph: {
     title: "Home | Gearizen – Free Client-Side Digital Tools",
     description:
-      "Explore Gearizen’s top tools—passwords, PDF to Word, QR codes, unit conversion and image compression—all privacy-first and signup-free.",
+      "Explore Gearizen’s top tools—password generator, PDF→Word, QR code, unit conversion and image compression—all privacy-first and signup-free.",
     url: "https://gearizen.com",
     siteName: "Gearizen",
     locale: "en_US",
@@ -30,7 +45,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Home | Gearizen – Free Client-Side Digital Tools",
     description:
-      "Explore Gearizen’s top tools—passwords, PDF to Word, QR codes, unit conversion and image compression—all privacy-first and signup-free.",
+      "Explore Gearizen’s top tools—password generator, PDF→Word, QR code, unit conversion and image compression—all privacy-first and signup-free.",
     creator: "@gearizen",
     images: ["/og-placeholder.svg"],
   },
@@ -43,7 +58,7 @@ const websiteJsonLd = {
   name: "Gearizen",
   potentialAction: {
     "@type": "SearchAction",
-    target: "https://gearizen.com/search?q={search_term_string}",
+    target: "https://gearizen.com/tools?search={search_term_string}",
     "query-input": "required name=search_term_string",
   },
 };
@@ -51,6 +66,10 @@ const websiteJsonLd = {
 export default function HomePage() {
   return (
     <>
+      <BreadcrumbJsonLd
+        pageTitle="Home"
+        pageUrl="https://gearizen.com"
+      />
       <JsonLd data={websiteJsonLd} />
       <HomeClient />
     </>

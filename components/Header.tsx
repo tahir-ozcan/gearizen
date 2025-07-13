@@ -13,6 +13,7 @@ import {
   Settings,
   Mail,
   Lock,
+  Cookie,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
@@ -33,7 +34,7 @@ const CORE_NAV: NavItem[] = [
 // LEGAL_NAV içine Icon da dahil edildi
 const LEGAL_NAV: NavItem[] = [
   { href: "/privacy", label: "Privacy Policy",   Icon: Lock },
-  { href: "/cookies", label: "Cookie Policy",    Icon: Lock },
+  { href: "/cookies", label: "Cookie Policy",    Icon: Cookie },
   { href: "/terms",   label: "Terms of Service", Icon: Info },
 ];
 

@@ -7,34 +7,40 @@
   },
   "features": [
     {
-      "href": "/tools/password-generator",
-      "icon": "Key",
-      "title": "Password Generator",
-      "description": "Generate strong, customizable passwords instantly."
+      "href": "/tools/json-formatter",
+      "icon": "FileJson",
+      "title": "JSON Formatter",
+      "description": "Format, validate, and beautify JSON data instantly—no external dependencies."
     },
     {
-      "href": "/tools/pdf-to-word",
-      "icon": "FilePlus",
-      "title": "PDF → Word Converter",
-      "description": "Convert PDFs to editable Word documents quickly."
+      "href": "/tools/url-shortener",
+      "icon": "Link2",
+      "title": "URL Shortener",
+      "description": "Trim long URLs down to size and share them with ease."
     },
     {
-      "href": "/tools/qr-code-generator",
-      "icon": "QrCode",
-      "title": "QR Code Generator",
-      "description": "Create QR codes for URLs, text, contacts, and more."
+      "href": "/tools/lorem-ipsum",
+      "icon": "Type",
+      "title": "Lorem Ipsum Generator",
+      "description": "Produce realistic placeholder text for mockups and wireframes."
     },
     {
-      "href": "/tools/unit-converter",
-      "icon": "ArrowRightLeft",
-      "title": "Unit Converter",
-      "description": "Convert between metric and imperial units easily."
+      "href": "/tools/color-picker",
+      "icon": "Droplet",
+      "title": "Color Picker",
+      "description": "Select, preview, and copy colors in HEX, RGB, or HSL formats."
     },
     {
-      "href": "/tools/image-compressor",
-      "icon": "ImageIcon",
-      "title": "Image Compressor",
-      "description": "Reduce image file sizes while preserving quality."
+      "href": "/tools/markdown-editor",
+      "icon": "FileCode",
+      "title": "Markdown Editor",
+      "description": "Write and preview Markdown in real time with live syntax highlighting."
+    },
+    {
+      "href": "/contact",
+      "icon": "Mail",
+      "title": "Suggest a Tool",
+      "description": "Have an idea for a new tool? Let us know and we’ll build it!"
     }
   ]
 }
