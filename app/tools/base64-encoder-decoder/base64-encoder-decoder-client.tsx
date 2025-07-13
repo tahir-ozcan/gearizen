@@ -2,14 +2,13 @@
 "use client";
 
 import { useState, useRef, ChangeEvent, FormEvent, DragEvent } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import {
-  ClipboardCopy,
   Trash2,
   Settings,
   ChevronDown,
   ChevronUp,
+  ClipboardCopy,
 } from "lucide-react";
 
 /**
@@ -17,9 +16,9 @@ import {
  *
  * - Encode/decode any text to/from Base64.
  * - Optional URL-safe mode (no “+” or “/”).
- * - Optional padding toggle.
+ * - Optional removal of “=” padding.
  * - Drag-and-drop file to auto-encode its contents.
- * - Live character count & size estimation.
+ * - Live character count.
  * - Gradient main heading matching site theme.
  */
 export default function Base64EncoderDecoderClient() {
@@ -30,28 +29,15 @@ export default function Base64EncoderDecoderClient() {
   const [error, setError] = useState<string | null>(null);
   const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
-  // Advanced options
+  // Advanced toggles
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [urlSafe, setUrlSafe] = useState(false);
   const [noPadding, setNoPadding] = useState(false);
 
-  // Refs
+  // Ref for focusing
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const outputRef = useRef<HTMLTextAreaElement>(null);
 
-  // ─── Handlers ────────────────────────────────────────────────────────────────
-  function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    setInput(e.target.value);
-    setError(null);
-    setOutput("");
-    setPreviewSrc(null);
-  }
-
-  function handleModeToggle() {
-    setMode((m) => (m === "encode" ? "decode" : "encode"));
-    clearAll();
-  }
-
+  // ─── Helpers ────────────────────────────────────────────────────────────────
   function clearAll() {
     setInput("");
     setOutput("");
@@ -77,6 +63,37 @@ export default function Base64EncoderDecoderClient() {
     return Buffer.from(b64, "base64").toString("utf-8");
   }
 
+  // ─── Handlers ────────────────────────────────────────────────────────────────
+  function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
+    setInput(e.target.value);
+    setError(null);
+    setOutput("");
+    setPreviewSrc(null);
+  }
+
+  function handleDrop(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.result instanceof ArrayBuffer) {
+        const b64 = Buffer.from(reader.result).toString("base64");
+        setMode("encode");
+        setInput("");
+        setOutput(
+          urlSafe
+            ? b64.replace(/\+/g, "-").replace(/\//g, "_")
+            : b64
+        );
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+  function handleDragOver(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+  }
+
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -85,20 +102,19 @@ export default function Base64EncoderDecoderClient() {
 
     try {
       if (mode === "encode") {
-        const result = encodeText(input);
-        setOutput(result);
+        setOutput(encodeText(input));
       } else {
-        const result = decodeText(input);
-        setOutput(result);
-        if (result.startsWith("data:image/")) {
-          setPreviewSrc(result);
+        const decoded = decodeText(input);
+        setOutput(decoded);
+        if (decoded.startsWith("data:image/")) {
+          setPreviewSrc(decoded);
         }
       }
     } catch {
       setError(
         mode === "encode"
           ? "❌ Encoding failed."
-          : "❌ Decoding failed: invalid Base64."
+          : "❌ Decoding failed."
       );
     }
   }
@@ -113,29 +129,6 @@ export default function Base64EncoderDecoderClient() {
     }
   }
 
-  // ─── Drag & Drop ─────────────────────────────────────────────────────────────
-  function handleDrop(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.result instanceof ArrayBuffer) {
-        const b64 = Buffer.from(reader.result).toString("base64");
-        setMode("encode");
-        setInput("");
-        setOutput(urlSafe
-          ? b64.replace(/\+/g, "-").replace(/\//g, "_")
-          : b64
-        );
-      }
-    };
-    reader.readAsArrayBuffer(file);
-  }
-  function handleDragOver(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-  }
-
   // ─── Counts ──────────────────────────────────────────────────────────────────
   const inputLength = input.length.toLocaleString();
   const outputLength = output.length.toLocaleString();
@@ -147,8 +140,8 @@ export default function Base64EncoderDecoderClient() {
       aria-labelledby="base64-heading"
       className="space-y-16 text-gray-900 antialiased"
     >
-      {/* Heading */}
-      <div className="text-center space-y-4 px-4 sm:px-0">
+      {/* Heading & Description */}
+      <div className="text-center sm:px-0 space-y-4">
         <h1
           id="base64-heading"
           className="
@@ -159,31 +152,17 @@ export default function Base64EncoderDecoderClient() {
         >
           Base64 Encoder / Decoder
         </h1>
-        <p className="text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Instantly encode text or decode Base64 strings, all in-browser—no servers,
-          no tracking. Drag & drop a file to auto-encode it.
+        {/* gradient underline, matches other pages */}
+        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+          Instantly encode text to Base64 or decode Base64 back to text—all in your browser, with optional URL-safe mode, padding control, and drag-and-drop support.
         </p>
-        <div className="flex justify-center gap-4">
-          <Link
-            href="/tools"
-            className="text-indigo-600 hover:text-indigo-800 font-medium transition"
-          >
-            ← Back to Tools
-          </Link>
-          <button
-            onClick={handleModeToggle}
-            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition text-sm font-medium"
-          >
-            <Settings className="w-4 h-4" aria-hidden="true" />
-            Switch to {mode === "encode" ? "Decode" : "Encode"}
-          </button>
-        </div>
       </div>
 
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="max-w-3xl mx-auto space-y-8 px-4 sm:px-0"
+        className="max-w-3xl mx-auto space-y-8 sm:px-0"
       >
         {/* Input & Output Panes */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -202,12 +181,12 @@ export default function Base64EncoderDecoderClient() {
               onChange={handleInputChange}
               placeholder={
                 mode === "encode"
-                  ? "Enter text to encode..."
-                  : "Enter Base64 to decode..."
+                  ? "Enter text to encode…"
+                  : "Enter Base64 to decode…"
               }
               className="
                 w-full h-48 p-4 border border-gray-300 rounded-md bg-white
-                focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono resize-y
+                focus:ring-2 focus:ring-indigo-500 font-mono resize-y
                 transition
               "
             />
@@ -230,16 +209,29 @@ export default function Base64EncoderDecoderClient() {
             </label>
             <textarea
               id="base64-output"
-              ref={outputRef}
               value={output}
               readOnly
-              placeholder="Result will appear here..."
+              placeholder="Result will appear here…"
               className="
                 w-full h-48 p-4 border border-gray-300 rounded-md bg-gray-50
-                focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono resize-y
+                focus:ring-2 focus:ring-indigo-500 font-mono resize-y
                 transition
               "
             />
+            {/* copy button */}
+            <button
+              type="button"
+              onClick={copyOutput}
+              disabled={!output}
+              className="
+                absolute top-2 right-2 p-1 text-gray-500 hover:text-indigo-600
+                disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none
+                transition
+              "
+              aria-label="Copy output"
+            >
+              <ClipboardCopy className="w-5 h-5" aria-hidden="true" />
+            </button>
             {previewSrc && (
               <Image
                 src={previewSrc}
@@ -253,14 +245,6 @@ export default function Base64EncoderDecoderClient() {
             <p className="mt-1 text-xs text-gray-500">
               {outputLength} characters
             </p>
-            <ClipboardCopy
-              onClick={copyOutput}
-              className={`
-                absolute top-2 right-2 w-5 h-5 cursor-pointer
-                ${!output ? "opacity-50 cursor-not-allowed" : "hover:text-indigo-600"}
-              `}
-              aria-hidden="true"
-            />
           </div>
         </div>
 
@@ -271,14 +255,17 @@ export default function Base64EncoderDecoderClient() {
           </div>
         )}
 
-        {/* Primary Controls */}
+        {/* Controls */}
         <div className="flex flex-wrap items-center justify-between gap-4">
+          {/* primary */}
           <button
             type="submit"
             className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
           >
             {mode === "encode" ? "Encode →" : "Decode →"}
           </button>
+
+          {/* clear */}
           <button
             type="button"
             onClick={clearAll}
@@ -287,14 +274,17 @@ export default function Base64EncoderDecoderClient() {
             <Trash2 className="w-4 h-4" aria-hidden="true" />
             Clear All
           </button>
+
+          {/* switch */}
           <button
             type="button"
-            onClick={copyOutput}
-            disabled={!output}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition disabled:opacity-50"
+            onClick={() =>
+              setMode((m) => (m === "encode" ? "decode" : "encode"))
+            }
+            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition text-sm font-medium"
           >
-            <ClipboardCopy className="w-4 h-4" aria-hidden="true" />
-            Copy Output
+            <Settings className="w-4 h-4" aria-hidden="true" />
+            Switch to {mode === "encode" ? "Decode" : "Encode"}
           </button>
         </div>
 
@@ -303,7 +293,7 @@ export default function Base64EncoderDecoderClient() {
           <button
             type="button"
             onClick={() => setShowAdvanced((v) => !v)}
-            className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
+            className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition text-sm"
           >
             Advanced Settings
             {showAdvanced ? (
@@ -313,7 +303,7 @@ export default function Base64EncoderDecoderClient() {
             )}
           </button>
           {showAdvanced && (
-            <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+            <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-3">
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"

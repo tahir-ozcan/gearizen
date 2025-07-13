@@ -13,7 +13,7 @@ export default function ContactClient() {
       className="space-y-12 text-gray-900 antialiased"
     >
       {/* Hero / Heading */}
-      <div className="text-center space-y-6 px-4 sm:px-0">
+      <div className="text-center space-y-6 sm:px-0">
         <h1
           id="contact-heading"
           className="

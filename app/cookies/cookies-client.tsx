@@ -11,7 +11,7 @@ export default function CookiesClient() {
       className="space-y-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       {/* Hero / Title */}
-      <div className="text-center mx-auto max-w-3xl space-y-6 px-4 sm:px-0">
+      <div className="text-center mx-auto max-w-3xl space-y-6 sm:px-0">
         <h1
           id="cookie-heading"
           className="
@@ -31,7 +31,7 @@ export default function CookiesClient() {
       </div>
 
       {/* What Are Cookies */}
-      <div className="mx-auto max-w-3xl space-y-12 px-4 sm:px-0">
+      <div className="mx-auto max-w-3xl space-y-12 sm:px-0">
         <section>
           <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 tracking-tight">
             What Are Cookies?

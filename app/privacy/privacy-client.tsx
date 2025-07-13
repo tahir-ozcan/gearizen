@@ -10,7 +10,7 @@ export default function PrivacyClient() {
       className="space-y-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
       {/* Intro */}
-      <div className="text-center mx-auto max-w-3xl space-y-6 px-4 sm:px-0 text-gray-700">
+      <div className="text-center mx-auto max-w-3xl space-y-6 sm:px-0 text-gray-700">
         <h1
           id="privacy-heading"
           className="
@@ -33,7 +33,7 @@ export default function PrivacyClient() {
       </div>
 
       {/* Policy Sections */}
-      <div className="mx-auto max-w-3xl space-y-12 px-4 sm:px-0">
+      <div className="mx-auto max-w-3xl space-y-12 sm:px-0">
         <section>
           <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 tracking-tight">
             Data We Don’t Collect

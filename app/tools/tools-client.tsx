@@ -25,7 +25,7 @@ export default function ToolsClient() {
       {/* Hero + Search */}
       <section
         aria-labelledby="all-tools-heading"
-        className="text-center space-y-6 px-4 sm:px-0"
+        className="text-center space-y-6 sm:px-0"
       >
         <h1
           id="all-tools-heading"
@@ -73,7 +73,7 @@ export default function ToolsClient() {
       </section>
 
       {/* Results Grid */}
-      <section className="space-y-6 px-4 sm:px-0">
+      <section className="space-y-6 sm:px-0">
         <div className="flex flex-col">
           <h2
             className="text-2xl sm:text-3xl font-semibold text-gray-800"

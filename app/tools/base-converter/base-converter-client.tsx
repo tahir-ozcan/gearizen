@@ -162,7 +162,7 @@ export default function BaseConverterClient() {
       className="space-y-16 text-gray-900 antialiased"
     >
       {/* Hero / Title */}
-      <div className="text-center space-y-4 px-4 sm:px-0">
+      <div className="text-center space-y-4 sm:px-0">
         <h1
           id="base-converter-heading"
           className="
@@ -196,7 +196,7 @@ export default function BaseConverterClient() {
       </div>
 
       {/* Main Form */}
-      <div className="max-w-xl mx-auto space-y-8 px-4 sm:px-0">
+      <div className="max-w-xl mx-auto space-y-8 sm:px-0">
         {/* Input Field */}
         <div>
           <label

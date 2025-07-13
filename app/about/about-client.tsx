@@ -16,7 +16,7 @@ export default function AboutClient({ blocks }: { blocks: AboutBlock[] }) {
           <section
             key="hero"
             aria-labelledby="about-hero-heading"
-            className="text-center space-y-6 px-4 sm:px-0"
+            className="text-center space-y-6 sm:px-0"
           >
             <h1
               id="about-hero-heading"
@@ -44,7 +44,7 @@ export default function AboutClient({ blocks }: { blocks: AboutBlock[] }) {
           <section
             key="bullets"
             aria-labelledby="about-bullets-heading"
-            className="space-y-6 px-4 sm:px-0"
+            className="space-y-6 sm:px-0"
           >
             <div className="max-w-2xl mx-auto">
               <h2
@@ -73,7 +73,7 @@ export default function AboutClient({ blocks }: { blocks: AboutBlock[] }) {
           <section
             key="team"
             aria-labelledby="about-team-heading"
-            className="space-y-6 px-4 sm:px-0"
+            className="space-y-6 sm:px-0"
           >
             <div className="max-w-2xl mx-auto">
               <h2

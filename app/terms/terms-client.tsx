@@ -45,7 +45,7 @@ export default function TermsClient() {
   return (
     <section id="terms-of-use" className="space-y-16 text-gray-900 antialiased">
       {/* Centered Main Heading with Gradient & Underline */}
-      <div className="text-center mx-auto max-w-3xl space-y-6 px-4 sm:px-0">
+      <div className="text-center mx-auto max-w-3xl space-y-6 sm:px-0">
         <h1
           id="terms-heading"
           className="
@@ -70,7 +70,7 @@ export default function TermsClient() {
         </p>
       </div>
 
-      <div className="mx-auto max-w-3xl space-y-12 px-4 sm:px-0">
+      <div className="mx-auto max-w-3xl space-y-12 sm:px-0">
         {/* Numbered Sections */}
         {sections.map(({ title, content }) => (
           <section key={title}>
