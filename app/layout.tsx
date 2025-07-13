@@ -1,11 +1,19 @@
 // app/layout.tsx
-
 import "./globals.css";
 import { ReactNode } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ToolProviders from "@/components/ToolProviders";
 import AnalyticsLoader from "./components/AnalyticsLoader";
+
+// 1. next/font/google’dan Inter fontunu içe aktarın ve yapılandırın
+import { Inter } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  variable: "--font-inter", // istersen CSS değişkeni olarak da kullanabilirsin
+});
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -71,57 +79,49 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className="bg-white text-gray-900 antialiased scroll-smooth"
+      // 2. next/font'un ürettiği className'i ekleyin
+      className={`${inter.className} bg-white text-gray-900 antialiased scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+        {/* Favicon preload */}
         <link rel="preload" href="/favicon.png" as="image" type="image/png" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
-        <link
-          rel="preconnect"
-          href="https://www.googletagmanager.com"
-          crossOrigin="anonymous"
-        />
+
+        {/* Font ön yüklemesi artık next/font ile otomatik */}
+        {/* Google Analytics / Ads */}
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
         <meta name="google-adsense-account" content="ca-pub-2108375251131552" />
+
+        {/* Analytics Loader */}
         <AnalyticsLoader />
       </head>
-      <body className="font-sans flex min-h-screen flex-col">
-        <ToolProviders>
-          {/* Accessible skip link */}
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 px-4 py-2 bg-indigo-600 text-white rounded-md z-50"
-          >
-            Skip to main content
-          </a>
+      <body className="flex min-h-screen flex-col">
+        {/* Accessible skip link */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 px-4 py-2 bg-indigo-600 text-white rounded-md z-50"
+        >
+          Skip to main content
+        </a>
 
-          {/* Primary navigation */}
-          <Header />
+        {/* Primary navigation */}
+        <Header />
 
-          {/* Main content area */}
-          <main
-            id="main-content"
-            role="main"
-            tabIndex={-1}
-            aria-label="Main content"
-            className="flex-grow container-responsive py-12"
-          >
-            {children}
-          </main>
+        {/* Main content area */}
+        <main
+          id="main-content"
+          role="main"
+          tabIndex={-1}
+          aria-label="Main content"
+          className="flex-grow container-responsive py-12"
+        >
+          {children}
+        </main>
 
-          {/* Footer */}
-          <Footer />
-        </ToolProviders>
+        {/* Footer */}
+        <Footer />
       </body>
     </html>
   );
