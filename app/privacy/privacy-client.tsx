@@ -1,5 +1,4 @@
 // app/privacy/privacy-client.tsx
-
 "use client";
 
 import Link from "next/link";
@@ -8,97 +7,96 @@ export default function PrivacyClient() {
   return (
     <section
       id="privacy-policy"
-      aria-labelledby="privacy-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="space-y-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
-      <h1
-        id="privacy-heading"
-        className="gradient-text text-4xl sm:text-5xl md:text-6xl font-extrabold mb-8 tracking-tight text-center"
-      >
-        Privacy Policy
-      </h1>
+      {/* Intro */}
+      <div className="text-center mx-auto max-w-3xl space-y-6 px-4 sm:px-0 text-gray-700">
+        <h1
+          id="privacy-heading"
+          className="
+            bg-clip-text text-transparent
+            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+            text-4xl sm:text-5xl md:text-6xl
+            font-extrabold tracking-tight
+          "
+        >
+          Privacy Policy
+        </h1>
+        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+      
+        <p className="text-lg leading-relaxed">
+          At <strong>Gearizen</strong>, your privacy is our utmost concern. All our tools operate entirely in your browser—no data is ever sent to our servers or third parties.
+        </p>
+        <p className="text-lg leading-relaxed">
+          No signup, no personal information, no tracking. Use our password generators, formatters, converters, and more with full confidence in your privacy.
+        </p>
+      </div>
 
-      <p className="mb-8 text-lg leading-relaxed max-w-3xl mx-auto">
-        At <strong>Gearizen</strong>, your privacy is our top priority. All of
-        our tools run <strong>100% client-side</strong>, meaning your data never
-        leaves your device—nothing is transmitted, stored, or tracked on our
-        servers.
-      </p>
-
-      <p className="mb-12 text-lg leading-relaxed max-w-3xl mx-auto">
-        You are never required to create an account or provide any personal
-        information. Feel free to use our password generators, JSON formatters,
-        text converters, QR code tools, and more—completely anonymously.
-      </p>
-
-      <div className="space-y-12 max-w-3xl mx-auto">
+      {/* Policy Sections */}
+      <div className="mx-auto max-w-3xl space-y-12 px-4 sm:px-0">
         <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 tracking-tight">
             Data We Don’t Collect
           </h2>
-          <ul className="list-disc list-inside space-y-2 text-lg leading-relaxed">
-            <li>No personal information (name, address, email, etc.)</li>
-            <li>No file uploads or storage on our servers</li>
-            <li>No IP address logging</li>
-            <li>No behavioral analytics or usage tracking</li>
+          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <ul className="mt-4 list-disc list-inside space-y-2 text-lg leading-relaxed text-gray-700">
+            <li>Names, emails, or any personal identifiers</li>
+            <li>File uploads or storage on our infrastructure</li>
+            <li>IP addresses or geolocation data</li>
+            <li>Usage analytics or behavioral tracking</li>
           </ul>
         </section>
 
         <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 tracking-tight">
             Advertising & Third-Party Services
           </h2>
-          <p className="text-lg leading-relaxed">
-            We display ads via third-party networks (e.g., Google Ads). Those
-            providers may set their own cookies or trackers; please review their
-            privacy policies. Gearizen does not share any personally
-            identifiable data with advertisers.
+          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <p className="mt-4 text-lg leading-relaxed text-gray-700">
+            We display ads via reputable networks (e.g., Google Ads). These networks may set cookies or trackers under their own policies—you can manage them through your browser. Gearizen itself never shares personal data.
           </p>
         </section>
 
         <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 tracking-tight">
             Cookies
           </h2>
-          <p className="text-lg leading-relaxed">
-            Gearizen itself does not use cookies. However, third-party ad
-            networks may drop cookies under their own policies. You can manage
-            those through your browser settings.
+          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <p className="mt-4 text-lg leading-relaxed text-gray-700">
+            Gearizen does not set cookies. Only third-party ad networks may use cookies; please review their privacy notices and manage your settings accordingly.
           </p>
         </section>
 
         <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 tracking-tight">
             Your Rights
           </h2>
-          <p className="text-lg leading-relaxed">
-            Since we collect no personal data, there is nothing for you to
-            access, modify, or delete. Your interactions remain private on your
-            device.
+          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <p className="mt-4 text-lg leading-relaxed text-gray-700">
+            Since we don’t collect any personal data, there is nothing to access, modify, or delete. Your interactions remain private and local to your device.
           </p>
         </section>
 
         <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 tracking-tight">
             Policy Updates
           </h2>
-          <p className="text-lg leading-relaxed">
-            We may update this policy to reflect changes in our tools or
-            applicable laws. Please revisit this page periodically to stay
-            informed.
+          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <p className="mt-4 text-lg leading-relaxed text-gray-700">
+            We may update this policy to reflect changes in our services or legal requirements. Check back periodically for the latest version.
           </p>
         </section>
 
         <section>
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 tracking-tight">
             Contact Us
           </h2>
-          <p className="text-lg leading-relaxed">
-            If you have questions about this policy, please{" "}
+          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <p className="mt-4 text-lg leading-relaxed text-gray-700">
+            For questions about this policy, please{" "}
             <Link
               href="/contact"
-              className="text-indigo-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded transition-colors"
-              aria-label="Go to Contact page"
+              className="text-[#7c3aed] hover:text-[#8b5cf6] underline transition-colors"
             >
               get in touch
             </Link>

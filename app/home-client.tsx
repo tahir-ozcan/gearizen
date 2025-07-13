@@ -55,7 +55,7 @@ export default function HomeClient() {
             <h2 id="home-tools-heading" className="text-2xl sm:text-3xl font-semibold text-gray-800">
               Popular &amp; Essential Tools
             </h2>
-            <div className="mt-2 h-1 w-16 rounded-full bg-[#ec4899]" />
+            <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
           </div>
           <Link
             href="/tools"

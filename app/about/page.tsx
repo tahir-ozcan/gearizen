@@ -3,7 +3,7 @@
 import AboutClient from "./about-client";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 import JsonLd from "@/app/components/JsonLd";
-import { loadAboutData } from "@/lib/aboutData";
+import { loadAboutData } from "@/lib/about-data";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),

@@ -85,7 +85,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         {/* Favicon preload */}
-        <link rel="preload" href="/favicon.png" as="image" type="image/png" />
+        <link rel="preload" href="/favicon.ico" as="image" type="image/png" />
 
         {/* Preconnects */}
         <link

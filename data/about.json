@@ -4,9 +4,9 @@
       "type": "hero",
       "heading": "About Gearizen",
       "paragraphs": [
-        "Gearizen is a free, client-side digital tools platform built for web developers, content creators, and everyday users. We deliver essential utilities—password generators, JSON formatters, text converters, QR code generators, and more—without requiring signup or collecting any personal data.",
-        "Powered entirely by client-side technologies, Gearizen guarantees privacy and security while providing fast, reliable tools accessible from anywhere in the world.",
-        "Our mission is to foster a growing ecosystem through SEO-optimized content and intuitive tools, turning organic traffic into sustainable ad revenue that fuels continuous improvement and expansion."
+        "Gearizen is a free, client‐side digital tools platform built for web developers, creators, and everyday users. We deliver essential utilities—password generators, JSON formatters, text converters, QR code generators, and more—without requiring signup or collecting any personal data.",
+        "Powered entirely by client‐side technologies, Gearizen guarantees privacy and security while providing fast, reliable tools accessible from anywhere in the world.",
+        "Our mission is to foster a growing ecosystem through SEO‐optimized content and intuitive tools, turning organic traffic into sustainable ad revenue that fuels continuous improvement and expansion."
       ]
     },
     {
@@ -25,9 +25,9 @@
       "heading": "Meet the Team",
       "members": [
         {
-          "name": "Tahir Ozcan",
+          "name": "Tahir Özcan",
           "role": "Founder & Developer",
-          "avatar": "https://avatars.githubusercontent.com/u/26418043?v=4",
+          "avatar": "https://avatars.githubusercontent.com/u/201351823?s=400&u=542658b3a2d746cabbc9c2aa67b043975f6048bd&v=4",
           "bio": "Tahir crafts every Gearizen tool with a focus on speed, privacy, and accessibility."
         }
       ]

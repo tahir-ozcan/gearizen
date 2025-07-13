@@ -63,18 +63,19 @@
   /* A wide gradient stripe of harmonious hues */
   background: linear-gradient(
     90deg,
-    /* Purple */    #7c3aed 0%,
-    /* Pink */      #ec4899 25%,
-    /* Amber */     #fbbf24 50%,
-    /* Pink */      #ec4899 75%,
-    /* Purple */    #7c3aed 100%
+    /* Purple */ #7c3aed 0%,
+    /* Pink   */ #ec4899 25%,
+    /* Amber  */ #fbbf24 50%,
+    /* Pink   */ #ec4899 75%,
+    /* Purple */ #7c3aed 100%
   );
   background-size: 200% 200%;
-  animation: gradient-slow 60s ease infinite;
+  /* 60s forward, then 60s reverse, ease timing all the way through */
+  animation: gradient-slow 30s ease-in-out infinite alternate;
 }
 
 @keyframes gradient-slow {
-  /* Slowly pan the gradient horizontally */
   0%   { background-position: 0%   50%; }
   100% { background-position: 100% 50%; }
+  0%   { background-position: 0%   50%; }
 }

@@ -12,8 +12,8 @@ const FaGithub = dynamic(
   () => import("react-icons/fa").then((m) => m.FaGithub),
   { ssr: false }
 );
-const FaTwitter = dynamic(
-  () => import("react-icons/fa").then((m) => m.FaTwitter),
+const FaX = dynamic(
+  () => import("react-icons/si").then((m) => m.SiX),
   { ssr: false }
 );
 const FaLinkedin = dynamic(
@@ -40,10 +40,10 @@ export default function Footer() {
 
   const popularTools: LinkItem[] = [
     { label: "JSON Formatter", href: "/tools/json-formatter" },
-    { label: "URL Slug Generator", href: "/tools/slug-generator" },
+    { label: "URL Shortener", href: "/tools/url-shortener" },
     { label: "Lorem Ipsum Generator", href: "/tools/lorem-ipsum-generator" },
-    { label: "Color Converter", href: "/tools/color-converter" },
-    { label: "Markdown Converter", href: "/tools/markdown-converter" },
+    { label: "Color Picker", href: "/tools/color-picker" },
+    { label: "Markdown Editor", href: "/tools/markdown-editor" },
   ];
 
   const legalLinks: LinkItem[] = [
@@ -68,14 +68,14 @@ export default function Footer() {
       icon: <FaGithub className="w-6 h-6" aria-hidden="true" />,
     },
     {
-      label: "Twitter",
-      href: "https://twitter.com/gearizen",
+      label: "X",
+      href: "https://x.com/gearizen",
       external: true,
-      icon: <FaTwitter className="w-6 h-6" aria-hidden="true" />,
+      icon: <FaX className="w-6 h-6 text-[#1DA1F2]" aria-hidden="true" />,
     },
     {
       label: "LinkedIn",
-      href: "https://linkedin.com/company/gearizen",
+      href: "https://www.linkedin.com/company/gearizen",
       external: true,
       icon: <FaLinkedin className="w-6 h-6" aria-hidden="true" />,
     },

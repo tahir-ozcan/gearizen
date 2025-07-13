@@ -80,7 +80,7 @@ export default function ToolsClient() {
           >
             {query ? `Results for “${search}”` : "Available Tools"}
           </h2>
-          <div className="mt-2 h-1 w-16 rounded-full bg-[#ec4899]" />
+          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         </div>
 
         {filtered.length === 0 ? (

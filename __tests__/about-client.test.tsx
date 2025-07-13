@@ -1,7 +1,7 @@
 /** @jest-environment jsdom */
 import { render, screen } from '@testing-library/react';
 import AboutClient from '../app/about/about-client';
-import { loadAboutData } from '../lib/aboutData';
+import { loadAboutData } from '../lib/about-data';
 
 describe('AboutClient', () => {
   test('renders dynamic blocks', async () => {

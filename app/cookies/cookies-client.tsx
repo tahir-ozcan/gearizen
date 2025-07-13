@@ -1,5 +1,4 @@
 // app/cookies/cookies-client.tsx
-
 "use client";
 
 import Link from "next/link";
@@ -9,95 +8,110 @@ export default function CookiesClient() {
     <section
       id="cookie-policy"
       aria-labelledby="cookie-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="space-y-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
-      {/* Başlık */}
-      <h1
-        id="cookie-heading"
-        className="gradient-text text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight text-center"
-      >
-        Cookie Policy
-      </h1>
-
-      {/* Giriş */}
-      <div className="max-w-3xl mx-auto space-y-6 text-lg leading-relaxed">
-        <p>
-          Gearizen does not use any first-party cookies. However, we display ads via third-party networks which may set cookies to deliver relevant content and measure performance.
+      {/* Hero / Title */}
+      <div className="text-center mx-auto max-w-3xl space-y-6 px-4 sm:px-0">
+        <h1
+          id="cookie-heading"
+          className="
+            bg-clip-text text-transparent
+            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+            text-4xl sm:text-5xl md:text-6xl
+            font-extrabold tracking-tight
+          "
+        >
+          Cookie Policy
+        </h1>
+        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <p className="text-lg leading-relaxed text-gray-700">
+          Gearizen itself does not set any first-party cookies, but third-party ad and analytics
+          networks may. Below is how those operate and how you can manage them.
         </p>
+      </div>
 
-        {/* What Are Cookies */}
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-semibold mt-12 mb-4 tracking-tight text-gray-900">
+      {/* What Are Cookies */}
+      <div className="mx-auto max-w-3xl space-y-12 px-4 sm:px-0">
+        <section>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 tracking-tight">
             What Are Cookies?
           </h2>
-          <p>
-            Cookies are small text files stored on your device by websites you visit. They can be used for functionality, analytics, or advertising purposes.
+          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <p className="mt-4 text-lg leading-relaxed text-gray-700">
+            Cookies are small text files stored on your device by websites you visit. Third-party
+            advertising or analytics services may use them to measure site usage or deliver relevant
+            ads.
           </p>
-        </div>
+        </section>
 
-        {/* Cookies We Use */}
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-semibold mt-12 mb-4 tracking-tight text-gray-900">
-            Cookies We Use
+        {/* Third-Party Cookies */}
+        <section>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 tracking-tight">
+            Third-Party Cookies We Use
           </h2>
-          <ul className="list-disc list-inside space-y-2">
+          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <ul className="mt-4 list-disc list-inside space-y-2 text-lg leading-relaxed text-gray-700">
             <li>
-              <strong>Advertising Cookies:</strong> Third-party ad networks (e.g., Google Ads) may set cookies to personalize ads and track effectiveness.
+              <strong>Advertising Cookies:</strong> Served by ad networks (e.g., Google Ads) to
+              personalize and measure ad performance.
             </li>
             <li>
-              <strong>Analytics Cookies:</strong> Third-party analytics providers may set cookies to help us understand site usage and improve our tools.
-            </li>
-            <li>
-              <strong>No First-Party Cookies:</strong> Gearizen itself does not store any data in cookies&mdash;all functionality runs entirely client-side.
+              <strong>Analytics Cookies:</strong> Used by third-party analytics (e.g., Google
+              Analytics) to understand usage trends and improve our tools.
             </li>
           </ul>
-        </div>
+        </section>
 
         {/* Managing Cookies */}
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-semibold mt-12 mb-4 tracking-tight text-gray-900">
-            Managing Cookies
+        <section>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 tracking-tight">
+            Managing or Opting-Out
           </h2>
-          <p>
-            You can control or delete cookies through your browser settings. Consult your browser’s Help documentation for instructions. To opt out of Google Ads cookies, visit{" "}
+          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <p className="mt-4 text-lg leading-relaxed text-gray-700">
+            You have control over cookies in your browser settings. To specifically manage Google Ads
+            cookies, visit{" "}
             <a
               href="https://adssettings.google.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-indigo-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded transition-colors"
+              className="text-[#7c3aed] hover:text-[#8b5cf6] underline transition-colors"
             >
-              Google Ads Settings
+              adssettings.google.com
             </a>
-            .
+            . Disabling certain cookies may affect ad personalization or analytics accuracy.
           </p>
-        </div>
+        </section>
 
-        {/* Your Choices */}
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-semibold mt-12 mb-4 tracking-tight text-gray-900">
-            Your Choices
+        {/* No First-Party Cookies */}
+        <section>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 tracking-tight">
+            No First-Party Cookies
           </h2>
-          <p>
-            You may opt out of advertising and analytics cookies at any time via your browser or the links above. Disabling cookies may affect your experience on some parts of the site.
+          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <p className="mt-4 text-lg leading-relaxed text-gray-700">
+            Gearizen does not itself set any cookies or store any personal data on our servers. All of
+            our tools run fully in your browser and all settings remain local to your device.
           </p>
-        </div>
+        </section>
 
-        {/* Contact */}
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-semibold mt-12 mb-4 tracking-tight text-gray-900">
-            Contact Us
+        {/* Your Choices & Contact */}
+        <section>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 tracking-tight">
+            Questions?
           </h2>
-          <p>
-            If you have any questions about our cookie policy, please{" "}
+          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <p className="mt-4 text-lg leading-relaxed text-gray-700">
+            If you have any questions about our Cookie Policy, feel free to{" "}
             <Link
               href="/contact"
-              className="text-indigo-600 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded transition-colors"
+              className="text-[#7c3aed] hover:text-[#8b5cf6] underline transition-colors"
             >
-              contact us
+              get in touch
             </Link>
             .
           </p>
-        </div>
+        </section>
       </div>
     </section>
   );

@@ -112,6 +112,9 @@ export default function Header() {
             width={40}
             height={40}
             priority
+            unoptimized
+            sizes="(max-width: 768px) 32px, 40px"
+            quality={100}
             className="rounded-full"
           />
           <span className="text-2xl font-bold tracking-tight">Gearizen</span>

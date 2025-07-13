@@ -1,4 +1,4 @@
-import { loadAboutData } from '../lib/aboutData';
+import { loadAboutData } from '../lib/about-data';
 
 describe('loadAboutData', () => {
   test('loads JSON blocks', async () => {

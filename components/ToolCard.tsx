@@ -23,32 +23,32 @@ export default function ToolCard({
     <Link href={href} aria-label={`Open ${title}`} className="block">
       <article
         className={`
-          group relative flex flex-col items-center
+          group relative flex flex-col items-center text-center
           bg-white rounded-2xl p-6
-          shadow-sm hover:shadow-lg
+          border border-gray-100
+          shadow-sm hover:shadow-md
           transform transition-all duration-300
-          hover:-translate-y-1 hover:bg-gradient-to-br hover:from-indigo-50 hover:via-pink-50 hover:to-yellow-50
+          hover:-translate-y-1
           focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500
           ${className}
         `}
       >
-        {/* Icon */}
+        {/* Icon Circle with subtle animation */}
         <div
           className="
             flex items-center justify-center
-            w-12 h-12 sm:w-14 sm:h-14
-            bg-gradient-to-br from-indigo-100 to-indigo-50
+            w-14 h-14
             rounded-full mb-4
-            transition-colors duration-300
-            group-hover:from-indigo-200 group-hover:to-indigo-100
+            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+            transition-transform duration-300
+            group-hover:scale-110
           "
         >
           <Icon
             className="
-              w-6 h-6 sm:w-7 sm:h-7
-              text-indigo-600
-              group-hover:text-indigo-700
+              w-7 h-7 text-white
               transition-colors duration-300
+              group-hover:text-white/80
             "
             aria-hidden="true"
           />
@@ -57,7 +57,7 @@ export default function ToolCard({
         {/* Title */}
         <h3
           className="
-            text-lg sm:text-xl font-semibold text-gray-900 mb-2 text-center
+            text-lg sm:text-xl font-semibold text-gray-900 mb-2
             transition-colors duration-300
             group-hover:text-indigo-600
           "
@@ -66,20 +66,20 @@ export default function ToolCard({
         </h3>
 
         {/* Description */}
-        <p className="text-gray-600 text-center line-clamp-3 flex-grow">
+        <p className="text-gray-600 text-sm flex-grow mb-4">
           {description}
         </p>
 
-        {/* Hover Arrow */}
+        {/* Call to action arrow */}
         <span
           className="
-            absolute bottom-4 right-4
-            text-indigo-500 text-xl
+            inline-flex items-center
+            text-indigo-600 font-medium
             opacity-0 group-hover:opacity-100
             transition-opacity duration-300
           "
         >
-          &rarr;
+          Learn more &rarr;
         </span>
       </article>
     </Link>
