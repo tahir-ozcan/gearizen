@@ -40,10 +40,10 @@ export default function Footer() {
 
   const popularTools: LinkItem[] = [
     { label: "JSON Formatter", href: "/tools/json-formatter" },
-    { label: "URL Shortener", href: "/tools/url-shortener" },
-    { label: "Lorem Ipsum Generator", href: "/tools/lorem-ipsum" },
-    { label: "Color Picker", href: "/tools/color-picker" },
-    { label: "Markdown Editor", href: "/tools/markdown-editor" },
+    { label: "URL Slug Generator", href: "/tools/slug-generator" },
+    { label: "Lorem Ipsum Generator", href: "/tools/lorem-ipsum-generator" },
+    { label: "Color Converter", href: "/tools/color-converter" },
+    { label: "Markdown Converter", href: "/tools/markdown-converter" },
   ];
 
   const legalLinks: LinkItem[] = [

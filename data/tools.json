@@ -31,16 +31,16 @@
       "description": "Shrink JPEG & PNG files while keeping visual fidelity."
     },
     {
-      "href": "/tools/contrast-checker",
+      "href": "/tools/color-contrast-checker",
       "icon": "Eye",
       "title": "Contrast Checker",
       "description": "Verify WCAG-compliant contrast ratios for your designs."
     },
     {
-      "href": "/tools/color-picker",
+      "href": "/tools/color-converter",
       "icon": "Palette",
-      "title": "Color Picker",
-      "description": "Sample and fine-tune colors with a live preview."
+      "title": "Color Converter",
+      "description": "Translate colors between HEX, RGB(A), HSL(A), and CMYK instantly."
     },
     {
       "href": "/tools/base64-encoder-decoder",
@@ -67,7 +67,7 @@
       "description": "Compare two text blocks and highlight changes."
     },
     {
-      "href": "/tools/timestamp-converter",
+      "href": "/tools/unix-timestamp-converter",
       "icon": "CalendarCheck2",
       "title": "Timestamp Converter",
       "description": "Convert UNIX timestamps to readable dates and back."
@@ -199,7 +199,7 @@
       "description": "Convert numbers between binary, decimal, hex & more."
     },
     {
-      "href": "/tools/hash-generator",
+      "href": "/tools/sha-hash-generator",
       "icon": "Hash",
       "title": "Hash Generator",
       "description": "Create MD5, SHA-1 & SHA-256 hashes on the fly."
