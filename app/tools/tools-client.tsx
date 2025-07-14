@@ -38,16 +38,13 @@ export default function ToolsClient() {
           All Gearizen Tools
         </h1>
 
-        {/* Decorative underline */}
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
 
         <p className="mx-auto max-w-2xl text-base sm:text-lg text-gray-700 leading-relaxed">
-          Explore our full suite of client-side utilities—generators, converters,
-          compressors, formatters, validators, and more. 100% free, no signup
-          required.
+          Explore Gearizen’s comprehensive suite of 20+ privacy-first, client-side utilities—password generators,
+          data transformers, code formatters, image optimizers and more. All tools are 100% free and require no signup.
         </p>
 
-        {/* Search Input */}
         <div className="mt-6 flex justify-center">
           <div className="relative w-full max-w-lg">
             <MagnifyingGlassIcon
@@ -75,10 +72,8 @@ export default function ToolsClient() {
       {/* Results Grid */}
       <section className="space-y-6 sm:px-0">
         <div className="flex flex-col">
-          <h2
-            className="text-2xl sm:text-3xl font-semibold text-gray-800"
-          >
-            {query ? `Results for “${search}”` : "Available Tools"}
+          <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800">
+            {query ? `Results for “${search}”` : "Browse All Tools"}
           </h2>
           <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         </div>

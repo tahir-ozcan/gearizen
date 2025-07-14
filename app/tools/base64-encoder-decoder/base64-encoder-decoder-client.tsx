@@ -1,38 +1,25 @@
 // app/tools/base64-encoder-decoder/base64-encoder-decoder-client.tsx
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useRef, ChangeEvent, FormEvent, DragEvent } from "react";
 import {
-  Trash2,
-  Settings,
-  ChevronDown,
-  ChevronUp,
-  ClipboardCopy,
-} from "lucide-react";
+  useState,
+  useRef,
+  ChangeEvent,
+  FormEvent,
+  DragEvent,
+} from "react";
+import { Trash2, ClipboardCopy } from "lucide-react";
 
 /**
- * Base64 Encoder / Decoder Tool
+ * Base64 Encoder/Decoder Tool
  *
- * - Encode/decode any text to/from Base64 (full Unicode support).
- * - Optional URL-safe mode (no “+” or “/”).
- * - Optional removal of “=” padding.
- * - Drag-and-drop file to auto-encode its contents.
- * - Live character count.
- * - Gradient main heading matching site theme.
+ * Convert text and files to and from Base64 with drag-and-drop support—no server, fully client-side.
  */
 export default function Base64EncoderDecoderClient() {
-  // ─── State ──────────────────────────────────────────────────────────────────
   const [mode, setMode] = useState<"encode" | "decode">("encode");
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [previewSrc, setPreviewSrc] = useState<string | null>(null);
-
-  // Advanced toggles
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [urlSafe, setUrlSafe] = useState(false);
-  const [noPadding, setNoPadding] = useState(false);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -41,28 +28,18 @@ export default function Base64EncoderDecoderClient() {
     setInput("");
     setOutput("");
     setError(null);
-    setPreviewSrc(null);
     inputRef.current?.focus();
   }
 
-  /** Full Unicode-safe Base64 encoding in browser */
+  /** UTF-8 → Base64 */
   function encodeText(text: string) {
     const utf8 = unescape(encodeURIComponent(text));
-    let b64 = btoa(utf8);
-    if (urlSafe) b64 = b64.replace(/\+/g, "-").replace(/\//g, "_");
-    if (noPadding) b64 = b64.replace(/=*$/, "");
-    return b64;
+    return btoa(utf8);
   }
 
-  /** Full Unicode-safe Base64 decoding in browser */
+  /** Base64 → UTF-8 */
   function decodeText(text: string) {
-    let b64 = text;
-    if (urlSafe) b64 = b64.replace(/-/g, "+").replace(/_/g, "/");
-    if (!noPadding) {
-      const pad = 4 - (b64.length % 4);
-      if (pad < 4) b64 += "=".repeat(pad);
-    }
-    const binary = atob(b64);
+    const binary = atob(text);
     return decodeURIComponent(escape(binary));
   }
 
@@ -74,21 +51,19 @@ export default function Base64EncoderDecoderClient() {
 
     const reader = new FileReader();
     reader.onload = () => {
-      if (typeof reader.result === "string") {
-        const dataUrl = reader.result;
-        setPreviewSrc(dataUrl);
-
-        const [, rawB64] = dataUrl.split(",");
-        let final = rawB64;
-        if (urlSafe) final = final.replace(/\+/g, "-").replace(/\//g, "_");
-        if (noPadding) final = final.replace(/=*$/, "");
-
+      if (reader.result instanceof ArrayBuffer) {
+        const bytes = new Uint8Array(reader.result);
+        let str = "";
+        for (const b of bytes) {
+          str += String.fromCharCode(b);
+        }
+        const b64 = btoa(str);
         setMode("encode");
         setInput("");
-        setOutput(final);
+        setOutput(b64);
       }
     };
-    reader.readAsDataURL(file);
+    reader.readAsArrayBuffer(file);
   }
 
   function handleDragOver(e: DragEvent<HTMLDivElement>) {
@@ -100,24 +75,18 @@ export default function Base64EncoderDecoderClient() {
     setInput(e.target.value);
     setError(null);
     setOutput("");
-    setPreviewSrc(null);
   }
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
     setOutput("");
-    setPreviewSrc(null);
 
     try {
       if (mode === "encode") {
         setOutput(encodeText(input));
       } else {
-        const decoded = decodeText(input);
-        setOutput(decoded);
-        if (decoded.startsWith("data:image/")) {
-          setPreviewSrc(decoded);
-        }
+        setOutput(decodeText(input));
       }
     } catch {
       setError(mode === "encode" ? "❌ Encoding failed." : "❌ Decoding failed.");
@@ -135,8 +104,8 @@ export default function Base64EncoderDecoderClient() {
   }
 
   // ─── Character Counts ───────────────────────────────────────────────────────
-  const inputLength = input.length.toLocaleString();
-  const outputLength = output.length.toLocaleString();
+  const inputCount = input.length.toLocaleString();
+  const outputCount = output.length.toLocaleString();
 
   // ─── Render ──────────────────────────────────────────────────────────────────
   return (
@@ -155,12 +124,12 @@ export default function Base64EncoderDecoderClient() {
             text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
           "
         >
-          Base64 Encoder / Decoder
+          Base64 Encoder/Decoder
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Instantly encode text to Base64 or decode Base64 back to text—all in your
-          browser, with optional URL-safe mode, padding control, and drag-and-drop support.
+          Convert text and files to and from Base64 with drag-and-drop support—no
+          server, fully client-side.
         </p>
       </div>
 
@@ -176,7 +145,7 @@ export default function Base64EncoderDecoderClient() {
               htmlFor="base64-input"
               className="block text-sm font-medium text-gray-800 mb-1"
             >
-              {mode === "encode" ? "Plain Text" : "Base64 String"}
+              {mode === "encode" ? "Text to Encode" : "Base64 to Decode"}
             </label>
             <textarea
               id="base64-input"
@@ -185,15 +154,15 @@ export default function Base64EncoderDecoderClient() {
               onChange={handleInputChange}
               placeholder={
                 mode === "encode"
-                  ? "Enter text to encode…"
-                  : "Enter Base64 to decode…"
+                  ? "Enter text or drop a file below…"
+                  : "Enter Base64 string to decode…"
               }
               className="
                 w-full h-48 p-4 border border-gray-300 rounded-md bg-white
-                focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition
+                focus:ring-2 focus:ring-[#7c3aed] font-mono resize-y transition
               "
             />
-            <p className="mt-1 text-xs text-gray-500">{inputLength} characters</p>
+            <p className="mt-1 text-xs text-gray-500">{inputCount} characters</p>
           </div>
 
           {/* Output */}
@@ -213,10 +182,10 @@ export default function Base64EncoderDecoderClient() {
                 id="base64-output"
                 value={output}
                 readOnly
-                placeholder="Result will appear here…"
+                placeholder="Result appears here…"
                 className="
                   w-full h-48 pl-4 pr-12 py-4 border border-gray-300 rounded-md bg-gray-50
-                  focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition
+                  focus:ring-2 focus:ring-[#7c3aed] font-mono resize-y transition
                 "
               />
               <button
@@ -224,26 +193,15 @@ export default function Base64EncoderDecoderClient() {
                 onClick={copyOutput}
                 disabled={!output}
                 className="
-                  absolute top-2 right-2 p-2 text-gray-500 hover:text-indigo-600
+                  absolute top-2 right-2 p-2 text-gray-500 hover:text-[#7c3aed]
                   disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition
                 "
-                aria-label="Copy output"  
+                aria-label="Copy output"
               >
-                <ClipboardCopy className="w-6 h-6" aria-hidden="true" />
+                <ClipboardCopy className="w-6 h-6" />
               </button>
             </div>
-
-            {previewSrc && (
-              <img
-                src={previewSrc}
-                alt="Decoded image preview"
-                width={96}
-                height={96}
-                className="absolute bottom-4 right-4 border border-gray-200 rounded-md shadow-sm"
-              />
-            )}
-
-            <p className="mt-1 text-xs text-gray-500">{outputLength} characters</p>
+            <p className="mt-1 text-xs text-gray-500">{outputCount} characters</p>
           </div>
         </div>
 
@@ -253,70 +211,29 @@ export default function Base64EncoderDecoderClient() {
           </div>
         )}
 
-        {/* Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        {/* Actions */}
+        <div className="flex flex-wrap items-center gap-4">
           <button
             type="submit"
             className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
           >
             {mode === "encode" ? "Encode →" : "Decode →"}
           </button>
-
           <button
             type="button"
             onClick={clearAll}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 transition"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 transition text-sm"
           >
-            <Trash2 className="w-5 h-5" aria-hidden="true" />
+            <Trash2 className="w-5 h-5" />
             Clear All
           </button>
-
           <button
             type="button"
-            onClick={() => setMode((m) => (m === "encode" ? "decode" : "encode"))}
-            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition text-sm font-medium"
+            onClick={() => setMode(m => (m === "encode" ? "decode" : "encode"))}
+            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition text-sm font-medium text-gray-700"
           >
-            <Settings className="w-5 h-5" aria-hidden="true" />
-            Switch to {mode === "encode" ? "Decode" : "Encode"}
+            {mode === "encode" ? "Switch to Decode" : "Switch to Encode"}
           </button>
-        </div>
-
-        {/* Advanced Settings */}
-        <div>
-          <button
-            type="button"
-            onClick={() => setShowAdvanced((v) => !v)}
-            className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition text-sm"
-          >
-            Advanced Settings
-            {showAdvanced ? (
-              <ChevronUp className="w-4 h-4" aria-hidden="true" />
-            ) : (
-              <ChevronDown className="w-4 h-4" aria-hidden="true" />
-            )}
-          </button>
-          {showAdvanced && (
-            <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-3">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={urlSafe}
-                  onChange={(e) => setUrlSafe(e.target.checked)}
-                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                />
-                <span className="text-gray-700 text-sm">URL-Safe Base64</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={noPadding}
-                  onChange={(e) => setNoPadding(e.target.checked)}
-                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                />
-                <span className="text-gray-700 text-sm">Remove “=” Padding</span>
-              </label>
-            </div>
-          )}
         </div>
       </form>
     </section>

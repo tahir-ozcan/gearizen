@@ -1,8 +1,7 @@
-# *
 User-agent: *
+Disallow: /not-found
 Allow: /
-# Host
-Host: https://gearizen.com
 
-# Sitemaps
+# Point search engines to the sitemap
 Sitemap: https://gearizen.com/sitemap.xml
+Host: gearizen.com

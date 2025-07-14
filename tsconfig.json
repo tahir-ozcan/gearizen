@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    // Hedeflenen JS sürümü ve global/types
+    /* Hedeflenen JS sürümü ve global/types */
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
 
-    // Modül çözümü ve çıktı
+    /* Modül çözümü ve çıktı ayarları */
     "module": "Node16",
     "moduleResolution": "Node16",
     "noEmit": true,
@@ -12,38 +12,38 @@
     "jsx": "preserve",
     "resolveJsonModule": true,
 
-    // Katı tip denetimi
+    /* Katı tip denetimi */
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "allowJs": true,
     "esModuleInterop": true,
 
-    // Proje içi import kısayolları
+    /* Proje içi import kısayolları */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
     },
 
-    // Hızlı yeniden derleme
+    /* Hızlı yeniden derleme */
     "incremental": true,
 
-    // Eklenecek global tip deklarasyonları
-    "typeRoots": ["types", "node_modules/@types"],
+    /* Global tip deklarasyonlarını arayacağımız klasörler */
+    "typeRoots": ["./node_modules/@types", "./types"],
 
-    // Next.js için önerilen eklenti
+    /* Next.js için önerilen plugin */
     "plugins": [
       {
         "name": "next"
       }
     ]
   },
-  // Derleme kapsamı
+  /* Derleme kapsamı */
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "types/**/*.d.ts",
+    "./types/**/*.d.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]

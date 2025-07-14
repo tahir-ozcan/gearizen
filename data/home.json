@@ -1,46 +1,58 @@
 {
   "hero": {
     "title": "Gearizen",
-    "subHeadline": "Free, fast, privacy-first web tools for developers, creators, and everyone. No signup, no tracking, 100% client-side.",
-    "ctaLabel": "Discover All Tools",
+    "subHeadline": "Discover 20+ free, privacy-first web tools for developers, creators and everyone—no signup, no tracking, 100% client-side.",
+    "ctaLabel": "Browse All Tools",
     "ctaHref": "/tools"
   },
   "features": [
     {
       "href": "/tools/json-formatter",
-      "icon": "FileJson",
-      "title": "JSON Formatter",
-      "description": "Format, validate, and beautify JSON data instantly—no external dependencies."
+      "icon": "Code",
+      "title": "JSON Formatter & Validator",
+      "description": "Validate, beautify, minify and lint JSON instantly in your browser with real-time error reporting."
     },
     {
-      "href": "/tools/slug-generator",
-      "icon": "Link2",
-      "title": "URL Slug Generator",
-      "description": "Slugify text into SEO-friendly URLs quickly."
+      "href": "/tools/password-generator",
+      "icon": "Key",
+      "title": "Strong Password Generator",
+      "description": "Instantly generate secure, customizable passwords with options for length, complexity and entropy visualization."
     },
     {
-      "href": "/tools/lorem-ipsum-generator",
-      "icon": "AlignLeft",
-      "title": "Lorem Ipsum Generator",
-      "description": "Produce realistic placeholder text of any length."
+      "href": "/tools/data-converter",
+      "icon": "Braces",
+      "title": "Data Converter",
+      "description": "Transform CSV, JSON, YAML or XML data in seconds—even large files—all client-side and offline."
     },
     {
-      "href": "/tools/color-converter",
-      "icon": "Droplet",
-      "title": "Color Converter",
-      "description": "Translate colors between HEX, RGB(A), HSL(A), and CMYK instantly."
+      "href": "/tools/code-formatter-minifier",
+      "icon": "Cpu",
+      "title": "Code Formatter & Minifier",
+      "description": "Beautify or compress your HTML, CSS and JavaScript for better readability or performance—no server needed."
     },
     {
-      "href": "/tools/markdown-converter",
-      "icon": "BookOpen",
-      "title": "Markdown Converter",
-      "description": "Live-edit Markdown and copy clean HTML output."
+      "href": "/tools/pdf-toolkit",
+      "icon": "FileArchive",
+      "title": "PDF Toolkit",
+      "description": "Shrink PDF sizes without quality loss and extract text to Word documents entirely in-browser."
+    },
+    {
+      "href": "/tools/seo-meta-tag-generator",
+      "icon": "Tag",
+      "title": "SEO Meta Tag Generator",
+      "description": "Generate optimized meta tags, Open Graph and Twitter card snippets to boost search visibility and social sharing."
+    },
+    {
+      "href": "/tools/qr-code-generator",
+      "icon": "QrCode",
+      "title": "QR Code Generator",
+      "description": "Create high-resolution QR codes for URLs, text, vCards and Wi-Fi credentials with color and size options."
     },
     {
       "href": "/contact",
       "icon": "Mail",
       "title": "Suggest a Tool",
-      "description": "Have an idea for a new tool? Let us know and we’ll build it!"
+      "description": "Have an idea for a new tool? Let us know and we’ll build it—your feedback powers Gearizen’s roadmap."
     }
   ]
 }

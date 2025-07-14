@@ -1,26 +1,160 @@
 {
-  "name": "Gearizen – Free Client-Side Digital Tools",
+  "name": "Gearizen",
   "short_name": "Gearizen",
-  "description": "Fast, privacy-first web tools (password generator, JSON formatter, text converter, QR code, unit converter, contrast checker) — 100% client-side, no signup.",
-  "start_url": "/?utm_source=homescreen",
+  "description": "Gearizen offers a comprehensive suite of free, privacy-first, client-side web tools for developers, creators and everyday users. No signup, no tracking, lightning-fast performance.",
+  "lang": "en-US",
+  "start_url": "/?utm_source=manifest",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
-  "theme_color": "#4f46e5",
+  "theme_color": "#7c3aed",
   "icons": [
     {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
-    },
-    {
       "src": "/favicon.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "categories": ["utilities", "tools"],
-  "lang": "en",
-  "prefer_related_applications": false
+  "shortcuts": [
+    {
+      "name": "Strong Password Generator",
+      "short_name": "Passwords",
+      "description": "Generate secure, customizable passwords",
+      "url": "/tools/password-generator"
+    },
+    {
+      "name": "UUID Generator",
+      "short_name": "UUID",
+      "description": "Create RFC4122-compliant UUIDs",
+      "url": "/tools/uuid-generator"
+    },
+    {
+      "name": "Lorem Ipsum Generator",
+      "short_name": "Lorem Ipsum",
+      "description": "Produce realistic placeholder text",
+      "url": "/tools/lorem-ipsum-generator"
+    },
+    {
+      "name": "Text Counter",
+      "short_name": "Text Count",
+      "description": "Count words, characters & lines",
+      "url": "/tools/text-counter"
+    },
+    {
+      "name": "Text Case Converter",
+      "short_name": "Case Converter",
+      "description": "Switch between UPPER, lower & more",
+      "url": "/tools/text-case-converter"
+    },
+    {
+      "name": "Markdown Converter",
+      "short_name": "Markdown",
+      "description": "Convert Markdown to HTML and back",
+      "url": "/tools/markdown-converter"
+    },
+    {
+      "name": "Text Diff Checker",
+      "short_name": "Diff Checker",
+      "description": "Compare and highlight text changes",
+      "url": "/tools/text-diff"
+    },
+    {
+      "name": "Regex Tester",
+      "short_name": "Regex",
+      "description": "Build and test regular expressions",
+      "url": "/tools/regex-tester"
+    },
+    {
+      "name": "JSON Formatter & Validator",
+      "short_name": "JSON",
+      "description": "Beautify, minify and validate JSON",
+      "url": "/tools/json-formatter"
+    },
+    {
+      "name": "Data Converter",
+      "short_name": "Data Conv",
+      "description": "Transform CSV, JSON, YAML & XML",
+      "url": "/tools/data-converter"
+    },
+    {
+      "name": "Code Formatter & Minifier",
+      "short_name": "Code Tools",
+      "description": "Beautify or compress HTML, CSS & JS",
+      "url": "/tools/code-formatter-minifier"
+    },
+    {
+      "name": "SEO Meta Tag Generator",
+      "short_name": "SEO Tags",
+      "description": "Generate optimized SEO & social meta tags",
+      "url": "/tools/seo-meta-tag-generator"
+    },
+    {
+      "name": "Sitemap Generator",
+      "short_name": "Sitemap",
+      "description": "Create XML sitemaps to improve indexing",
+      "url": "/tools/sitemap-generator"
+    },
+    {
+      "name": "URL Tools: Encode, Parse & Slugify",
+      "short_name": "URL Tools",
+      "description": "Encode, parse and slugify URLs",
+      "url": "/tools/url-tools"
+    },
+    {
+      "name": "Base64 Encoder/Decoder",
+      "short_name": "Base64",
+      "description": "Convert text & files to Base64",
+      "url": "/tools/base64-encoder-decoder"
+    },
+    {
+      "name": "JWT & Hash Generator",
+      "short_name": "JWT & Hash",
+      "description": "Decode JWTs and generate hashes",
+      "url": "/tools/jwt-hash-generator"
+    },
+    {
+      "name": "HTML to PDF Converter",
+      "short_name": "HTML→PDF",
+      "description": "Convert HTML pages into PDF files",
+      "url": "/tools/html-to-pdf"
+    },
+    {
+      "name": "PDF Toolkit: Compress & Convert",
+      "short_name": "PDF Tools",
+      "description": "Shrink PDFs and extract text client-side",
+      "url": "/tools/pdf-toolkit"
+    },
+    {
+      "name": "Image Toolkit: Compress & Resize",
+      "short_name": "Image Tools",
+      "description": "Optimize and resize images offline",
+      "url": "/tools/image-toolkit"
+    },
+    {
+      "name": "QR Code Generator",
+      "short_name": "QR Code",
+      "description": "Generate high-res QR codes",
+      "url": "/tools/qr-code-generator"
+    },
+    {
+      "name": "Unit Converter",
+      "short_name": "Converter",
+      "description": "Convert metric & imperial units",
+      "url": "/tools/unit-converter"
+    },
+    {
+      "name": "Color Toolkit: Converter & Checker",
+      "short_name": "Color Tools",
+      "description": "Convert colors and check contrast",
+      "url": "/tools/color-toolkit"
+    },
+    {
+      "name": "Time Converter: UNIX & Timezone",
+      "short_name": "Time Conv",
+      "description": "Convert timestamps and timezones",
+      "url": "/tools/time-converter"
+    }
+  ]
 }

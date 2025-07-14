@@ -39,6 +39,7 @@ import {
   Shield,
   Tag,
   Type,
+  Fingerprint,
 } from "lucide-react";
 
 /**
@@ -117,6 +118,7 @@ const ICON_MAP: Record<string, React.ComponentType<LucideProps>> = {
   Shield,
   Tag,
   Type,
+  Fingerprint, // Yeni eklenen UUID Generator ikonu
 };
 
 /**

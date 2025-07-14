@@ -1,12 +1,35 @@
+// app/components/BreadcrumbJsonLd.tsx
+"use client";
+
+import React from "react";
 import JsonLd from "./JsonLd";
 
-interface Props {
+export interface BreadcrumbJsonLdProps {
+  /** The title of the current page, used as the last breadcrumb item’s name */
   pageTitle: string;
+  /** The canonical URL of the current page, used as the last breadcrumb item’s link */
   pageUrl: string;
 }
 
-export default function BreadcrumbJsonLd({ pageTitle, pageUrl }: Props) {
-  const data = {
+/**
+ * BreadcrumbJsonLd
+ *
+ * Renders a JSON-LD `<script>` tag describing a breadcrumb trail for search engines,
+ * following schema.org’s BreadcrumbList specification.
+ *
+ * Usage:
+ * ```tsx
+ * <BreadcrumbJsonLd
+ *   pageTitle="URL Tools"
+ *   pageUrl="https://gearizen.com/tools/url-tools"
+ * />
+ * ```
+ */
+export default function BreadcrumbJsonLd({
+  pageTitle,
+  pageUrl,
+}: BreadcrumbJsonLdProps) {
+  const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
@@ -31,5 +54,5 @@ export default function BreadcrumbJsonLd({ pageTitle, pageUrl }: Props) {
     ],
   };
 
-  return <JsonLd data={data} />;
+  return <JsonLd data={jsonLd} />;
 }

@@ -60,22 +60,26 @@
 /* components/globals.css (or wherever you keep your shared styles) */
 
 .gradient-bg {
-  /* A wide gradient stripe of harmonious hues */
+  /* Çapraz dalgalı gradient */
   background: linear-gradient(
-    90deg,
+    45deg,
     /* Purple */ #7c3aed 0%,
     /* Pink   */ #ec4899 25%,
     /* Amber  */ #fbbf24 50%,
     /* Pink   */ #ec4899 75%,
     /* Purple */ #7c3aed 100%
   );
-  background-size: 200% 200%;
-  /* 60s forward, then 60s reverse, ease timing all the way through */
-  animation: gradient-slow 30s ease-in-out infinite alternate;
+  /* Daha geniş alanda kayma için büyüttük */
+  background-size: 400% 400%;
+  /* 60 saniyede tam döngü, ease-in-out, sonsuz tekrar */
+  animation: gradient-wave 60s ease-in-out infinite;
 }
 
-@keyframes gradient-slow {
-  0%   { background-position: 0%   50%; }
-  100% { background-position: 100% 50%; }
-  0%   { background-position: 0%   50%; }
+@keyframes gradient-wave {
+  /* Dalga hareketi: köşeler arasında akış */
+  0%   { background-position: 0%   0%; }
+  25%  { background-position: 100% 0%; }
+  50%  { background-position: 100% 100%; }
+  75%  { background-position: 0%   100%; }
+  100% { background-position: 0%   0%; }
 }

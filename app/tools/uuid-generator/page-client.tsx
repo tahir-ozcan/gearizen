@@ -1,16 +1,19 @@
+// app/tools/uuid-generator/uuid-generator-client.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, ChangeEvent, FormEvent } from "react";
 
-type Version = "v1" | "v4";
-type Separator = "-" | "_" | "none";
-
-function uuidV4() {
+/**
+ * Generate a RFC4122 v4 UUID using the browser crypto API.
+ */
+function uuidV4(): string {
   return crypto.randomUUID();
 }
 
-// Lightweight v1 generator (timestamp based)
-function uuidV1() {
+/**
+ * Generate a simple timestamp-based UUID v1.
+ */
+function uuidV1(): string {
   const now = Date.now();
   const timeLow = (now & 0xffffffff).toString(16).padStart(8, "0");
   const timeMid = (((now / 0x100000000) & 0xffff) | 0)
@@ -28,6 +31,9 @@ function uuidV1() {
   return `${timeLow}-${timeMid}-${timeHiAndVersion}-${clockSeq}-${node}`;
 }
 
+type Version = "v1" | "v4";
+type Separator = "-" | "_" | "none";
+
 export default function UuidGeneratorClient() {
   const [version, setVersion] = useState<Version>("v4");
   const [uppercase, setUppercase] = useState(false);
@@ -35,28 +41,31 @@ export default function UuidGeneratorClient() {
   const [count, setCount] = useState(1);
   const [uuids, setUuids] = useState<string[]>([]);
 
-  const generateUuid = () => (version === "v1" ? uuidV1() : uuidV4());
+  const inputRef = useRef<HTMLButtonElement>(null);
+
+  const generateOne = () => (version === "v1" ? uuidV1() : uuidV4());
 
   const generateBatch = () => {
-    const items: string[] = [];
+    const list: string[] = [];
     for (let i = 0; i < count; i++) {
-      let id = generateUuid();
+      let id = generateOne();
       if (separator !== "-") {
-        id = id.replace(/-/g, separator === "none" ? "" : "_");
+        id = separator === "none" ? id.replace(/-/g, "") : id.replace(/-/g, "_");
       }
       id = uppercase ? id.toUpperCase() : id.toLowerCase();
-      items.push(id);
+      list.push(id);
     }
-    setUuids(items);
+    setUuids(list);
+    inputRef.current?.focus();
   };
 
   const copyAll = async () => {
-    if (!uuids.length) return;
+    if (uuids.length === 0) return;
     try {
       await navigator.clipboard.writeText(uuids.join("\n"));
       alert("✅ UUIDs copied to clipboard!");
     } catch {
-      alert("❌ Failed to copy UUIDs.");
+      alert("❌ Failed to copy.");
     }
   };
 
@@ -66,114 +75,129 @@ export default function UuidGeneratorClient() {
     <section
       id="uuid-generator"
       aria-labelledby="uuid-generator-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="space-y-16 text-gray-900 antialiased"
     >
-      <h1
-        id="uuid-generator-heading"
-        className="text-4xl sm:text-5xl font-extrabold text-center mb-6 tracking-tight"
-      >
-        Free UUID Generator
-      </h1>
-      <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-        Generate RFC4122 v1 or v4 UUIDs entirely in your browser. Customize case
-        and separators, generate batches, and copy with one click.
-      </p>
+      {/* Heading & Description */}
+      <div className="text-center sm:px-0 space-y-4">
+        <h1
+          id="uuid-generator-heading"
+          className="
+            bg-clip-text text-transparent
+            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+            text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
+          "
+        >
+          Free UUID Generator
+        </h1>
+        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <p className="mx-auto max-w-3xl text-lg sm:text-xl text-gray-700 leading-relaxed">
+          Generate RFC 4122 v1 or v4 UUIDs entirely in your browser. Customize case,
+          separators, batch size, and copy instantly—100% client-side, no signup.
+        </p>
+      </div>
 
+      {/* Controls Form */}
       <form
-        onSubmit={(e) => {
+        onSubmit={(e: FormEvent) => {
           e.preventDefault();
           generateBatch();
         }}
-        className="max-w-2xl mx-auto space-y-6"
+        className="max-w-3xl mx-auto space-y-6 sm:px-0"
       >
-        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 space-y-4 sm:space-y-0">
-          <label htmlFor="version" className="flex items-center space-x-2">
-            <span className="text-sm font-medium text-gray-700">Version:</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Version */}
+          <label className="flex flex-col text-sm font-medium text-gray-800">
+            Version
             <select
-              id="version"
               value={version}
-              onChange={(e) => setVersion(e.target.value as Version)}
-              className="input-base w-auto px-2 py-1 text-sm"
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                setVersion(e.target.value as Version)
+              }
+              className="mt-1 input-base"
             >
               <option value="v1">v1</option>
               <option value="v4">v4</option>
             </select>
           </label>
 
-          <label className="flex items-center space-x-2">
+          {/* Uppercase */}
+          <label className="flex items-center space-x-2 text-sm text-gray-800">
             <input
               type="checkbox"
               checked={uppercase}
               onChange={() => setUppercase((v) => !v)}
               className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
             />
-            <span className="text-sm text-gray-700">Uppercase</span>
+            <span>Uppercase</span>
           </label>
 
-          <label htmlFor="separator" className="flex items-center space-x-2">
-            <span className="text-sm font-medium text-gray-700">
-              Separator:
-            </span>
+          {/* Separator */}
+          <label className="flex flex-col text-sm font-medium text-gray-800">
+            Separator
             <select
-              id="separator"
               value={separator}
-              onChange={(e) => setSeparator(e.target.value as Separator)}
-              className="input-base w-auto px-2 py-1 text-sm"
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                setSeparator(e.target.value as Separator)
+              }
+              className="mt-1 input-base"
             >
-              <option value="-">Dash (-)</option>
+              <option value="-">Dash (–)</option>
               <option value="_">Underscore (_)</option>
               <option value="none">None</option>
             </select>
           </label>
 
-          <label htmlFor="count" className="flex items-center space-x-2">
-            <span className="text-sm font-medium text-gray-700">Batch:</span>
+          {/* Batch Count */}
+          <label className="flex flex-col text-sm font-medium text-gray-800">
+            Batch Size
             <input
-              id="count"
               type="number"
               min={1}
               max={50}
               value={count}
-              onChange={(e) =>
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setCount(Math.min(50, Math.max(1, Number(e.target.value))))
               }
-              className="input-base w-20 px-2 py-1 text-sm"
+              className="mt-1 input-base"
             />
           </label>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        {/* Action Buttons */}
+        <div className="flex flex-wrap justify-center gap-4">
           <button
+            ref={inputRef}
             type="submit"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
+            className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
           >
             Generate
           </button>
           <button
             type="button"
             onClick={copyAll}
-            disabled={!uuids.length}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition text-sm font-medium disabled:opacity-60"
+            disabled={uuids.length === 0}
+            className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition font-medium disabled:opacity-50"
           >
             Copy
           </button>
           <button
             type="button"
             onClick={clearAll}
-            disabled={!uuids.length}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition text-sm font-medium disabled:opacity-60"
+            disabled={uuids.length === 0}
+            className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition font-medium disabled:opacity-50"
           >
             Clear
           </button>
         </div>
       </form>
 
+      {/* Output List */}
       {uuids.length > 0 && (
         <textarea
           readOnly
           aria-label="Generated UUIDs"
           value={uuids.join("\n")}
-          className="input-base mt-8 w-full max-w-2xl mx-auto h-48 font-mono text-sm bg-gray-50 resize-y"
+          className="w-full max-w-3xl mx-auto h-48 p-4 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-[#7c3aed] transition"
         />
       )}
     </section>

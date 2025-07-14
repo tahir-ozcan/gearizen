@@ -1,64 +1,132 @@
+// app/tools/text-counter/text-counter-converter-client.tsx
 "use client";
 
-import { useState } from "react";
-import { countWords, countCharacters, estimateReadingTime } from "./count-utils";
+import { useState, useRef, ChangeEvent } from "react";
+import { Trash2 } from "lucide-react";
+
+/**
+ * Utility functions for TextCounterClient
+ */
+function countWords(text: string): number {
+  return text.trim()
+    ? text.trim().split(/\s+/).filter(Boolean).length
+    : 0;
+}
+
+function countCharacters(text: string, ignoreSpaces: boolean): number {
+  if (ignoreSpaces) {
+    return text.replace(/\s+/g, "").length;
+  }
+  return text.length;
+}
+
+function estimateReadingTime(text: string, wpm: number): number {
+  const words = countWords(text);
+  return words === 0 ? 0 : Math.max(1, Math.ceil(words / wpm));
+}
 
 export default function TextCounterClient() {
   const [text, setText] = useState("");
   const [ignoreSpaces, setIgnoreSpaces] = useState(false);
   const [wpm, setWpm] = useState(200);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const words = countWords(text);
-  const chars = countCharacters(text, { ignoreSpaces });
+  const chars = countCharacters(text, ignoreSpaces);
   const reading = estimateReadingTime(text, wpm);
+
+  const clearAll = () => {
+    setText("");
+    textareaRef.current?.focus();
+  };
 
   return (
     <section
       id="text-counter"
       aria-labelledby="text-counter-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="space-y-16 text-gray-900 antialiased"
     >
-      <h1
-        id="text-counter-heading"
-        className="text-4xl sm:text-5xl font-extrabold text-center mb-6 tracking-tight"
-      >
-        Word & Character Counter
-      </h1>
-      <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-        Type or paste text below to instantly see word and character counts.
-      </p>
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        rows={8}
-        placeholder="Enter your text..."
-        className="w-full max-w-3xl mx-auto block border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition resize-y"
-      />
-      <label className="mt-4 flex items-center justify-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={ignoreSpaces}
-          onChange={() => setIgnoreSpaces(!ignoreSpaces)}
-          className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+      {/* Heading & Description */}
+      <div className="text-center sm:px-0 space-y-4">
+        <h1
+          id="text-counter-heading"
+          className="
+            bg-clip-text text-transparent
+            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+            text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
+          "
+        >
+          Word & Character Counter
+        </h1>
+        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+          Paste or type text below to instantly see word count, character count, and estimated reading time—all client-side, no signup required.
+        </p>
+      </div>
+
+      {/* Input & Controls */}
+      <div className="max-w-3xl mx-auto sm:px-0 space-y-6">
+        <textarea
+          id="text-input"
+          ref={textareaRef}
+          value={text}
+          onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setText(e.target.value)}
+          rows={8}
+          placeholder="Enter your text here…"
+          className="
+            w-full p-4 border border-gray-300 rounded-md bg-white
+            focus:ring-2 focus:ring-[#7c3aed] font-mono resize-y transition
+          "
         />
-        Ignore spaces in character count
-      </label>
-      <label className="mt-4 flex items-center justify-center gap-2 text-sm">
-        <span>Words per minute:</span>
-        <input
-          type="number"
-          min={50}
-          max={500}
-          step={10}
-          value={wpm}
-          onChange={(e) => setWpm(Number(e.target.value))}
-          className="w-20 border border-gray-300 rounded-lg px-2 py-1 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </label>
-      <div className="mt-6 flex justify-center gap-8 text-lg font-medium">
-        <span>{words} words</span>
-        <span>{chars} characters</span>
-        <span>{reading} min read</span>
+
+        <div className="flex flex-wrap justify-center gap-6">
+          <label className="inline-flex items-center space-x-2 text-sm">
+            <input
+              type="checkbox"
+              checked={ignoreSpaces}
+              onChange={() => setIgnoreSpaces((v) => !v)}
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <span>Ignore spaces</span>
+          </label>
+
+          <label className="inline-flex items-center space-x-2 text-sm">
+            <span>WPM:</span>
+            <input
+              type="number"
+              min={50}
+              max={1000}
+              step={50}
+              value={wpm}
+              onChange={(e) => setWpm(Number(e.target.value))}
+              className="
+                w-20 text-center border border-gray-300 rounded-md
+                px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#7c3aed]
+                transition
+              "
+            />
+          </label>
+
+          <button
+            type="button"
+            onClick={clearAll}
+            className="
+              inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md
+              hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7c3aed]
+              transition text-sm font-medium
+            "
+          >
+            <Trash2 className="w-5 h-5" />
+            Clear All
+          </button>
+        </div>
+
+        {/* Results */}
+        <div className="flex flex-wrap justify-center gap-8 text-lg font-medium">
+          <span>{words.toLocaleString()} words</span>
+          <span>{chars.toLocaleString()} characters</span>
+          <span>{reading.toLocaleString()} min read</span>
+        </div>
       </div>
     </section>
   );
