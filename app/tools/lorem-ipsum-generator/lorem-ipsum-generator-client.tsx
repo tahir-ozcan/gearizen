@@ -8,7 +8,8 @@ type LoremMode = "paragraphs" | "sentences" | "words";
 /**
  * Lorem Ipsum Generator Tool
  *
- * Produce realistic placeholder text of any length—control paragraphs, words and formatting for design mockups. 100% client-side, no signup required.
+ * Produce realistic placeholder text of any length—control paragraphs,
+ * words and formatting for design mockups. 100% client-side, no signup required.
  */
 function generateLorem(count: number, mode: LoremMode): string {
   const baseSentence =
@@ -21,6 +22,7 @@ function generateLorem(count: number, mode: LoremMode): string {
     "Excepteur sint occaecat cupidatat non proident.",
   ];
 
+  // Flatten into words for “words” mode
   const allWords = sentencePool
     .join(" ")
     .replace(/[.]/g, "")
@@ -28,17 +30,16 @@ function generateLorem(count: number, mode: LoremMode): string {
 
   if (mode === "words") {
     const slice = allWords.slice(0, count);
-    return slice.join(" ") + (slice.length < count ? "" : "…");
+    return slice.join(" ") + (slice.length >= count ? "…" : "");
   }
 
   if (mode === "sentences") {
     return sentencePool.slice(0, count).join(" ");
   }
 
-  // paragraphs
+  // paragraphs mode: build each using the first four sentences
   const paragraphs: string[] = [];
   for (let i = 0; i < count; i++) {
-    // use first 4 sentences for each paragraph
     paragraphs.push(sentencePool.slice(0, 4).join(" "));
   }
   return paragraphs.join("\n\n");

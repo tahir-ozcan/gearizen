@@ -19,16 +19,22 @@ import bcrypt from "bcryptjs";
  */
 export default function JwtHashGeneratorClient() {
   const [mode, setMode] = useState<"decode" | "hash">("decode");
+
+  // JWT decode state
   const [jwtInput, setJwtInput] = useState("");
   const [decodedHeader, setDecodedHeader] = useState<object | null>(null);
   const [decodedPayload, setDecodedPayload] = useState<object | null>(null);
+
+  // Hash generation state
   const [hashInput, setHashInput] = useState("");
   const [hashAlg, setHashAlg] = useState<"MD5" | "SHA-1" | "SHA-256" | "bcrypt">("MD5");
   const [bcryptRounds, setBcryptRounds] = useState(10);
   const [hashOutput, setHashOutput] = useState("");
+
+  // Shared error state
   const [error, setError] = useState<string | null>(null);
 
-  // Decode a Base64URL-encoded JSON segment
+  /** Decode a Base64URL-encoded JSON segment */
   function decodeSegment(seg: string): object {
     const padded =
       seg.replace(/-/g, "+").replace(/_/g, "/") +
@@ -37,7 +43,7 @@ export default function JwtHashGeneratorClient() {
     return JSON.parse(json);
   }
 
-  // Handle JWT decoding
+  /** Handle JWT decoding */
   function handleDecode(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -54,7 +60,7 @@ export default function JwtHashGeneratorClient() {
     }
   }
 
-  // Handle hash generation
+  /** Handle hash generation */
   async function handleHash(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -87,7 +93,7 @@ export default function JwtHashGeneratorClient() {
     }
   }
 
-  // Copy to clipboard
+  /** Copy text to clipboard */
   async function copyToClipboard(text: string) {
     if (!text) return;
     try {
@@ -118,8 +124,7 @@ export default function JwtHashGeneratorClient() {
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mx-auto max-w-2xl text-lg sm:text-xl text-gray-700 leading-relaxed">
-          Decode JWTs and generate cryptographic hashes (MD5, SHA-1, SHA-256, bcrypt)
-          with adjustable parameters—100% client-side, no signup required.
+          Decode JWTs and generate cryptographic hashes (MD5, SHA-1, SHA-256, bcrypt) with adjustable parameters.
         </p>
       </div>
 
@@ -167,10 +172,7 @@ export default function JwtHashGeneratorClient() {
       {mode === "decode" && (
         <form onSubmit={handleDecode} className="max-w-3xl mx-auto space-y-6 sm:px-0">
           <div>
-            <label
-              htmlFor="jwt-input"
-              className="block text-sm font-medium text-gray-800 mb-1"
-            >
+            <label htmlFor="jwt-input" className="block text-sm font-medium text-gray-800 mb-1">
               JWT Token
             </label>
             <textarea
@@ -179,26 +181,21 @@ export default function JwtHashGeneratorClient() {
               value={jwtInput}
               onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setJwtInput(e.target.value)}
               placeholder="Paste your JWT here…"
-              className="
-                w-full p-4 border border-gray-300 rounded-md bg-white
-                focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition
-              "
+              className="w-full p-4 border border-gray-300 rounded-md bg-white font-mono resize-y focus:ring-2 focus:ring-indigo-500 transition"
             />
           </div>
           <div className="text-center">
             <button
               type="submit"
-              className="
-                px-6 py-2 bg-indigo-600 text-white rounded-md
-                hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500
-                transition font-medium
-              "
+              className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
             >
               Decode →
             </button>
           </div>
+
           {decodedHeader && decodedPayload && (
             <div className="space-y-6">
+              {/* Header */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-800">Header</h2>
                 <pre className="p-4 mt-2 bg-gray-50 border border-gray-200 rounded-md overflow-auto font-mono">
@@ -212,6 +209,8 @@ export default function JwtHashGeneratorClient() {
                   Copy Header
                 </button>
               </div>
+
+              {/* Payload */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-800">Payload</h2>
                 <pre className="p-4 mt-2 bg-gray-50 border border-gray-200 rounded-md overflow-auto font-mono">
@@ -234,10 +233,7 @@ export default function JwtHashGeneratorClient() {
       {mode === "hash" && (
         <form onSubmit={handleHash} className="max-w-3xl mx-auto space-y-6 sm:px-0">
           <div>
-            <label
-              htmlFor="hash-input"
-              className="block text-sm font-medium text-gray-800 mb-1"
-            >
+            <label htmlFor="hash-input" className="block text-sm font-medium text-gray-800 mb-1">
               Input Text
             </label>
             <textarea
@@ -246,28 +242,23 @@ export default function JwtHashGeneratorClient() {
               value={hashInput}
               onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setHashInput(e.target.value)}
               placeholder="Enter text to hash…"
-              className="
-                w-full p-4 border border-gray-300 rounded-md bg-white
-                focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition
-              "
+              className="w-full p-4 border border-gray-300 rounded-md bg-white font-mono resize-y focus:ring-2 focus:ring-indigo-500 transition"
             />
           </div>
+
           <div className="flex flex-wrap items-center gap-4">
+            {/* Algorithm Selector */}
             <div className="flex-1">
-              <label
-                htmlFor="alg-select"
-                className="block text-sm font-medium text-gray-800 mb-1"
-              >
+              <label htmlFor="alg-select" className="block text-sm font-medium text-gray-800 mb-1">
                 Algorithm
               </label>
               <select
                 id="alg-select"
                 value={hashAlg}
-                onChange={(e: ChangeEvent<HTMLSelectElement>) => setHashAlg(e.target.value as typeof hashAlg)}
-                className="
-                  w-full p-3 border border-gray-300 rounded-md
-                  focus:ring-2 focus:ring-indigo-500 transition
-                "
+                onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                  setHashAlg(e.target.value as typeof hashAlg)
+                }
+                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 transition"
               >
                 <option value="MD5">MD5</option>
                 <option value="SHA-1">SHA-1</option>
@@ -275,12 +266,11 @@ export default function JwtHashGeneratorClient() {
                 <option value="bcrypt">bcrypt</option>
               </select>
             </div>
+
+            {/* bcrypt Rounds */}
             {hashAlg === "bcrypt" && (
               <div className="flex-1">
-                <label
-                  htmlFor="rounds-input"
-                  className="block text-sm font-medium text-gray-800 mb-1"
-                >
+                <label htmlFor="rounds-input" className="block text-sm font-medium text-gray-800 mb-1">
                   Salt Rounds
                 </label>
                 <input
@@ -290,32 +280,24 @@ export default function JwtHashGeneratorClient() {
                   max={31}
                   value={bcryptRounds}
                   onChange={(e) => setBcryptRounds(Number(e.target.value))}
-                  className="
-                    w-full p-3 border border-gray-300 rounded-md
-                    focus:ring-2 focus:ring-indigo-500 transition
-                  "
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 transition"
                 />
               </div>
             )}
           </div>
+
           <div className="text-center">
             <button
               type="submit"
-              className="
-                px-6 py-2 bg-indigo-600 text-white rounded-md
-                hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500
-                transition font-medium
-              "
+              className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
             >
               Generate →
             </button>
           </div>
+
           {hashOutput && (
             <div className="mt-6">
-              <label
-                htmlFor="hash-output"
-                className="block text-sm font-medium text-gray-800 mb-1"
-              >
+              <label htmlFor="hash-output" className="block text-sm font-medium text-gray-800 mb-1">
                 Hash Output
               </label>
               <div className="relative">
@@ -324,18 +306,12 @@ export default function JwtHashGeneratorClient() {
                   readOnly
                   value={hashOutput}
                   rows={4}
-                  className="
-                    w-full p-4 border border-gray-300 rounded-md bg-gray-50
-                    focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition
-                  "
+                  className="w-full p-4 border border-gray-300 rounded-md bg-gray-50 focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition"
                 />
                 <button
                   onClick={() => copyToClipboard(hashOutput)}
                   aria-label="Copy hash"
-                  className="
-                    absolute top-2 right-2 p-2 text-gray-500 hover:text-indigo-600
-                    disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition
-                  "
+                  className="absolute top-2 right-2 p-2 text-gray-500 hover:text-indigo-600 focus:outline-none transition"
                 >
                   <ClipboardCopy className="w-6 h-6" />
                 </button>

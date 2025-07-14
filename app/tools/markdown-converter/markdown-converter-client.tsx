@@ -23,7 +23,6 @@ async function renderMarkdown(md: string): Promise<string> {
   // Dynamically import marked and highlight.js
   const [{ marked }, hljsModule] = await Promise.all([
     import("marked"),
-    // @ts-expect-error highlight.js has no bundled types
     import("highlight.js"),
   ]);
   const hljs = hljsModule.default ?? hljsModule;
