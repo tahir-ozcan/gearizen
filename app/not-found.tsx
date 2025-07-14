@@ -18,7 +18,7 @@ export default function NotFoundClient() {
     <section
       id="notfound-section"
       aria-labelledby="notfound-title"
-      className="flex flex-col items-center justify-center text-center text-gray-900 antialiased min-h-screen px-4"
+      className="flex flex-col items-center justify-center text-center text-gray-900 antialiased"
     >
       <h1
         id="notfound-title"
