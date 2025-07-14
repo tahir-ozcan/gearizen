@@ -27,7 +27,7 @@ interface Preset {
 }
 
 export default function CodeMinifierClient() {
-  // ─── State ────────────────────────────────────────────────────────────────
+  // State
   const [input, setInput] = useState<string>("");
   const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -46,20 +46,18 @@ export default function CodeMinifierClient() {
     inputRef.current?.focus();
   }, []);
 
-  // ─── Helpers ────────────────────────────────────────────────────────────────
+  // Helpers
   function resetAll() {
     setInput("");
     setOutput("");
     setError(null);
     inputRef.current?.focus();
   }
-
   function applyPreset(p: Preset) {
     setLanguage(p.language);
     setStripComments(p.stripComments);
     setCollapseWhitespace(p.collapseWhitespace);
   }
-
   function savePreset() {
     const name = newPresetName.trim();
     if (!name) return;
@@ -70,7 +68,7 @@ export default function CodeMinifierClient() {
     setNewPresetName("");
   }
 
-  // ─── Minification ───────────────────────────────────────────────────────────
+  // Minify
   async function minifyCode() {
     setError(null);
     setOutput("");
@@ -79,7 +77,7 @@ export default function CodeMinifierClient() {
       let result: string;
 
       if (language === "javascript") {
-        // ─ JavaScript: terser ───────────────────────────────────────────────
+        // JavaScript -> Terser
         const terserOptions = {
           compress: true,
           mangle: true,
@@ -93,7 +91,7 @@ export default function CodeMinifierClient() {
         result = minified ?? "";
 
       } else if (language === "css") {
-        // ─ CSS: csso (dynamically imported) ───────────────────────────────
+        // CSS -> csso (dynamically imported)
         const csso = (await import("csso")).default;
         const cssoOptions = {
           restructure: collapseWhitespace,
@@ -102,22 +100,18 @@ export default function CodeMinifierClient() {
         result = csso.minify(input, cssoOptions).css;
 
       } else {
-        // ─ HTML: html-minifier-terser (dynamically imported) ────────────
-        const { minify: htmlMinify } = await import(
-          "html-minifier-terser"
-        );
-        const htmlOptions = {
-          collapseWhitespace,
-          removeComments: stripComments,
-          removeAttributeQuotes: false,
-          minifyJS: true,
-          minifyCSS: true,
-        };
-        // htmlMinify returns Promise<string>
-        result = await htmlMinify(input, htmlOptions);
+        // HTML -> simple regex minify (no fs-dependent lib)
+        let html = input;
+        if (stripComments) {
+          html = html.replace(/<!--[\s\S]*?-->/g, "");
+        }
+        if (collapseWhitespace) {
+          html = html.replace(/\s+/g, " ");
+        }
+        result = html.trim();
       }
 
-      setOutput(result.trim());
+      setOutput(result);
     } catch (err: unknown) {
       console.error(err);
       const msg = err instanceof Error ? err.message : String(err);
@@ -125,7 +119,7 @@ export default function CodeMinifierClient() {
     }
   }
 
-  // ─── Copy & Download ────────────────────────────────────────────────────────
+  // Copy & Download
   const copyOutput = async () => {
     if (!output) return;
     try {
