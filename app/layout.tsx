@@ -104,7 +104,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body className="flex min-h-screen flex-col">
         {/* Launch notice */}
-        <div className="bg-indigo-50 border-b border-indigo-200 text-indigo-700 px-4 py-3 flex items-center justify-center">
+        <div className="bg-indigo-50 border-b border-indigo-200 text-indigo-700 px-4 py-3 flex justify-center">
           <Info className="w-5 h-5 mr-2 flex-shrink-0" aria-hidden="true" />
           <div className="text-sm font-medium text-center">
             We just launched our website; some tools may be buggy or missing but we’ll fix them shortly!
