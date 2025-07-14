@@ -47,23 +47,29 @@ export default function ColorContrastCheckerClient() {
     <section
       id="color-contrast-checker"
       aria-labelledby="contrast-heading"
-      className="container-responsive py-20 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
+      className="container-responsive space-y-16 text-gray-900 antialiased selection:bg-indigo-200 selection:text-indigo-900"
     >
-      <h1
-        id="contrast-heading"
-        className="text-4xl sm:text-5xl font-extrabold text-center mb-6 tracking-tight"
-      >
-        Color Contrast Checker
-      </h1>
-      <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-        Verify WCAG compliance by checking contrast ratio between foreground and
-        background colors. 100% client-side, no signup required.
-      </p>
-      <div className="flex flex-col sm:flex-row sm:justify-center sm:space-x-8 space-y-6 sm:space-y-0 mb-10">
+      {/* Heading & Description */}
+      <div className="text-center space-y-4">
+        <h1
+          id="contrast-heading"
+          className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight"
+        >
+          Color Contrast Checker
+        </h1>
+        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <p className="text-lg sm:text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed">
+          Verify WCAG compliance by checking contrast ratio between foreground and
+          background colors—100% client-side, no signup required.
+        </p>
+      </div>
+
+      {/* Pickers */}
+      <div className="flex flex-col sm:flex-row justify-center sm:space-x-12 space-y-6 sm:space-y-0">
         <div className="space-y-2 text-center sm:text-left">
           <label
             htmlFor="fg-input"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-800"
           >
             Text Color
           </label>
@@ -88,7 +94,7 @@ export default function ColorContrastCheckerClient() {
         <div className="space-y-2 text-center sm:text-left">
           <label
             htmlFor="bg-input"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-800"
           >
             Background Color
           </label>
@@ -111,9 +117,11 @@ export default function ColorContrastCheckerClient() {
           </div>
         </div>
       </div>
+
+      {/* Live Preview */}
       <div
         aria-label="Sample text panel"
-        className="p-8 rounded-lg border border-gray-200 text-center mb-10 space-y-2"
+        className="p-8 rounded-lg border border-gray-200 text-center space-y-3"
         style={{ color: fgHex, backgroundColor: bgHex }}
       >
         <p className="text-base">The quick brown fox jumps over the lazy dog</p>
@@ -124,7 +132,9 @@ export default function ColorContrastCheckerClient() {
           The quick brown fox jumps over the lazy dog
         </p>
       </div>
-      <div className="max-w-md mx-auto space-y-4 mb-10 text-center">
+
+      {/* Results */}
+      <div className="max-w-md mx-auto space-y-4 text-center">
         <p className="text-xl font-semibold">
           Contrast Ratio:{" "}
           <span className="text-indigo-600">
@@ -136,7 +146,9 @@ export default function ColorContrastCheckerClient() {
             <li>
               WCAG AA Normal:{" "}
               <span
-                className={`px-2 py-0.5 rounded text-white ${passes.aaNormal ? "bg-green-600" : "bg-red-600"}`}
+                className={`px-2 py-0.5 rounded text-white ${
+                  passes.aaNormal ? "bg-green-600" : "bg-red-600"
+                }`}
               >
                 {passes.aaNormal ? "Pass" : "Fail"}
               </span>
@@ -144,7 +156,9 @@ export default function ColorContrastCheckerClient() {
             <li>
               WCAG AA Large:{" "}
               <span
-                className={`px-2 py-0.5 rounded text-white ${passes.aaLarge ? "bg-green-600" : "bg-red-600"}`}
+                className={`px-2 py-0.5 rounded text-white ${
+                  passes.aaLarge ? "bg-green-600" : "bg-red-600"
+                }`}
               >
                 {passes.aaLarge ? "Pass" : "Fail"}
               </span>
@@ -152,7 +166,9 @@ export default function ColorContrastCheckerClient() {
             <li>
               WCAG AAA Normal:{" "}
               <span
-                className={`px-2 py-0.5 rounded text-white ${passes.aaaNormal ? "bg-green-600" : "bg-red-600"}`}
+                className={`px-2 py-0.5 rounded text-white ${
+                  passes.aaaNormal ? "bg-green-600" : "bg-red-600"
+                }`}
               >
                 {passes.aaaNormal ? "Pass" : "Fail"}
               </span>
@@ -160,7 +176,9 @@ export default function ColorContrastCheckerClient() {
             <li>
               WCAG AAA Large:{" "}
               <span
-                className={`px-2 py-0.5 rounded text-white ${passes.aaaLarge ? "bg-green-600" : "bg-red-600"}`}
+                className={`px-2 py-0.5 rounded text-white ${
+                  passes.aaaLarge ? "bg-green-600" : "bg-red-600"
+                }`}
               >
                 {passes.aaaLarge ? "Pass" : "Fail"}
               </span>
@@ -168,6 +186,8 @@ export default function ColorContrastCheckerClient() {
           </ul>
         )}
       </div>
+
+      {/* Copy CSS Button */}
       <div className="text-center">
         <Button onClick={copyCss}>Copy CSS</Button>
       </div>

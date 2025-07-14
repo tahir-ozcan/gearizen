@@ -1,8 +1,8 @@
 // app/tools/base64-encoder-decoder/base64-encoder-decoder-client.tsx
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState, useRef, ChangeEvent, FormEvent, DragEvent } from "react";
-import Image from "next/image";
 import {
   Trash2,
   Settings,
@@ -14,7 +14,7 @@ import {
 /**
  * Base64 Encoder / Decoder Tool
  *
- * - Encode/decode any text to/from Base64.
+ * - Encode/decode any text to/from Base64 (full Unicode support).
  * - Optional URL-safe mode (no “+” or “/”).
  * - Optional removal of “=” padding.
  * - Drag-and-drop file to auto-encode its contents.
@@ -34,7 +34,6 @@ export default function Base64EncoderDecoderClient() {
   const [urlSafe, setUrlSafe] = useState(false);
   const [noPadding, setNoPadding] = useState(false);
 
-  // Ref for focusing
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -46,13 +45,16 @@ export default function Base64EncoderDecoderClient() {
     inputRef.current?.focus();
   }
 
+  /** Full Unicode-safe Base64 encoding in browser */
   function encodeText(text: string) {
-    let b64 = Buffer.from(text, "utf-8").toString("base64");
+    const utf8 = unescape(encodeURIComponent(text));
+    let b64 = btoa(utf8);
     if (urlSafe) b64 = b64.replace(/\+/g, "-").replace(/\//g, "_");
     if (noPadding) b64 = b64.replace(/=*$/, "");
     return b64;
   }
 
+  /** Full Unicode-safe Base64 decoding in browser */
   function decodeText(text: string) {
     let b64 = text;
     if (urlSafe) b64 = b64.replace(/-/g, "+").replace(/_/g, "/");
@@ -60,38 +62,45 @@ export default function Base64EncoderDecoderClient() {
       const pad = 4 - (b64.length % 4);
       if (pad < 4) b64 += "=".repeat(pad);
     }
-    return Buffer.from(b64, "base64").toString("utf-8");
+    const binary = atob(b64);
+    return decodeURIComponent(escape(binary));
   }
 
-  // ─── Handlers ────────────────────────────────────────────────────────────────
+  // ─── Drag & Drop Handlers ───────────────────────────────────────────────────
+  function handleDrop(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        const dataUrl = reader.result;
+        setPreviewSrc(dataUrl);
+
+        const [, rawB64] = dataUrl.split(",");
+        let final = rawB64;
+        if (urlSafe) final = final.replace(/\+/g, "-").replace(/\//g, "_");
+        if (noPadding) final = final.replace(/=*$/, "");
+
+        setMode("encode");
+        setInput("");
+        setOutput(final);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleDragOver(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+  }
+
+  // ─── Form Handlers ──────────────────────────────────────────────────────────
   function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value);
     setError(null);
     setOutput("");
     setPreviewSrc(null);
-  }
-
-  function handleDrop(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.result instanceof ArrayBuffer) {
-        const b64 = Buffer.from(reader.result).toString("base64");
-        setMode("encode");
-        setInput("");
-        setOutput(
-          urlSafe
-            ? b64.replace(/\+/g, "-").replace(/\//g, "_")
-            : b64
-        );
-      }
-    };
-    reader.readAsArrayBuffer(file);
-  }
-  function handleDragOver(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault();
   }
 
   function handleSubmit(e: FormEvent) {
@@ -111,11 +120,7 @@ export default function Base64EncoderDecoderClient() {
         }
       }
     } catch {
-      setError(
-        mode === "encode"
-          ? "❌ Encoding failed."
-          : "❌ Decoding failed."
-      );
+      setError(mode === "encode" ? "❌ Encoding failed." : "❌ Decoding failed.");
     }
   }
 
@@ -129,7 +134,7 @@ export default function Base64EncoderDecoderClient() {
     }
   }
 
-  // ─── Counts ──────────────────────────────────────────────────────────────────
+  // ─── Character Counts ───────────────────────────────────────────────────────
   const inputLength = input.length.toLocaleString();
   const outputLength = output.length.toLocaleString();
 
@@ -164,7 +169,6 @@ export default function Base64EncoderDecoderClient() {
         onSubmit={handleSubmit}
         className="max-w-3xl mx-auto space-y-8 sm:px-0"
       >
-        {/* Input & Output */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Input */}
           <div className="flex flex-col">
@@ -223,26 +227,26 @@ export default function Base64EncoderDecoderClient() {
                   absolute top-2 right-2 p-2 text-gray-500 hover:text-indigo-600
                   disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition
                 "
-                aria-label="Copy output"
+                aria-label="Copy output"  
               >
                 <ClipboardCopy className="w-6 h-6" aria-hidden="true" />
               </button>
             </div>
+
             {previewSrc && (
-              <Image
+              <img
                 src={previewSrc}
                 alt="Decoded image preview"
                 width={96}
                 height={96}
                 className="absolute bottom-4 right-4 border border-gray-200 rounded-md shadow-sm"
-                unoptimized
               />
             )}
+
             <p className="mt-1 text-xs text-gray-500">{outputLength} characters</p>
           </div>
         </div>
 
-        {/* Error */}
         {error && (
           <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
             {error}
@@ -269,9 +273,7 @@ export default function Base64EncoderDecoderClient() {
 
           <button
             type="button"
-            onClick={() =>
-              setMode((m) => (m === "encode" ? "decode" : "encode"))
-            }
+            onClick={() => setMode((m) => (m === "encode" ? "decode" : "encode"))}
             className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition text-sm font-medium"
           >
             <Settings className="w-5 h-5" aria-hidden="true" />

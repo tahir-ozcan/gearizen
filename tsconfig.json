@@ -5,8 +5,8 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
 
     // Modül çözümü ve çıktı
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "noEmit": true,
     "isolatedModules": true,
     "jsx": "preserve",
