@@ -1,51 +1,64 @@
 // app/tools/pdf-toolkit/pdf-toolkit-client.tsx
 "use client";
 
-import { useState, ChangeEvent } from "react";
+import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { PDFDocument } from "pdf-lib";
 
-/**
- * PDF Toolkit: Compress & Convert
- *
- * Shrink PDF file sizes without quality loss and extract text to Word documents—
- * all in-browser and offline, no signup required.
- */
+type LoadingState = "idle" | "compress" | "extract";
+
 export default function PdfToolkitClient() {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState<"idle" | "compress" | "extract">("idle");
+  const [loading, setLoading] = useState<LoadingState>("idle");
   const [error, setError] = useState<string | null>(null);
   const [extractedText, setExtractedText] = useState<string>("");
+  const [compressedUrl, setCompressedUrl] = useState<string | null>(null);
 
-  /** PDF dosyası seçildiğinde */
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Configure PDF.js worker on client once
+  useEffect(() => {
+    import("pdfjs-dist/legacy/build/pdf").then((pdfjsLib) => {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.8.162/pdf.worker.min.js";
+    });
+  }, []);
+
+  /** Trigger hidden file input */
+  function handleBrowseClick() {
+    fileInputRef.current?.click();
+  }
+
+  /** When PDF file selected */
   function handleUploadChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
-    if (file && file.type !== "application/pdf") {
-      setError("Please upload a valid PDF file.");
+    setCompressedUrl(null);
+    setExtractedText("");
+    setError(null);
+    if (!file) {
       setUploadFile(null);
       return;
     }
-    setError(null);
-    setExtractedText("");
+    if (file.type !== "application/pdf") {
+      setError("Please select a valid PDF file.");
+      setUploadFile(null);
+      return;
+    }
     setUploadFile(file);
   }
 
-  /** PDF’i sıkıştır ve indir */
+  /** Compress PDF and prepare view/download URLs */
   async function handleCompressPdf() {
     if (!uploadFile) return;
     setLoading("compress");
     setError(null);
+    setCompressedUrl(null);
     try {
       const buffer = await uploadFile.arrayBuffer();
       const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
-      const compressedBytes = await pdfDoc.save({ useObjectStreams: true });
-      const blob = new Blob([compressedBytes], { type: "application/pdf" });
+      const bytes = await pdfDoc.save({ useObjectStreams: true });
+      const blob = new Blob([bytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `compressed-${uploadFile.name}`;
-      a.click();
-      URL.revokeObjectURL(url);
+      setCompressedUrl(url);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Compression failed.");
     } finally {
@@ -53,14 +66,29 @@ export default function PdfToolkitClient() {
     }
   }
 
-  /** PDF’ten metni çıkar ve .doc olarak indir */
+  /** Download compressed PDF */
+  function handleDownloadCompressed() {
+    if (!compressedUrl || !uploadFile) return;
+    const a = document.createElement("a");
+    a.href = compressedUrl;
+    a.download = `compressed-${uploadFile.name}`;
+    a.click();
+  }
+
+  /** View compressed PDF in new tab */
+  function handleViewCompressed() {
+    if (!compressedUrl) return;
+    window.open(compressedUrl, "_blank");
+  }
+
+  /** Extract text and download as .doc */
   async function handleExtractText() {
     if (!uploadFile) return;
     setLoading("extract");
     setError(null);
+    setExtractedText("");
     try {
       const buffer = await uploadFile.arrayBuffer();
-      // dinamik import, sadece tarayıcıda
       const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
       const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
 
@@ -70,14 +98,13 @@ export default function PdfToolkitClient() {
         const content = await page.getTextContent();
         const strings = content.items
           .filter((item): item is { str: string } => "str" in item)
-          .map(item => item.str);
+          .map((item) => item.str);
         fullText += strings.join(" ") + "\n\n";
       }
       setExtractedText(fullText.trim());
 
       const blob = new Blob([fullText], { type: "application/msword" });
       const url = URL.createObjectURL(blob);
-
       const a = document.createElement("a");
       a.href = url;
       a.download = `${uploadFile.name.replace(/\.pdf$/i, "")}.doc`;
@@ -108,72 +135,103 @@ export default function PdfToolkitClient() {
         <div className="mx-auto mt-2 h-1 w-32 rounded-full
                         bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Shrink PDF file sizes without quality loss and extract text to Word documents—all in-browser and offline, no signup required.
+          Shrink PDF file sizes without quality loss and extract text to Word documents—
+          all in-browser and offline, no signup required.
         </p>
       </div>
 
-      {/* PDF Yükleme ve İşlemler */}
-      <div className="max-w-3xl mx-auto space-y-8">
-        <label className="block text-sm font-medium text-gray-800">
-          Select a PDF file
-          <input
-            type="file"
-            accept="application/pdf"
-            onChange={handleUploadChange}
-            className="mt-1 block w-full text-sm text-gray-700"
-          />
-        </label>
-
+      {/* File Input */}
+      <div className="max-w-3xl mx-auto space-y-4">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/pdf"
+          onChange={handleUploadChange}
+          className="hidden"
+        />
+        <button
+          type="button"
+          onClick={handleBrowseClick}
+          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700
+                     focus:ring-2 focus:ring-blue-500 transition"
+        >
+          {uploadFile ? "Change PDF…" : "Browse PDF…"}
+        </button>
         {uploadFile && (
           <div className="text-sm text-gray-600">
             Selected: {uploadFile.name} ({(uploadFile.size / 1024).toFixed(1)} KB)
           </div>
         )}
+      </div>
 
-        {error && (
-          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
-            {error}
-          </div>
-        )}
+      {/* Error Message */}
+      {error && (
+        <div className="max-w-3xl mx-auto p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
 
-        {/* İşlem Butonları */}
-        <div className="flex flex-wrap gap-4">
+      {/* Actions */}
+      {uploadFile && (
+        <div className="max-w-3xl mx-auto flex flex-wrap gap-4">
           <button
             type="button"
             onClick={handleCompressPdf}
-            disabled={!uploadFile || loading !== "idle"}
+            disabled={loading !== "idle"}
             className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700
                        focus:ring-2 focus:ring-green-500 transition disabled:opacity-50"
           >
             {loading === "compress" ? "Compressing…" : "Compress PDF"}
           </button>
+
+          {compressedUrl && (
+            <>
+              <button
+                type="button"
+                onClick={handleViewCompressed}
+                className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700
+                           focus:ring-2 focus:ring-indigo-500 transition"
+              >
+                View Compressed
+              </button>
+              <button
+                type="button"
+                onClick={handleDownloadCompressed}
+                className="px-6 py-2 bg-green-800 text-white rounded-md hover:bg-green-900
+                           focus:ring-2 focus:ring-green-700 transition"
+              >
+                Download Compressed
+              </button>
+            </>
+          )}
+
           <button
             type="button"
             onClick={handleExtractText}
-            disabled={!uploadFile || loading !== "idle"}
+            disabled={loading !== "idle"}
             className="px-6 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700
                        focus:ring-2 focus:ring-yellow-500 transition disabled:opacity-50"
           >
             {loading === "extract" ? "Extracting…" : "Extract Text to Word"}
           </button>
         </div>
+      )}
 
-        {/* Extracted Text Önizleme */}
-        {extractedText && (
-          <div className="space-y-2">
-            <span className="block text-sm font-medium text-gray-800">
-              Extracted Text Preview
-            </span>
-            <textarea
-              rows={6}
-              readOnly
-              value={extractedText}
-              className="w-full p-3 border border-gray-300 rounded-md bg-gray-50
-                         font-mono text-sm resize-y focus:ring-2 focus:ring-indigo-500 transition"
-            />
-          </div>
-        )}
-      </div>
+      {/* Extracted Text Preview */}
+      {extractedText && (
+        <div className="max-w-3xl mx-auto space-y-2">
+          <span className="block text-sm font-medium text-gray-800">
+            Extracted Text Preview
+          </span>
+          <textarea
+            rows={6}
+            readOnly
+            value={extractedText}
+            className="w-full p-3 border border-gray-300 rounded-md bg-gray-50
+                       font-mono text-sm resize-y focus:ring-2 focus:ring-indigo-500 transition"
+          />
+        </div>
+      )}
     </section>
   );
 }
