@@ -1,25 +1,50 @@
 // app/tools/markdown-converter/markdown-converter-client.tsx
 "use client";
 
-import { useState, useEffect, ChangeEvent, useRef } from "react";
+import {
+  useState,
+  useEffect,
+  ChangeEvent,
+  useRef,
+} from "react";
 import { Trash2, ClipboardCopy, Download } from "lucide-react";
 
 /**
  * Markdown Converter Tool
  *
  * Live-edit Markdown and convert to clean HTML with instant preview,
- * copy or download HTML or original Markdown—100% client-side, no signup required.
+ * copy or download HTML or original Markdown, complete with syntax highlighting.
  */
 
 /**
- * Simple Markdown → HTML renderer using the "marked" library.
- * We dynamically import it and sanitize via a basic regex strip.
+ * Render Markdown → HTML with syntax highlighting.
  */
 async function renderMarkdown(md: string): Promise<string> {
-  const { marked } = await import("marked");
-  // marked.parse may return Promise<string>, so await it
+  // Dynamically import marked and highlight.js
+  const [{ marked }, hljsModule] = await Promise.all([
+    import("marked"),
+    // @ts-expect-error highlight.js has no bundled types
+    import("highlight.js"),
+  ]);
+  const hljs = hljsModule.default ?? hljsModule;
+
+  marked.setOptions({
+    // @ts-expect-error 'highlight' isn't in MarkedOptions, but works at runtime
+    highlight: (code: string, lang: string) => {
+      try {
+        if (lang && hljs.getLanguage(lang)) {
+          return hljs.highlight(code, { language: lang }).value;
+        }
+      } catch {
+        // fallback to auto
+      }
+      return hljs.highlightAuto(code).value;
+    },
+  });
+
+  // Parse markdown to HTML
   const raw = await marked.parse(md);
-  // strip out any <script> tags for safety
+  // Strip any <script> tags for safety
   return raw.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
 }
 
@@ -29,29 +54,36 @@ export default function MarkdownConverterClient() {
   );
   const [html, setHtml] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  // Character counts
+  const inputCount = markdown.length.toLocaleString();
+  const outputCount = html.length.toLocaleString();
 
   // Re-render HTML on Markdown change
   useEffect(() => {
-    let canceled = false;
+    let cancelled = false;
     setError(null);
 
     renderMarkdown(markdown)
       .then((result) => {
-        if (!canceled) setHtml(result);
+        if (!cancelled) setHtml(result);
       })
       .catch((err) => {
-        if (!canceled) {
+        if (!cancelled) {
           setError(err instanceof Error ? err.message : "Error rendering Markdown");
           setHtml("");
         }
       });
 
     return () => {
-      canceled = true;
+      cancelled = true;
     };
   }, [markdown]);
 
+  // Handlers
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setMarkdown(e.target.value);
   };
@@ -95,9 +127,6 @@ export default function MarkdownConverterClient() {
     URL.revokeObjectURL(url);
   };
 
-  const inputCount = markdown.length.toLocaleString();
-  const outputCount = html.length.toLocaleString();
-
   return (
     <section
       id="markdown-converter"
@@ -118,7 +147,7 @@ export default function MarkdownConverterClient() {
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Live-edit Markdown and convert to clean HTML with instant preview, copy or download HTML or original Markdown.
+          Live-edit Markdown and convert to clean HTML or export as Markdown, complete with syntax highlighting.
         </p>
       </div>
 
@@ -245,6 +274,7 @@ export default function MarkdownConverterClient() {
 
       {/* Live Preview */}
       <div
+        ref={previewRef}
         className="
           max-w-3xl mx-auto prose prose-indigo p-4 border border-gray-300
           rounded-lg bg-gray-50 overflow-auto markdown-preview
