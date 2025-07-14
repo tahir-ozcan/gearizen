@@ -15,24 +15,19 @@ import {
   ChevronUp,
   RefreshCcw,
 } from "lucide-react";
-import esprima, { Program } from "esprima";
-import type { Comment } from "estree";
-import prettier from "prettier/standalone";
-import parserBabel from "prettier/parser-babel";
-import parserHtml from "prettier/parser-html";
-import parserPostcss from "prettier/parser-postcss";
+import { minify as terserMinify } from "terser";
 
 type Language = "javascript" | "css" | "html";
 
 interface Preset {
   name: string;
+  language: Language;
   stripComments: boolean;
   collapseWhitespace: boolean;
-  language: Language;
 }
 
 export default function CodeMinifierClient() {
-  // ─── State ──────────────────────────────────────────────────────────────────
+  // ─── State ────────────────────────────────────────────────────────────────
   const [input, setInput] = useState<string>("");
   const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +65,7 @@ export default function CodeMinifierClient() {
     if (!name) return;
     setPresets((ps) => [
       ...ps,
-      { name, stripComments, collapseWhitespace, language },
+      { name, language, stripComments, collapseWhitespace },
     ]);
     setNewPresetName("");
   }
@@ -78,55 +73,55 @@ export default function CodeMinifierClient() {
   // ─── Minification ───────────────────────────────────────────────────────────
   async function minifyCode() {
     setError(null);
-    let code = input;
+    setOutput("");
 
     try {
-      // 1) Strip comments
-      if (stripComments && language === "javascript") {
-        const ast = esprima.parseScript(code, {
-          comment: true,
-          range: true,
-        }) as Program & { comments: Comment[] };
-        const ranges = ast.comments
-          .map((c) => c.range!)
-          .sort((a, b) => b[0] - a[0]);
-        for (const [start, end] of ranges) {
-          code = code.slice(0, start) + code.slice(end);
-        }
-      } else if (stripComments) {
-        code = code
-          .replace(/\/\*[\s\S]*?\*\//g, "")
-          .replace(/<!--[\s\S]*?-->/g, "");
+      let result: string;
+
+      if (language === "javascript") {
+        // ─ JavaScript: terser ───────────────────────────────────────────────
+        const terserOptions = {
+          compress: true,
+          mangle: true,
+          format: { comments: stripComments ? false : true },
+        };
+        const { code: minified, error: terserError } = await terserMinify(
+          input,
+          terserOptions
+        );
+        if (terserError) throw terserError;
+        result = minified ?? "";
+
+      } else if (language === "css") {
+        // ─ CSS: csso (dynamically imported) ───────────────────────────────
+        const csso = (await import("csso")).default;
+        const cssoOptions = {
+          restructure: collapseWhitespace,
+          comments: stripComments ? false : true,
+        };
+        result = csso.minify(input, cssoOptions).css;
+
+      } else {
+        // ─ HTML: html-minifier-terser (dynamically imported) ────────────
+        const { minify: htmlMinify } = await import(
+          "html-minifier-terser"
+        );
+        const htmlOptions = {
+          collapseWhitespace,
+          removeComments: stripComments,
+          removeAttributeQuotes: false,
+          minifyJS: true,
+          minifyCSS: true,
+        };
+        // htmlMinify returns Promise<string>
+        result = await htmlMinify(input, htmlOptions);
       }
 
-      // 2) Collapse whitespace
-      if (collapseWhitespace) {
-        if (language === "html") {
-          code = code.replace(/\s+/g, " ");
-        } else {
-          code = code
-            .split("\n")
-            .map((l) => l.trim())
-            .filter((l) => l.length > 0)
-            .join(" ");
-        }
-      }
-
-      // 3) Prettier pass
-      const parserName =
-        language === "css" ? "css" : language === "html" ? "html" : "babel";
-      const formatted = await prettier.format(code, {
-        parser: parserName,
-        plugins: [parserBabel, parserHtml, parserPostcss],
-        printWidth: Infinity,
-        bracketSpacing: false,
-        singleQuote: false,
-      });
-      setOutput(formatted.trim());
-    } catch (e: unknown) {
-      console.error(e);
-      setError("Minification failed: " + ((e as Error).message || "unknown"));
-      setOutput("");
+      setOutput(result.trim());
+    } catch (err: unknown) {
+      console.error(err);
+      const msg = err instanceof Error ? err.message : String(err);
+      setError("Minification failed: " + msg);
     }
   }
 
@@ -146,7 +141,7 @@ export default function CodeMinifierClient() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "minified.txt";
+    a.download = `minified.${language === "javascript" ? "js" : language}`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -158,57 +153,44 @@ export default function CodeMinifierClient() {
         aria-labelledby="code-minifier-heading"
         className="space-y-16 text-gray-900 antialiased"
       >
-        {/* Heading & Description */}
+        {/* Heading */}
         <div className="text-center space-y-4">
           <h1
             id="code-minifier-heading"
-            className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight"
+            className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] text-4xl font-extrabold"
           >
             Code Minifier
           </h1>
-          <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-          <p className="text-lg sm:text-xl text-gray-700 max-w-2xl mx-auto">
-            Strip comments, collapse whitespace, and run Prettier—all client-side.
+          <p className="text-lg text-gray-700 max-w-2xl mx-auto">
+            Strip comments, collapse whitespace, and minify—all client-side.
           </p>
         </div>
 
-        {/* Controls Panel */}
+        {/* Controls */}
         <div className="max-w-3xl mx-auto space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <button
               onClick={() => setShowPresets((v) => !v)}
-              className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 transition"
+              className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800"
             >
-              Presets{" "}
-              {showPresets ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
+              Presets {showPresets ? <ChevronUp /> : <ChevronDown />}
             </button>
-
             <button
               onClick={() => setShowAdvanced((v) => !v)}
-              className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 transition"
+              className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800"
             >
-              Advanced{" "}
-              {showAdvanced ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
+              Advanced {showAdvanced ? <ChevronUp /> : <ChevronDown />}
             </button>
-
             <button
               onClick={resetAll}
-              className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-800 transition"
+              className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-800"
             >
-              <RefreshCcw className="w-5 h-5" /> Reset
+              <RefreshCcw /> Reset
             </button>
           </div>
 
           {showPresets && (
-            <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-3">
+            <div className="p-4 border rounded bg-gray-50 space-y-3">
               <h2 className="text-lg font-semibold text-gray-800">Presets</h2>
               {presets.length === 0 ? (
                 <p className="text-gray-500">No presets yet.</p>
@@ -217,7 +199,7 @@ export default function CodeMinifierClient() {
                   <button
                     key={i}
                     onClick={() => applyPreset(p)}
-                    className="block w-full text-left px-3 py-2 bg-white border border-gray-300 rounded hover:bg-gray-100 transition"
+                    className="block w-full text-left px-3 py-2 border rounded hover:bg-gray-100"
                   >
                     {p.name}
                   </button>
@@ -229,11 +211,11 @@ export default function CodeMinifierClient() {
                   placeholder="Preset name"
                   value={newPresetName}
                   onChange={(e) => setNewPresetName(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 transition"
+                  className="flex-1 px-3 py-2 border rounded"
                 />
                 <button
                   onClick={savePreset}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+                  className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
                 >
                   Save
                 </button>
@@ -242,13 +224,17 @@ export default function CodeMinifierClient() {
           )}
 
           {showAdvanced && (
-            <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-4 border rounded bg-gray-50 grid grid-cols-1 sm:grid-cols-3 gap-4">
               <label className="flex flex-col">
-                <span className="text-sm font-medium text-gray-800">Language</span>
+                <span className="text-sm font-medium text-gray-800">
+                  Language
+                </span>
                 <select
                   value={language}
-                  onChange={(e) => setLanguage(e.target.value as Language)}
-                  className="mt-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 transition"
+                  onChange={(e) =>
+                    setLanguage(e.target.value as Language)
+                  }
+                  className="mt-1 px-3 py-2 border rounded"
                 >
                   <option value="javascript">JavaScript</option>
                   <option value="css">CSS</option>
@@ -261,7 +247,7 @@ export default function CodeMinifierClient() {
                   type="checkbox"
                   checked={stripComments}
                   onChange={(e) => setStripComments(e.target.checked)}
-                  className="h-4 w-4 text-indigo-600 rounded focus:ring-indigo-500"
+                  className="h-4 w-4 rounded"
                 />
                 <span className="text-gray-700">Strip Comments</span>
               </label>
@@ -270,8 +256,10 @@ export default function CodeMinifierClient() {
                 <input
                   type="checkbox"
                   checked={collapseWhitespace}
-                  onChange={(e) => setCollapseWhitespace(e.target.checked)}
-                  className="h-4 w-4 text-indigo-600 rounded focus:ring-indigo-500"
+                  onChange={(e) =>
+                    setCollapseWhitespace(e.target.checked)
+                  }
+                  className="h-4 w-4 rounded"
                 />
                 <span className="text-gray-700">Collapse Whitespace</span>
               </label>
@@ -288,11 +276,11 @@ export default function CodeMinifierClient() {
               setInput(e.target.value)
             }
             placeholder="Paste code here…"
-            className="w-full h-48 p-4 border border-gray-300 rounded-lg font-mono resize-y focus:ring-2 focus:ring-indigo-500 transition"
+            className="w-full h-48 p-4 border rounded-lg font-mono resize-y"
           />
           <button
             onClick={minifyCode}
-            className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+            className="w-full py-3 bg-indigo-600 text-white rounded-lg"
           >
             Minify
           </button>
@@ -300,10 +288,7 @@ export default function CodeMinifierClient() {
 
         {/* Error */}
         {error && (
-          <p
-            role="alert"
-            className="max-w-3xl mx-auto text-red-600 text-sm"
-          >
+          <p role="alert" className="max-w-3xl mx-auto text-red-600">
             {error}
           </p>
         )}
@@ -315,20 +300,20 @@ export default function CodeMinifierClient() {
               readOnly
               value={output}
               rows={6}
-              className="w-full p-4 border border-gray-300 rounded-lg font-mono bg-gray-50 resize-y focus:ring-2 focus:ring-indigo-500 transition text-sm"
+              className="w-full p-4 border rounded-lg font-mono bg-gray-50 resize-y"
             />
             <div className="flex justify-end gap-3">
               <button
                 onClick={copyOutput}
-                className="inline-flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                className="inline-flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-lg"
               >
-                <ClipboardCopy className="w-5 h-5" /> Copy
+                <ClipboardCopy /> Copy
               </button>
               <button
                 onClick={downloadOutput}
-                className="inline-flex items-center gap-2 px-5 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition"
+                className="inline-flex items-center gap-2 px-5 py-2 bg-gray-700 text-white rounded-lg"
               >
-                <Download className="w-5 h-5" /> Download
+                <Download /> Download
               </button>
             </div>
           </div>
