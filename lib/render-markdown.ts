@@ -1,37 +1,50 @@
-import { marked } from "marked";
+// lib/render-markdown.ts
 import DOMPurify from "isomorphic-dompurify";
 
-// Allow blob URLs so uploaded or generated images render in the preview.
+// — Allow blob URLs so uploaded/generated images render in the preview.
 DOMPurify.setConfig({
-  ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel|data|blob):|[^a-z]|[a-z+.-]+(?:[^a-z]|$))/i,
+  ALLOWED_URI_REGEXP:
+    /^(?:(?:https?|mailto|tel|data|blob):|[^a-z]|[a-z+.\-]+(?:[^a-z]|$))/i,
 });
 
-// Resolve relative image paths against the current page location so
-// Markdown like `![](./foo.png)` shows correctly in the preview.
-DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-  if (node.tagName === 'IMG') {
-    const src = node.getAttribute('src');
+// Resolve relative image paths so `![](./foo.png)` works.
+DOMPurify.addHook("afterSanitizeAttributes", (node) => {
+  if (node.tagName === "IMG") {
+    const src = node.getAttribute("src");
     if (src && !/^(?:[a-z]+:|\/)/i.test(src)) {
       try {
         const base =
-          typeof window === 'undefined' ? 'http://localhost/' : window.location.href;
-        node.setAttribute('src', new URL(src, base).toString());
+          typeof window === "undefined"
+            ? "http://localhost/"
+            : window.location.href;
+        node.setAttribute("src", new URL(src, base).toString());
       } catch {
-        /* noop */
+        /* no-op */
       }
     }
   }
 });
 
-// Renders markdown to sanitized HTML.
-// Configure marked once with GitHub-flavored markdown and line breaks so
-// the preview mirrors typical editors.
-// Disable async mode so marked.parse always returns a string.
-marked.setOptions({ gfm: true, breaks: true, async: false });
+/**
+ * Dynamically import `marked` and configure it for
+ * GFM + hard breaks + synchronous mode.
+ */
+async function getMarked() {
+  const { marked } = await import("marked");
+  marked.setOptions({ gfm: true, breaks: true, async: false });
+  return marked;
+}
 
-export function renderMarkdown(src: string): string {
-  const input = src ?? "";
-  // marked.parse returns a string (because async is disabled above). DOMPurify
-  // sanitizes the HTML to keep the preview safe against XSS attacks.
-  return DOMPurify.sanitize(marked.parse(input) as string);
+/**
+ * Render markdown → sanitized HTML.
+ */
+export async function renderMarkdown(src: string): Promise<string> {
+  const marked = await getMarked();
+
+  // `.parse()` is typed as returning `string | Promise<string>`.
+  // Force it to a true string by awaiting if needed:
+  const result = marked.parse(src ?? "");
+  const html = typeof result === "string" ? result : await result;
+
+  return DOMPurify.sanitize(html);
 }
