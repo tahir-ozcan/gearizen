@@ -11,9 +11,9 @@ import { Trash2, ClipboardCopy } from "lucide-react";
  */
 export default function JsonFormatterClient() {
   const [mode, setMode] = useState<"beautify" | "minify">("beautify");
-  const [indent, setIndent] = useState(2);
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
+  const [indent, setIndent] = useState<number>(2);
+  const [input, setInput] = useState<string>("");
+  const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);

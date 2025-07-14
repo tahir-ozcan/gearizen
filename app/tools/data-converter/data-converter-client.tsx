@@ -66,7 +66,7 @@ function jsonToXml(value: unknown, nodeName = "root"): string {
   let xml = `<${nodeName}>`;
   for (const [key, val] of Object.entries(value)) {
     if (key === "@attributes" && typeof val === "object" && val !== null) {
-      // skip attributes in this simple converter
+      // attributes are not in this simple converter
       continue;
     }
     xml += jsonToXml(val, key);
@@ -78,8 +78,8 @@ function jsonToXml(value: unknown, nodeName = "root"): string {
 export default function DataConverterClient() {
   const [from, setFrom] = useState<Format>("csv");
   const [to, setTo] = useState<Format>("json");
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
+  const [input, setInput] = useState<string>("");
+  const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -120,6 +120,7 @@ export default function DataConverterClient() {
       } else if (from === "yaml") {
         data = YAML.load(input);
       } else {
+        // XML
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(input, "application/xml");
         const parseError = xmlDoc.getElementsByTagName("parsererror")[0];

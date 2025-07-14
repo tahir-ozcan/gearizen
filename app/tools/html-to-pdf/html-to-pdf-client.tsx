@@ -4,9 +4,17 @@
 import { useState, useRef, ChangeEvent } from "react";
 
 export default function HtmlToPdfClient() {
-  const [htmlInput, setHtmlInput] = useState("");
+  const [htmlInput, setHtmlInput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [processing, setProcessing] = useState(false);
+  const [processing, setProcessing] = useState<boolean>(false);
+
+  // new controls for layout
+  const [margin, setMargin] = useState<number>(0.5);
+  const [format, setFormat] = useState<"letter" | "a4">("letter");
+  const [orientation, setOrientation] = useState<"portrait" | "landscape">(
+    "portrait"
+  );
+
   const previewRef = useRef<HTMLDivElement>(null);
 
   const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -23,21 +31,25 @@ export default function HtmlToPdfClient() {
 
     setProcessing(true);
     try {
+      // dynamic import
       const { default: html2pdf } = await import("html2pdf.js");
+      // inject HTML
       previewRef.current.innerHTML = htmlInput;
       await html2pdf()
         .set({
-          margin: 0.5,
+          margin,                // controlled margin (in inches)
           filename: "document.pdf",
           image: { type: "jpeg", quality: 0.98 },
           html2canvas: { scale: 2 },
-          jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+          jsPDF: { unit: "in", format, orientation },
         })
         .from(previewRef.current)
         .save();
     } catch (err) {
       console.error(err);
-      setError("❌ An error occurred while generating the PDF.");
+      setError(
+        "❌ An error occurred while generating the PDF. Check your HTML or settings."
+      );
     } finally {
       setProcessing(false);
     }
@@ -63,11 +75,12 @@ export default function HtmlToPdfClient() {
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Paste or type your HTML markup below to generate a PDF file instantly—100% client-side, no backend or signup required.
+          Render any webpage or HTML snippet into a PDF document client-side with custom
+          layout and margins.
         </p>
       </div>
 
-      {/* Form */}
+      {/* Input & Layout Controls */}
       <div className="max-w-3xl mx-auto space-y-8 sm:px-0">
         <label htmlFor="html-input" className="sr-only">
           HTML Input
@@ -85,6 +98,55 @@ export default function HtmlToPdfClient() {
           "
         />
 
+        {/* layout settings */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label htmlFor="margin-input" className="block text-sm font-medium text-gray-800">
+              Margin (in)
+            </label>
+            <input
+              id="margin-input"
+              type="number"
+              step={0.1}
+              min={0}
+              max={2}
+              value={margin}
+              onChange={(e) => setMargin(Number(e.target.value))}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#7c3aed] transition"
+            />
+          </div>
+          <div>
+            <label htmlFor="format-select" className="block text-sm font-medium text-gray-800">
+              Page Format
+            </label>
+            <select
+              id="format-select"
+              value={format}
+              onChange={(e) => setFormat(e.target.value as "letter" | "a4")}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#7c3aed] transition"
+            >
+              <option value="letter">Letter</option>
+              <option value="a4">A4</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="orient-select" className="block text-sm font-medium text-gray-800">
+              Orientation
+            </label>
+            <select
+              id="orient-select"
+              value={orientation}
+              onChange={(e) =>
+                setOrientation(e.target.value as "portrait" | "landscape")
+              }
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#7c3aed] transition"
+            >
+              <option value="portrait">Portrait</option>
+              <option value="landscape">Landscape</option>
+            </select>
+          </div>
+        </div>
+
         {error && (
           <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
             {error}
@@ -99,8 +161,7 @@ export default function HtmlToPdfClient() {
             className={`
               px-6 py-3 bg-indigo-600 text-white rounded-md
               hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500
-              transition font-medium
-              ${processing ? "opacity-60 cursor-not-allowed" : ""}
+              transition font-medium ${processing ? "opacity-60 cursor-not-allowed" : ""}
             `}
           >
             {processing ? "Generating PDF…" : "Generate PDF"}

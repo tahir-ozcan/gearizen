@@ -71,37 +71,40 @@ function hslToRgb(h: number, s: number, l: number) {
   const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
   const m = l - c / 2;
   let r1 = 0,
-    g1 = 0,
-    b1 = 0;
+      g1 = 0,
+      b1 = 0;
   if (h < 60) {
-    r1 = c;
-    g1 = x;
-    b1 = 0;
+    r1 = c; g1 = x; b1 = 0;
   } else if (h < 120) {
-    r1 = x;
-    g1 = c;
-    b1 = 0;
+    r1 = x; g1 = c; b1 = 0;
   } else if (h < 180) {
-    r1 = 0;
-    g1 = c;
-    b1 = x;
+    r1 = 0; g1 = c; b1 = x;
   } else if (h < 240) {
-    r1 = 0;
-    g1 = x;
-    b1 = c;
+    r1 = 0; g1 = x; b1 = c;
   } else if (h < 300) {
-    r1 = x;
-    g1 = 0;
-    b1 = c;
+    r1 = x; g1 = 0; b1 = c;
   } else {
-    r1 = c;
-    g1 = 0;
-    b1 = x;
+    r1 = c; g1 = 0; b1 = x;
   }
   return {
     r: Math.round((r1 + m) * 255),
     g: Math.round((g1 + m) * 255),
     b: Math.round((b1 + m) * 255),
+  };
+}
+
+// Convert RGB → CMYK
+function rgbToCmyk(r: number, g: number, b: number) {
+  const rr = r / 255, gg = g / 255, bb = b / 255;
+  const k = 1 - Math.max(rr, gg, bb);
+  const c = k === 1 ? 0 : (1 - rr - k) / (1 - k);
+  const m = k === 1 ? 0 : (1 - gg - k) / (1 - k);
+  const y = k === 1 ? 0 : (1 - bb - k) / (1 - k);
+  return {
+    c: Math.round(c * 100),
+    m: Math.round(m * 100),
+    y: Math.round(y * 100),
+    k: Math.round(k * 100),
   };
 }
 
@@ -143,6 +146,7 @@ export default function ColorToolkitClient() {
   const [hex, setHex] = useState<string>("");
   const [rgb, setRgb] = useState<{ r: number; g: number; b: number } | null>(null);
   const [hsl, setHsl] = useState<{ h: number; s: number; l: number } | null>(null);
+  const [cmyk, setCmyk] = useState<{ c: number; m: number; y: number; k: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Parse on input change
@@ -170,13 +174,16 @@ export default function ColorToolkitClient() {
     if (newHex) {
       const cRgb = hexToRgb(newHex)!;
       const cHsl = rgbToHsl(cRgb.r, cRgb.g, cRgb.b);
+      const cCmyk = rgbToCmyk(cRgb.r, cRgb.g, cRgb.b);
       setHex(newHex);
       setRgb(cRgb);
       setHsl(cHsl);
+      setCmyk(cCmyk);
     } else {
       setHex("");
       setRgb(null);
       setHsl(null);
+      setCmyk(null);
     }
   }, [input]);
 
@@ -191,7 +198,11 @@ export default function ColorToolkitClient() {
   };
 
   return (
-    <section id="color-toolkit" aria-labelledby="color-toolkit-heading" className="space-y-16 text-gray-900 antialiased">
+    <section
+      id="color-toolkit"
+      aria-labelledby="color-toolkit-heading"
+      className="space-y-16 text-gray-900 antialiased"
+    >
       {/* Heading */}
       <div className="text-center space-y-4 sm:px-0">
         <h1
@@ -235,10 +246,10 @@ export default function ColorToolkitClient() {
       </div>
 
       {/* Formats & Palette */}
-      {rgb && hsl && (
+      {rgb && hsl && cmyk && (
         <div className="max-w-xl mx-auto space-y-8 sm:px-0">
           {/* Format Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <FormatCard label="HEX" value={hex} onCopy={() => copyToClipboard(hex)} />
             <FormatCard
               label="RGB"
@@ -250,41 +261,61 @@ export default function ColorToolkitClient() {
               value={`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`}
               onCopy={() => copyToClipboard(`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`)}
             />
+            <FormatCard
+              label="CMYK"
+              value={`cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`}
+              onCopy={() =>
+                copyToClipboard(`cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`)
+              }
+            />
           </div>
 
           {/* Palette: Complement, Tints, Shades */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <PaletteCard
-              label="Complement"
-              color={(() => {
-                const compH = complementary(hsl.h);
-                const col = { ...hsl, h: compH };
-                const { r, g, b } = hslToRgb(col.h, col.s, col.l);
-                return rgbToHex(r, g, b);
-              })()}
-              onCopy={copyToClipboard}
-            />
-            {[20, 40].map((d) => {
-              const tint = shiftLightness(hsl.h, hsl.s, hsl.l, d);
-              const { r, g, b } = hslToRgb(tint.h, tint.s, tint.l);
+            {/* Complement */}
+            {(() => {
+              const compH = complementary(hsl.h);
+              const { r, g, b } = hslToRgb(compH, hsl.s, hsl.l);
+              const compHex = rgbToHex(r, g, b);
               return (
                 <PaletteCard
-                  key={d}
+                  key="complement"
+                  label="Complement"
+                  color={compHex}
+                  onCopy={() => copyToClipboard(compHex)}
+                />
+              );
+            })()}
+
+            {/* Tints */}
+            {[20, 40].map((d) => {
+              const tintHsl = shiftLightness(hsl.h, hsl.s, hsl.l, d);
+              const { r, g, b } = hslToRgb(tintHsl.h, tintHsl.s, tintHsl.l);
+              const tintHex = rgbToHex(r, g, b);
+              return (
+                <PaletteCard
+                  key={`tint-${d}`}
                   label={`Tint +${d}%`}
-                  color={rgbToHex(r, g, b)}
-                  onCopy={copyToClipboard}
+                  color={tintHex}
+                  onCopy={() => copyToClipboard(tintHex)}
                 />
               );
             })}
-            <PaletteCard
-              label="Shade -20%"
-              color={(() => {
-                const sh = shiftLightness(hsl.h, hsl.s, hsl.l, -20);
-                const { r, g, b } = hslToRgb(sh.h, sh.s, sh.l);
-                return rgbToHex(r, g, b);
-              })()}
-              onCopy={copyToClipboard}
-            />
+
+            {/* Shade */}
+            {(() => {
+              const shadeHsl = shiftLightness(hsl.h, hsl.s, hsl.l, -20);
+              const { r, g, b } = hslToRgb(shadeHsl.h, shadeHsl.s, shadeHsl.l);
+              const shadeHex = rgbToHex(r, g, b);
+              return (
+                <PaletteCard
+                  key="shade-20"
+                  label="Shade -20%"
+                  color={shadeHex}
+                  onCopy={() => copyToClipboard(shadeHex)}
+                />
+              );
+            })()}
           </div>
 
           {/* Contrast Ratio */}
@@ -333,7 +364,7 @@ function FormatCard({
   return (
     <div className="p-4 bg-gray-50 rounded-lg text-center">
       <p className="text-sm text-gray-600 mb-1">{label}</p>
-      <p className="font-mono text-lg text-indigo-600 break-all">{value}</p>
+      <p className="font-mono text-indigo-600 break-all">{value}</p>
       <button onClick={onCopy} className="mt-2 text-gray-500 hover:text-indigo-600 transition">
         <ClipboardCopy className="inline-block w-5 h-5" />
       </button>
@@ -348,13 +379,13 @@ function PaletteCard({
 }: {
   label: string;
   color: string;
-  onCopy: (c: string) => void;
+  onCopy: () => void;
 }) {
   return (
     <div className="p-4 rounded-lg text-center" style={{ background: color }}>
       <p className="text-sm text-white mb-1">{label}</p>
       <p className="font-mono text-white break-all">{color}</p>
-      <button onClick={() => onCopy(color)} className="mt-2 text-white hover:underline">
+      <button onClick={onCopy} className="mt-2 text-white hover:underline">
         Copy
       </button>
     </div>

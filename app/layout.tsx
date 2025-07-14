@@ -103,13 +103,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <AnalyticsLoader />
       </head>
       <body className="flex min-h-screen flex-col">
-        {/* Temporary launch notice */}
+        {/* Launch notice */}
         <div className="bg-indigo-50 border-b border-indigo-200 text-indigo-700 px-4 py-3 flex items-center justify-center">
-          <Info className="w-5 h-5 mr-2" aria-hidden="true" />
-          <span className="text-sm font-medium">
-            We just launched our website; some tools may be buggy or missing but
-            we&#39;ll fix them shortly! 🙂
-          </span>
+          <Info className="w-5 h-5 mr-2 flex-shrink-0" aria-hidden="true" />
+          <div className="text-sm font-medium text-center">
+            We just launched our website; some tools may be buggy or missing but we’ll fix them shortly! 🙂
+            <br />
+            <span className="font-normal block mt-1">
+              Last updated: July 14, 2025 at 22:00 (GMT+3). For feedback, please <a href="/contact" className="underline">visit our Contact page</a>.
+            </span>
+          </div>
         </div>
 
         {/* Header */}

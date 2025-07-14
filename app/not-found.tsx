@@ -5,29 +5,34 @@ import { useEffect } from "react";
 import Link from "next/link";
 
 export default function NotFoundClient() {
-  // Move focus to heading for screen readers
+  // Move focus to heading for screen readers, but suppress the default focus outline
   useEffect(() => {
-    document.getElementById("notfound-title")?.focus();
+    const title = document.getElementById("notfound-title");
+    if (title) {
+      title.setAttribute("tabIndex", "-1");
+      title.focus();
+    }
   }, []);
 
   return (
     <section
       id="notfound-section"
       aria-labelledby="notfound-title"
-      className="flex flex-col items-center justify-center text-center text-gray-900 antialiased"
+      className="flex flex-col items-center justify-center text-center text-gray-900 antialiased min-h-screen px-4"
     >
       <h1
         id="notfound-title"
-        tabIndex={-1}
         className="text-7xl sm:text-8xl font-extrabold bg-clip-text text-transparent
-                   bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] mb-2 tracking-tight"
+                   bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+                   mb-2 tracking-tight focus:outline-none"
       >
         404
       </h1>
+      {/* Colored underline matching other pages */}
+      <div className="h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] mb-4" />
       <h2
         className="
-          gradient-text text-3xl sm:text-4xl
-          font-semibold mb-6 bg-clip-text text-transparent
+          text-3xl sm:text-4xl font-semibold mb-6 bg-clip-text text-transparent
           bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
         "
       >

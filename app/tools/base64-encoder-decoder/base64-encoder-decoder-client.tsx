@@ -8,10 +8,10 @@ import {
   FormEvent,
   DragEvent,
 } from "react";
-import { Trash2, ClipboardCopy } from "lucide-react";
+import { Trash2, ClipboardCopy, Paperclip } from "lucide-react";
 
 /**
- * Base64 Encoder/Decoder Tool
+ * Base64 Encoder/Decoder
  *
  * Convert text and files to and from Base64 with drag-and-drop support—no server, fully client-side.
  */
@@ -132,8 +132,7 @@ export default function Base64EncoderDecoderClient() {
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Convert text and files to and from Base64 with drag-and-drop support—no
-          server, fully client-side.
+          Convert text and files to and from Base64 with drag-and-drop support—no server, fully client-side.
         </p>
       </div>
 
@@ -240,6 +239,7 @@ export default function Base64EncoderDecoderClient() {
             onClick={() => setMode((m) => (m === "encode" ? "decode" : "encode"))}
             className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition text-sm font-medium text-gray-700"
           >
+            <Paperclip className="w-5 h-5" />
             {mode === "encode" ? "Switch to Decode" : "Switch to Encode"}
           </button>
         </div>

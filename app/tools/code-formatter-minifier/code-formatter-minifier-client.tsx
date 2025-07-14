@@ -17,8 +17,9 @@ import {
 /**
  * Code Formatter & Minifier Tool
  *
- * Beautify or compress your HTML, CSS and JavaScript code for readability or performance—
- * all client-side, no uploads.
+ * Beautify or compress HTML, CSS and JavaScript code for readability
+ * or performance gains—no uploads, no server.
+ * 100% client-side, instant results.
  */
 export default function CodeFormatterMinifierClient() {
   const [mode, setMode] = useState<"format" | "minify">("format");
@@ -109,8 +110,7 @@ export default function CodeFormatterMinifierClient() {
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Beautify or compress your HTML, CSS and JavaScript code for readability
-          or performance. 100% client-side—no server, no uploads, instant results.
+          Beautify or compress HTML, CSS and JavaScript code for readability or performance gains—no uploads, no server.
         </p>
       </div>
 
