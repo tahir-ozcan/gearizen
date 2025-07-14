@@ -111,7 +111,8 @@ export default function Footer() {
                 height={32}
                 loading="lazy"
               />
-              <span className="ml-2 text-xl font-extrabold bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]">
+              <span className="ml-2 text-xl font-extrabold bg-clip-text text-transparent
+                               bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]">
                 Gearizen
               </span>
             </Link>
