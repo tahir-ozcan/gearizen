@@ -2,7 +2,8 @@
 "use client";
 
 import { useState, ChangeEvent, FormEvent } from "react";
-import { diffWords } from "diff";
+import { diffWords, Change } from "diff";
+import { ClipboardCopy } from "lucide-react";
 
 /**
  * Text Diff Checker Tool
@@ -13,37 +14,64 @@ import { diffWords } from "diff";
 export default function TextDiffClient() {
   const [original, setOriginal] = useState("");
   const [modified, setModified] = useState("");
-  const [diffHtml, setDiffHtml] = useState("");
+  const [leftHtml, setLeftHtml] = useState("");
+  const [rightHtml, setRightHtml] = useState("");
 
-  const handleOriginalChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  function handleOriginalChange(e: ChangeEvent<HTMLTextAreaElement>) {
     setOriginal(e.target.value);
-  };
+  }
 
-  const handleModifiedChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  function handleModifiedChange(e: ChangeEvent<HTMLTextAreaElement>) {
     setModified(e.target.value);
-  };
+  }
 
-  const runDiff = (e: FormEvent<HTMLFormElement>) => {
+  function renderSideBySide() {
+    // diffWords returns Change[] 
+    const parts: Change[] = diffWords(original, modified);
+    let left = "";
+    let right = "";
+
+    parts.forEach((p) => {
+      // escape HTML
+      const escaped = p.value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      if (p.added) {
+        // show additions on the right
+        right += `<span class="bg-green-100 text-green-800">${escaped}</span>`;
+      } else if (p.removed) {
+        // show deletions on the left
+        left += `<span class="bg-red-100 text-red-800 line-through">${escaped}</span>`;
+      } else {
+        // unchanged in both
+        left += `<span>${escaped}</span>`;
+        right += `<span>${escaped}</span>`;
+      }
+    });
+
+    setLeftHtml(left || "<em>(no content)</em>");
+    setRightHtml(right || "<em>(no content)</em>");
+  }
+
+  function runDiff(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const parts = diffWords(original, modified);
-    const html = parts
-      .map(part => {
-        if (part.added) {
-          return `<span class="bg-green-100 text-green-800">${part.value}</span>`;
-        }
-        if (part.removed) {
-          return `<span class="bg-red-100 text-red-800 line-through">${part.value}</span>`;
-        }
-        return `<span class="text-gray-900">${part.value}</span>`;
-      })
-      .join("");
-    setDiffHtml(html);
-  };
+    renderSideBySide();
+  }
 
   const copyDiff = async () => {
-    if (!diffHtml) return;
+    if (!leftHtml && !rightHtml) return;
+    const html = `
+      <div style="display:flex; gap:1rem;">
+        <div style="flex:1; padding:1rem; border:1px solid #ddd; overflow:auto;">
+          ${leftHtml}
+        </div>
+        <div style="flex:1; padding:1rem; border:1px solid #ddd; overflow:auto;">
+          ${rightHtml}
+        </div>
+      </div>`;
     try {
-      await navigator.clipboard.writeText(diffHtml);
+      await navigator.clipboard.writeText(html);
       alert("✅ Diff HTML copied to clipboard!");
     } catch {
       alert("❌ Copy failed.");
@@ -70,16 +98,12 @@ export default function TextDiffClient() {
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mx-auto max-w-3xl text-lg sm:text-xl text-gray-700 leading-relaxed">
-          Compare two blocks of text side-by-side. Additions are highlighted in green,
-          deletions in red, with instant inline diff—entirely client-side.
+          Compare two text blocks side-by-side and highlight additions, deletions and changes for effortless proofreading.
         </p>
       </div>
 
       {/* Input Form */}
-      <form
-        onSubmit={runDiff}
-        className="max-w-4xl mx-auto space-y-6 sm:px-0"
-      >
+      <form onSubmit={runDiff} className="max-w-4xl mx-auto space-y-6 sm:px-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="flex flex-col">
             <label
@@ -100,6 +124,7 @@ export default function TextDiffClient() {
               "
             />
           </div>
+
           <div className="flex flex-col">
             <label
               htmlFor="modified-text"
@@ -136,13 +161,19 @@ export default function TextDiffClient() {
       </form>
 
       {/* Diff Output */}
-      {diffHtml && (
+      {(leftHtml || rightHtml) && (
         <div className="mt-12 max-w-4xl mx-auto sm:px-0 space-y-6">
           <h2 className="text-2xl font-semibold text-gray-800">Differences</h2>
-          <div
-            className="prose prose-sm max-w-none whitespace-pre-wrap break-words"
-            dangerouslySetInnerHTML={{ __html: diffHtml }}
-          />
+          <div className="flex gap-4">
+            <div
+              className="prose prose-sm w-1/2 max-w-none whitespace-pre-wrap break-words p-4 border rounded bg-gray-50"
+              dangerouslySetInnerHTML={{ __html: leftHtml }}
+            />
+            <div
+              className="prose prose-sm w-1/2 max-w-none whitespace-pre-wrap break-words p-4 border rounded bg-gray-50"
+              dangerouslySetInnerHTML={{ __html: rightHtml }}
+            />
+          </div>
           <div className="text-center">
             <button
               onClick={copyDiff}
@@ -152,6 +183,7 @@ export default function TextDiffClient() {
                 focus-visible:ring-green-500 transition text-sm font-medium
               "
             >
+              <ClipboardCopy className="w-5 h-5" />
               Copy Diff HTML
             </button>
           </div>

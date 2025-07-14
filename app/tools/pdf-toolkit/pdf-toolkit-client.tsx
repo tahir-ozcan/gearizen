@@ -6,11 +6,9 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 /**
- * PDF Toolkit Client
+ * PDF Toolkit: Compress & Convert
  *
- * Convert any HTML snippet into a PDF—enter your HTML,
- * preview it live, adjust page size/orientation, then
- * download the result 100% client-side.
+ * Shrink PDF file sizes without quality loss and extract text to Word documents—all in-browser and offline.
  */
 export default function PdfToolkitClient() {
   const [html, setHtml] = useState<string>(
@@ -23,170 +21,222 @@ export default function PdfToolkitClient() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [extractedText, setExtractedText] = useState<string>("");
+
   const previewRef = useRef<HTMLDivElement>(null);
 
-  function handleHtmlChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    setHtml(e.target.value);
-  }
-
+  /** Convert HTML preview into a PDF and download it */
   async function handleGeneratePdf() {
     if (!previewRef.current) return;
-    setError(null);
     setLoading(true);
+    setError(null);
     try {
-      // Render the preview div to a high-resolution canvas
       const canvas = await html2canvas(previewRef.current, { scale: 2 });
       const imgData = canvas.toDataURL("image/png");
-
-      // Create PDF
-      const pdf = new jsPDF({
-        orientation,
-        unit: "px",
-        format: paperSize,
-      });
-
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-
-      // Fit image into page, preserving aspect ratio
-      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-      const x = (pageWidth - imgWidth * ratio) / 2;
-      const y = (pageHeight - imgHeight * ratio) / 2;
-
-      pdf.addImage(imgData, "PNG", x, y, imgWidth * ratio, imgHeight * ratio);
+      const pdf = new jsPDF({ orientation, unit: "px", format: paperSize });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const ratio = Math.min(pageW / canvas.width, pageH / canvas.height);
+      const x = (pageW - canvas.width * ratio) / 2;
+      const y = (pageH - canvas.height * ratio) / 2;
+      pdf.addImage(imgData, "PNG", x, y, canvas.width * ratio, canvas.height * ratio);
       pdf.save(`${fileName}.pdf`);
     } catch (err: unknown) {
-      // Narrow error type
-      const message = err instanceof Error ? err.message : String(err);
-      setError(message || "❌ Failed to generate PDF.");
+      setError(err instanceof Error ? err.message : "Failed to generate PDF.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /** Handle selection of a PDF file for compression or extraction */
+  function handleUploadChange(e: ChangeEvent<HTMLInputElement>) {
+    setUploadFile(e.target.files?.[0] ?? null);
+    setExtractedText("");
+    setError(null);
+  }
+
+  /** Compress the uploaded PDF using pdf-lib */
+  async function handleCompressPdf() {
+    if (!uploadFile) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const { PDFDocument } = await import("pdf-lib");
+      const buffer = await uploadFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
+      const compressedBytes = await pdfDoc.save({ useObjectStreams: true });
+      const blob = new Blob([compressedBytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `compressed-${uploadFile.name}`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to compress PDF.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /** Extract text from the uploaded PDF and offer it as a .doc download */
+  async function handleExtractText() {
+    if (!uploadFile) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
+      const buffer = await uploadFile.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+
+      let fullText = "";
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const strings = content.items
+          .filter((item): item is { str: string } => "str" in item)
+          .map(item => item.str);
+        fullText += strings.join(" ") + "\n\n";
+      }
+      setExtractedText(fullText.trim());
+
+      const blob = new Blob([fullText], { type: "application/msword" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${uploadFile.name.replace(/\.pdf$/i, "")}.doc`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to extract text.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <section
-      id="pdf-toolkit"
-      aria-labelledby="pdf-toolkit-heading"
-      className="space-y-16 text-gray-900 antialiased"
-    >
+    <section id="pdf-toolkit" aria-labelledby="pdf-toolkit-heading" className="space-y-16 text-gray-900 antialiased">
       {/* Heading & Description */}
-      <div className="text-center space-y-4">
-        <h1
-          id="pdf-toolkit-heading"
-          className="
-            bg-clip-text text-transparent
-            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
-            text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
-          "
-        >
-          PDF Toolkit
+      <div className="text-center space-y-4 sm:px-0">
+        <h1 id="pdf-toolkit-heading" className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
+          PDF Toolkit: Compress & Convert
         </h1>
-        <p className="mx-auto max-w-2xl text-lg text-gray-700 leading-relaxed">
-          Convert any HTML snippet into a PDF—enter your HTML, preview live, choose page size and
-          orientation, and download instantly, all in your browser.
+        <p className="mx-auto max-w-2xl text-lg sm:text-xl text-gray-700 leading-relaxed">
+          Shrink PDF file sizes without quality loss and extract text to Word documents—all in-browser and offline.
         </p>
       </div>
 
-      {/* Controls & Editor */}
-      <div className="max-w-3xl mx-auto space-y-8 sm:px-0">
-        {/* File name */}
-        <div>
-          <label htmlFor="filename-input" className="block text-sm font-medium text-gray-800 mb-1">
-            File Name
-          </label>
+      {/* Section: HTML → PDF */}
+      <div className="max-w-3xl mx-auto space-y-6 sm:px-0">
+        <h2 className="text-xl font-semibold text-gray-800">Generate PDF from HTML</h2>
+
+        <label className="block text-sm font-medium text-gray-800">
+          File Name
           <input
-            id="filename-input"
             type="text"
             value={fileName}
-            onChange={(e) => setFileName(e.target.value)}
-            placeholder="document"
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 transition font-mono"
+            onChange={e => setFileName(e.target.value)}
+            className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 transition font-mono"
           />
-        </div>
+        </label>
 
-        {/* Page settings */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
-            <label
-              htmlFor="orientation-select"
-              className="block text-sm font-medium text-gray-800 mb-1"
-            >
-              Orientation
-            </label>
+          <label className="block text-sm font-medium text-gray-800">
+            Orientation
             <select
-              id="orientation-select"
               value={orientation}
-              onChange={(e) =>
-                setOrientation(e.target.value as "portrait" | "landscape")
-              }
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 transition"
+              onChange={e => setOrientation(e.target.value as "portrait" | "landscape")}
+              className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 transition"
             >
               <option value="portrait">Portrait</option>
               <option value="landscape">Landscape</option>
             </select>
-          </div>
-          <div>
-            <label
-              htmlFor="papersize-select"
-              className="block text-sm font-medium text-gray-800 mb-1"
-            >
-              Paper Size
-            </label>
+          </label>
+
+          <label className="block text-sm font-medium text-gray-800">
+            Paper Size
             <select
-              id="papersize-select"
               value={paperSize}
-              onChange={(e) => setPaperSize(e.target.value as "a4" | "letter")}
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 transition"
+              onChange={e => setPaperSize(e.target.value as "a4" | "letter")}
+              className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 transition"
             >
               <option value="a4">A4</option>
               <option value="letter">Letter</option>
             </select>
-          </div>
-        </div>
-
-        {/* HTML Editor */}
-        <div>
-          <label htmlFor="html-input" className="block text-sm font-medium text-gray-800 mb-1">
-            HTML Content
           </label>
-          <textarea
-            id="html-input"
-            value={html}
-            onChange={handleHtmlChange}
-            rows={8}
-            className="
-              w-full p-4 border border-gray-300 rounded-md bg-white
-              font-mono text-sm resize-y focus:ring-2 focus:ring-indigo-500 transition
-            "
-          />
         </div>
 
-        {/* Generate Button */}
+        <label className="block text-sm font-medium text-gray-800">
+          HTML Content
+          <textarea
+            rows={6}
+            value={html}
+            onChange={e => setHtml(e.target.value)}
+            className="mt-1 w-full p-4 border border-gray-300 rounded-md bg-white font-mono text-sm resize-y focus:ring-2 focus:ring-indigo-500 transition"
+          />
+        </label>
+
         <div className="text-center">
           <button
-            type="button"
             onClick={handleGeneratePdf}
             disabled={loading}
-            className="
-              inline-flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-md
-              hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500
-              transition font-medium disabled:opacity-50
-            "
+            className="inline-flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 transition disabled:opacity-50"
           >
             {loading ? "Generating..." : "Download PDF"}
           </button>
         </div>
+      </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="text-center text-red-700 text-sm">{error}</div>
+      {/* Section: PDF Upload → Compress & Extract */}
+      <div className="max-w-3xl mx-auto space-y-6 sm:px-0">
+        <h2 className="text-xl font-semibold text-gray-800">Compress & Extract from PDF</h2>
+
+        <label className="block text-sm font-medium text-gray-800">
+          Upload PDF
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={handleUploadChange}
+            className="mt-1 block w-full text-sm text-gray-700"
+          />
+        </label>
+
+        {uploadFile && (
+          <div className="flex flex-wrap gap-4">
+            <button
+              onClick={handleCompressPdf}
+              disabled={loading}
+              className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:ring-2 focus:ring-green-500 transition disabled:opacity-50"
+            >
+              {loading ? "Compressing..." : "Compress PDF"}
+            </button>
+            <button
+              onClick={handleExtractText}
+              disabled={loading}
+              className="px-6 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500 transition disabled:opacity-50"
+            >
+              {loading ? "Extracting..." : "Extract Text to Word"}
+            </button>
+          </div>
+        )}
+
+        {error && <p className="text-center text-red-700">{error}</p>}
+
+        {extractedText && (
+          <label className="block">
+            <span className="block text-sm font-medium text-gray-800 mb-1">Extracted Text Preview</span>
+            <textarea
+              rows={6}
+              readOnly
+              value={extractedText}
+              className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm resize-y focus:ring-2 focus:ring-indigo-500 transition"
+            />
+          </label>
         )}
       </div>
 
-      {/* Live Preview */}
+      {/* Live HTML Preview */}
       <div className="max-w-3xl mx-auto sm:px-0">
         <div
           ref={previewRef}

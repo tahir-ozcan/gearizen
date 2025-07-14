@@ -7,7 +7,7 @@ import { Trash2, ClipboardCopy } from "lucide-react";
 /**
  * JSON Formatter & Validator Tool
  *
- * Validate, beautify and minify JSON instantly in your browser with real-time error reporting—100% client-side, no signup required.
+ * Validate, beautify, minify and lint JSON instantly in your browser with real-time error reporting—100% client-side, no signup required.
  */
 export default function JsonFormatterClient() {
   const [mode, setMode] = useState<"beautify" | "minify">("beautify");
@@ -80,7 +80,7 @@ export default function JsonFormatterClient() {
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Validate, beautify and minify JSON instantly in your browser with real-time error reporting—100% client-side, no signup required.
+          Validate, beautify, minify and lint JSON instantly in your browser with real-time error reporting—100% client-side, no signup required.
         </p>
       </div>
 

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* 2) Base düzey reset ve global ayarlar */
 @layer base {
   html {
     @apply scroll-smooth;
@@ -7,53 +8,76 @@
   body {
     @apply font-sans text-gray-900 bg-white antialiased;
   }
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
     font-family: theme("fontFamily.sans");
   }
 }
 
+/* 3) Reusable component sınıfları */
 @layer components {
   .btn-primary {
-    @apply px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium;
+    @apply px-6 py-3 bg-indigo-600 text-white rounded-lg 
+           hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 
+           transition font-medium;
   }
+
   .btn-secondary {
-    @apply px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 transition font-medium;
+    @apply px-6 py-3 bg-gray-700 text-white rounded-lg
+           hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 
+           transition font-medium;
   }
+
   .input-base {
-    @apply w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition;
+    @apply w-full border border-gray-300 rounded-lg px-4 py-2 
+           focus:outline-none focus:ring-2 focus:ring-indigo-500 transition;
   }
+
   .container-responsive {
     @apply container mx-auto px-4 sm:px-6 md:px-8 lg:px-12;
   }
+
   .gradient-text {
     @apply bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent;
   }
 
   .card {
-    @apply bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-shadow;
+    @apply bg-white border border-gray-200 rounded-2xl p-6 shadow-sm 
+           hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 
+           transition-shadow;
   }
 
-  .json-key {
-    @apply text-purple-700;
-  }
-  .json-string {
-    @apply text-green-700;
-  }
-  .json-number {
-    @apply text-blue-700;
-  }
-  .json-boolean {
-    @apply text-red-700;
-  }
-  .json-null {
-    @apply text-gray-500;
-  }
+  /* JSON syntax highlighting */
+  .json-key     { @apply text-purple-700; }
+  .json-string  { @apply text-green-700; }
+  .json-number  { @apply text-blue-700; }
+  .json-boolean { @apply text-red-700; }
+  .json-null    { @apply text-gray-500; }
 }
+
+/* 4) Markdown preview panelindeki Tailwind taşıma stilerini kapatmak için */
+/*    preview bileşeninizin container’ına örneğin `.markdown-preview` sınıfını ekleyin */
+.markdown-preview {
+  /* tüm Tailwind component ve utility’lerin burada geçersiz kalması için */
+  all: unset;
+  /* yine de metin görünmesi için: */
+  color: inherit;
+  font-family: inherit;
+  background: transparent;
+  /* isteğe bağlı padding/margin ekleyin: */
+  padding: 1rem;
+}
+.markdown-preview * {
+  all: unset;
+  color: inherit;
+  font: inherit;
+}
+
+/* Eğer `.prose` eklentisi kullanıyorsanız, yalnızca markdown içerik için şunları kullanın: */
+/*
+.markdown-preview :where(h1, h2, h3, p, ul, ol, blockquote, pre, code, img) {
+  @apply prose;
+}
+*/
 
 /* styles/globals.css */
 

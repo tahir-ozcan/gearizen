@@ -1,234 +1,348 @@
 // app/tools/jwt-hash-generator/jwt-hash-generator-client.tsx
 "use client";
 
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import { ClipboardCopy } from "lucide-react";
+// @ts-expect-error crypto-js has no bundled type declarations
+import MD5 from "crypto-js/md5";
+// @ts-expect-error crypto-js has no bundled type declarations
+import SHA1 from "crypto-js/sha1";
+// @ts-expect-error crypto-js has no bundled type declarations
+import SHA256 from "crypto-js/sha256";
+import bcrypt from "bcryptjs";
 
 /**
- * JWT Hash Generator
+ * JWT & Hash Generator Tool
  *
- * Generate signed JSON Web Tokens (JWT) in your browser using HMAC-SHA algorithms.
- * Enter a payload and secret, choose HS256/HS384/HS512, then generate and copy your token—100% client-side.
+ * Decode JWTs and generate cryptographic hashes (MD5, SHA-1, SHA-256, bcrypt)
+ * with adjustable parameters—100% client-side, no signup required.
  */
 export default function JwtHashGeneratorClient() {
-  const [payload, setPayload] = useState<string>(
-    `{"sub":"1234567890","name":"John Doe","iat":${Math.floor(Date.now() / 1000)}}`
-  );
-  const [secret, setSecret] = useState<string>("your-256-bit-secret");
-  const [alg, setAlg] = useState<"HS256" | "HS384" | "HS512">("HS256");
-  const [token, setToken] = useState<string>("");
+  const [mode, setMode] = useState<"decode" | "hash">("decode");
+  const [jwtInput, setJwtInput] = useState("");
+  const [decodedHeader, setDecodedHeader] = useState<object | null>(null);
+  const [decodedPayload, setDecodedPayload] = useState<object | null>(null);
+  const [hashInput, setHashInput] = useState("");
+  const [hashAlg, setHashAlg] = useState<"MD5" | "SHA-1" | "SHA-256" | "bcrypt">("MD5");
+  const [bcryptRounds, setBcryptRounds] = useState(10);
+  const [hashOutput, setHashOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  // Map our alg codes to the Web Crypto hash names
-  const hashMap: Record<"HS256" | "HS384" | "HS512", "SHA-256" | "SHA-384" | "SHA-512"> = {
-    HS256: "SHA-256",
-    HS384: "SHA-384",
-    HS512: "SHA-512",
-  };
-
-  // Base64-URL encode an ArrayBuffer (HMAC signature)
-  async function signHmac(
-    data: Uint8Array,
-    secretKey: string
-  ): Promise<ArrayBuffer> {
-    const key = await crypto.subtle.importKey(
-      "raw",
-      new TextEncoder().encode(secretKey),
-      { name: "HMAC", hash: { name: hashMap[alg] } },
-      false,
-      ["sign"]
-    );
-    return crypto.subtle.sign("HMAC", key, data);
+  // Decode a Base64URL-encoded JSON segment
+  function decodeSegment(seg: string): object {
+    const padded =
+      seg.replace(/-/g, "+").replace(/_/g, "/") +
+      "==".slice(0, (4 - (seg.length % 4)) % 4);
+    const json = atob(padded);
+    return JSON.parse(json);
   }
 
-  // Encode JSON → Base64URL
-  function encodeSegment(obj: object): string {
-    const json = JSON.stringify(obj);
-    const utf8 = new TextEncoder().encode(json);
-    let binary = "";
-    utf8.forEach((b) => (binary += String.fromCharCode(b)));
-    const b64 = btoa(binary);
-    return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-  }
-
-  const handleGenerate = async () => {
+  // Handle JWT decoding
+  function handleDecode(e: FormEvent) {
+    e.preventDefault();
     setError(null);
+    setDecodedHeader(null);
+    setDecodedPayload(null);
+
     try {
-      // 1) Header & payload
-      const header = { alg, typ: "JWT" };
-      const b64Header = encodeSegment(header);
-
-      let payloadObj: Record<string, unknown>;
-      try {
-        payloadObj = JSON.parse(payload);
-        if (typeof payloadObj !== "object" || payloadObj === null) {
-          throw new Error();
-        }
-      } catch {
-        throw new Error("Payload is not valid JSON object");
-      }
-      const b64Payload = encodeSegment(payloadObj);
-
-      // 2) Sign
-      const data = new TextEncoder().encode(`${b64Header}.${b64Payload}`);
-      const signatureBuffer = await signHmac(data, secret);
-      const sigBytes = new Uint8Array(signatureBuffer);
-      let sigBinary = "";
-      sigBytes.forEach((b) => (sigBinary += String.fromCharCode(b)));
-      const b64Sig = btoa(sigBinary)
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/g, "");
-
-      // 3) Assemble JWT
-      setToken(`${b64Header}.${b64Payload}.${b64Sig}`);
+      const parts = jwtInput.trim().split(".");
+      if (parts.length !== 3) throw new Error("JWT must have three parts");
+      setDecodedHeader(decodeSegment(parts[0]));
+      setDecodedPayload(decodeSegment(parts[1]));
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to generate JWT";
-      setToken("");
-      setError(msg);
+      setError(err instanceof Error ? err.message : "Failed to decode JWT");
     }
-  };
+  }
 
-  const copyToken = async () => {
-    if (!token) return;
+  // Handle hash generation
+  async function handleHash(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setHashOutput("");
+
     try {
-      await navigator.clipboard.writeText(token);
-      alert("✅ Token copied!");
-    } catch {
-      alert("❌ Copy failed");
+      let result: string;
+      switch (hashAlg) {
+        case "MD5":
+          result = MD5(hashInput).toString();
+          break;
+        case "SHA-1":
+          result = SHA1(hashInput).toString();
+          break;
+        case "SHA-256":
+          result = SHA256(hashInput).toString();
+          break;
+        case "bcrypt":
+          if (bcryptRounds < 4 || bcryptRounds > 31) {
+            throw new Error("Rounds must be between 4 and 31");
+          }
+          result = await bcrypt.hash(hashInput, bcryptRounds);
+          break;
+        default:
+          throw new Error("Unsupported algorithm");
+      }
+      setHashOutput(result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to generate hash");
     }
-  };
+  }
+
+  // Copy to clipboard
+  async function copyToClipboard(text: string) {
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("✅ Copied to clipboard!");
+    } catch {
+      alert("❌ Copy failed.");
+    }
+  }
 
   return (
     <section
       id="jwt-hash-generator"
-      aria-labelledby="jwt-generator-heading"
+      aria-labelledby="jwt-hash-generator-heading"
       className="space-y-16 text-gray-900 antialiased"
     >
       {/* Heading & Description */}
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-4 sm:px-0">
         <h1
-          id="jwt-generator-heading"
+          id="jwt-hash-generator-heading"
           className="
             bg-clip-text text-transparent
             bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
             text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
           "
         >
-          JWT Hash Generator
+          JWT & Hash Generator
         </h1>
-        <p className="mt-2 max-w-2xl mx-auto text-lg text-gray-700 leading-relaxed">
-          Generate signed JSON Web Tokens (JWT) using HS256, HS384, or HS512—entirely in your
-          browser. Enter a JSON payload and secret, choose an algorithm, then generate and copy
-          your token.
+        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <p className="mx-auto max-w-2xl text-lg sm:text-xl text-gray-700 leading-relaxed">
+          Decode JWTs and generate cryptographic hashes (MD5, SHA-1, SHA-256, bcrypt)
+          with adjustable parameters—100% client-side, no signup required.
         </p>
       </div>
 
-      {/* Controls */}
-      <div className="max-w-3xl mx-auto space-y-8 sm:px-0">
-        {/* Algorithm */}
-        <div>
-          <label htmlFor="alg-select" className="block mb-1 font-medium text-gray-800">
-            Algorithm
-          </label>
-          <select
-            id="alg-select"
-            value={alg}
-            onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-              setAlg(e.target.value as "HS256" | "HS384" | "HS512")
-            }
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 transition"
-          >
-            <option value="HS256">HS256</option>
-            <option value="HS384">HS384</option>
-            <option value="HS512">HS512</option>
-          </select>
-        </div>
-
-        {/* Payload */}
-        <div>
-          <label htmlFor="payload-input" className="block mb-1 font-medium text-gray-800">
-            Payload (JSON)
-          </label>
-          <textarea
-            id="payload-input"
-            rows={6}
-            value={payload}
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-              setPayload(e.target.value)
-            }
-            className="
-              w-full p-4 border border-gray-300 rounded-md bg-white
-              focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition
-            "
-            placeholder='{"sub":"1234567890","name":"John Doe"}'
-          />
-        </div>
-
-        {/* Secret */}
-        <div>
-          <label htmlFor="secret-input" className="block mb-1 font-medium text-gray-800">
-            Secret Key
-          </label>
-          <input
-            id="secret-input"
-            type="password"
-            value={secret}
-            onChange={(e) => setSecret(e.target.value)}
-            placeholder="your-256-bit-secret"
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 transition font-mono"
-          />
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
-            {error}
-          </div>
-        )}
-
-        {/* Generate Button */}
-        <div className="text-center">
-          <button
-            onClick={handleGenerate}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
-          >
-            Generate JWT
-          </button>
-        </div>
+      {/* Mode Switch */}
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={() => {
+            setMode("decode");
+            setError(null);
+            setHashOutput("");
+          }}
+          className={`px-4 py-2 rounded-md font-medium transition ${
+            mode === "decode"
+              ? "bg-indigo-600 text-white"
+              : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+          }`}
+        >
+          Decode JWT
+        </button>
+        <button
+          onClick={() => {
+            setMode("hash");
+            setError(null);
+            setDecodedHeader(null);
+            setDecodedPayload(null);
+          }}
+          className={`px-4 py-2 rounded-md font-medium transition ${
+            mode === "hash"
+              ? "bg-indigo-600 text-white"
+              : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+          }`}
+        >
+          Generate Hash
+        </button>
       </div>
 
-      {/* Output */}
-      {token && (
-        <div className="mt-12 max-w-3xl mx-auto space-y-4">
-          <label htmlFor="jwt-output" className="block mb-1 font-medium text-gray-800">
-            Your JWT
-          </label>
-          <textarea
-            id="jwt-output"
-            readOnly
-            value={token}
-            rows={4}
-            className="
-              w-full p-4 border border-gray-300 rounded-md bg-gray-50
-              focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition
-            "
-          />
-          <div className="flex justify-center gap-4">
-            <button
-              onClick={copyToken}
+      {/* Error */}
+      {error && (
+        <div className="max-w-3xl mx-auto p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
+
+      {/* Decode JWT Form */}
+      {mode === "decode" && (
+        <form onSubmit={handleDecode} className="max-w-3xl mx-auto space-y-6 sm:px-0">
+          <div>
+            <label
+              htmlFor="jwt-input"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
+              JWT Token
+            </label>
+            <textarea
+              id="jwt-input"
+              rows={4}
+              value={jwtInput}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setJwtInput(e.target.value)}
+              placeholder="Paste your JWT here…"
               className="
-                inline-flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-md
+                w-full p-4 border border-gray-300 rounded-md bg-white
+                focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition
+              "
+            />
+          </div>
+          <div className="text-center">
+            <button
+              type="submit"
+              className="
+                px-6 py-2 bg-indigo-600 text-white rounded-md
                 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500
                 transition font-medium
               "
             >
-              <ClipboardCopy className="w-5 h-5" />
-              Copy Token
+              Decode →
             </button>
           </div>
-        </div>
+          {decodedHeader && decodedPayload && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">Header</h2>
+                <pre className="p-4 mt-2 bg-gray-50 border border-gray-200 rounded-md overflow-auto font-mono">
+                  {JSON.stringify(decodedHeader, null, 2)}
+                </pre>
+                <button
+                  onClick={() => copyToClipboard(JSON.stringify(decodedHeader))}
+                  className="mt-2 inline-flex items-center gap-2 text-sm text-indigo-600 hover:underline"
+                >
+                  <ClipboardCopy className="w-4 h-4" />
+                  Copy Header
+                </button>
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">Payload</h2>
+                <pre className="p-4 mt-2 bg-gray-50 border border-gray-200 rounded-md overflow-auto font-mono">
+                  {JSON.stringify(decodedPayload, null, 2)}
+                </pre>
+                <button
+                  onClick={() => copyToClipboard(JSON.stringify(decodedPayload))}
+                  className="mt-2 inline-flex items-center gap-2 text-sm text-indigo-600 hover:underline"
+                >
+                  <ClipboardCopy className="w-4 h-4" />
+                  Copy Payload
+                </button>
+              </div>
+            </div>
+          )}
+        </form>
+      )}
+
+      {/* Generate Hash Form */}
+      {mode === "hash" && (
+        <form onSubmit={handleHash} className="max-w-3xl mx-auto space-y-6 sm:px-0">
+          <div>
+            <label
+              htmlFor="hash-input"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
+              Input Text
+            </label>
+            <textarea
+              id="hash-input"
+              rows={4}
+              value={hashInput}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setHashInput(e.target.value)}
+              placeholder="Enter text to hash…"
+              className="
+                w-full p-4 border border-gray-300 rounded-md bg-white
+                focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition
+              "
+            />
+          </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex-1">
+              <label
+                htmlFor="alg-select"
+                className="block text-sm font-medium text-gray-800 mb-1"
+              >
+                Algorithm
+              </label>
+              <select
+                id="alg-select"
+                value={hashAlg}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => setHashAlg(e.target.value as typeof hashAlg)}
+                className="
+                  w-full p-3 border border-gray-300 rounded-md
+                  focus:ring-2 focus:ring-indigo-500 transition
+                "
+              >
+                <option value="MD5">MD5</option>
+                <option value="SHA-1">SHA-1</option>
+                <option value="SHA-256">SHA-256</option>
+                <option value="bcrypt">bcrypt</option>
+              </select>
+            </div>
+            {hashAlg === "bcrypt" && (
+              <div className="flex-1">
+                <label
+                  htmlFor="rounds-input"
+                  className="block text-sm font-medium text-gray-800 mb-1"
+                >
+                  Salt Rounds
+                </label>
+                <input
+                  id="rounds-input"
+                  type="number"
+                  min={4}
+                  max={31}
+                  value={bcryptRounds}
+                  onChange={(e) => setBcryptRounds(Number(e.target.value))}
+                  className="
+                    w-full p-3 border border-gray-300 rounded-md
+                    focus:ring-2 focus:ring-indigo-500 transition
+                  "
+                />
+              </div>
+            )}
+          </div>
+          <div className="text-center">
+            <button
+              type="submit"
+              className="
+                px-6 py-2 bg-indigo-600 text-white rounded-md
+                hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500
+                transition font-medium
+              "
+            >
+              Generate →
+            </button>
+          </div>
+          {hashOutput && (
+            <div className="mt-6">
+              <label
+                htmlFor="hash-output"
+                className="block text-sm font-medium text-gray-800 mb-1"
+              >
+                Hash Output
+              </label>
+              <div className="relative">
+                <textarea
+                  id="hash-output"
+                  readOnly
+                  value={hashOutput}
+                  rows={4}
+                  className="
+                    w-full p-4 border border-gray-300 rounded-md bg-gray-50
+                    focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition
+                  "
+                />
+                <button
+                  onClick={() => copyToClipboard(hashOutput)}
+                  aria-label="Copy hash"
+                  className="
+                    absolute top-2 right-2 p-2 text-gray-500 hover:text-indigo-600
+                    disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition
+                  "
+                >
+                  <ClipboardCopy className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+          )}
+        </form>
       )}
     </section>
   );

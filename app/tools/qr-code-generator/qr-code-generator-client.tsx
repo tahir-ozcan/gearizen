@@ -1,3 +1,4 @@
+// app/tools/qr-code-generator/qr-code-generator-client.tsx
 "use client";
 
 import {
@@ -7,15 +8,15 @@ import {
   useMemo,
   ChangeEvent,
 } from "react";
-import QRCodeStyling from "qr-code-styling"; // statik import ile doğru tip alıyoruz
+import QRCodeStyling from "qr-code-styling";
 
 /**
  * QR Code Generator Client
  *
- * Create custom QR codes instantly in the browser.
+ * Generate high-resolution QR codes for URLs, text, vCards, and Wi-Fi credentials with color and size options.
  */
 
-// Basit bir debounce hook'u
+// Simple debounce hook
 function useDebounce<T>(value: T, delay = 300): T {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -26,9 +27,11 @@ function useDebounce<T>(value: T, delay = 300): T {
 }
 
 type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
+type DataType = "text" | "url" | "vcard" | "wifi";
+type WifiAuthType = "WPA" | "WEP" | "nopass";
 
 interface QrOptions {
-  text: string;
+  data: string;
   width: number;
   margin: number;
   darkColor: string;
@@ -37,13 +40,39 @@ interface QrOptions {
   logoDataUrl?: string;
 }
 
-/**
- * Generate a Data URL (PNG) for the QR code image
- */
+/** Build payload based on selected type */
+function buildPayload(
+  type: DataType,
+  text: string,
+  url: string,
+  vcard: { name: string; org: string; email: string; phone: string },
+  wifi: { ssid: string; auth: WifiAuthType; password: string }
+): string {
+  switch (type) {
+    case "url":
+      return url.trim();
+    case "vcard":
+      return [
+        "BEGIN:VCARD",
+        "VERSION:3.0",
+        `N:${vcard.name}`,
+        `ORG:${vcard.org}`,
+        `EMAIL:${vcard.email}`,
+        `TEL:${vcard.phone}`,
+        "END:VCARD",
+      ].join("\n");
+    case "wifi":
+      return `WIFI:T:${wifi.auth};S:${wifi.ssid};P:${wifi.password};;`;
+    case "text":
+    default:
+      return text.trim();
+  }
+}
+
+/** Generate a blob URL for the QR code PNG */
 async function generateQrDataUrl(opts: QrOptions): Promise<string> {
-  // Statik import ettiğimiz sınıfı doğrudan kullanıyoruz
   const qr = new QRCodeStyling({
-    data: opts.text,
+    data: opts.data,
     width: opts.width,
     margin: opts.margin,
     dotsOptions: { color: opts.darkColor },
@@ -52,49 +81,44 @@ async function generateQrDataUrl(opts: QrOptions): Promise<string> {
     imageOptions: { crossOrigin: "anonymous" },
     qrOptions: { errorCorrectionLevel: opts.errorCorrectionLevel },
   });
-
-  // getRawData, PNG olarak ham ArrayBuffer döndürüyor
-  const arrayBuffer = await qr.getRawData("png");
-  // ArrayBuffer'ı blob'a sarıyoruz
-  const blob = new Blob([arrayBuffer], { type: "image/png" });
+  const buffer = await qr.getRawData("png");
+  const blob = new Blob([buffer], { type: "image/png" });
   return URL.createObjectURL(blob);
 }
 
-/**
- * Render the QR code to an off-screen canvas
- */
-async function generateQrCanvas(opts: QrOptions): Promise<HTMLCanvasElement> {
-  const dataUrl = await generateQrDataUrl(opts);
+/** Draw the QR onto our canvas for preview */
+async function renderToCanvas(
+  opts: QrOptions,
+  canvas: HTMLCanvasElement
+) {
+  const url = await generateQrDataUrl(opts);
   const img = new Image();
   img.crossOrigin = "anonymous";
-
-  return new Promise((resolve, reject) => {
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = opts.width;
-      canvas.height = opts.width;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        reject(new Error("Canvas context failed"));
-        return;
-      }
-      ctx.drawImage(img, 0, 0, opts.width, opts.width);
-      resolve(canvas);
-    };
-    img.onerror = reject;
-    img.src = dataUrl;
+  await new Promise((res, rej) => {
+    img.onload = res;
+    img.onerror = rej;
+    img.src = url;
   });
-}
-
-/**
- * Stub for embedding metadata; brevity için orijinal URL'i döndürüyoruz
- */
-function embedPngMetadata(dataUrl: string): string {
-  return dataUrl;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas context failed");
+  canvas.width = opts.width;
+  canvas.height = opts.width;
+  ctx.clearRect(0, 0, opts.width, opts.width);
+  ctx.drawImage(img, 0, 0, opts.width, opts.width);
+  URL.revokeObjectURL(url);
 }
 
 export default function QrCodeGeneratorClient() {
+  const [type, setType] = useState<DataType>("text");
   const [text, setText] = useState("");
+  const [urlValue, setUrlValue] = useState("");
+  const [vcardName, setVcardName] = useState("");
+  const [vcardOrg, setVcardOrg] = useState("");
+  const [vcardEmail, setVcardEmail] = useState("");
+  const [vcardPhone, setVcardPhone] = useState("");
+  const [wifiSsid, setWifiSsid] = useState("");
+  const [wifiAuth, setWifiAuth] = useState<WifiAuthType>("WPA");
+  const [wifiPassword, setWifiPassword] = useState("");
   const [size, setSize] = useState(256);
   const [margin, setMargin] = useState(1);
   const [darkColor, setDarkColor] = useState("#000000");
@@ -103,13 +127,49 @@ export default function QrCodeGeneratorClient() {
   const [logo, setLogo] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const debouncedText = useDebounce(text, 300);
+  const debouncedInputs = useDebounce(
+    {
+      type,
+      text,
+      urlValue,
+      vcardName,
+      vcardOrg,
+      vcardEmail,
+      vcardPhone,
+      wifiSsid,
+      wifiAuth,
+      wifiPassword,
+    },
+    300
+  );
+
+  const payload = useMemo(
+    () =>
+      buildPayload(
+        debouncedInputs.type,
+        debouncedInputs.text,
+        debouncedInputs.urlValue,
+        {
+          name: debouncedInputs.vcardName,
+          org: debouncedInputs.vcardOrg,
+          email: debouncedInputs.vcardEmail,
+          phone: debouncedInputs.vcardPhone,
+        },
+        {
+          ssid: debouncedInputs.wifiSsid,
+          auth: debouncedInputs.wifiAuth,
+          password: debouncedInputs.wifiPassword,
+        }
+      ),
+    [debouncedInputs]
+  );
 
   const options = useMemo<QrOptions>(
     () => ({
-      text: debouncedText,
+      data: payload,
       width: size,
       margin,
       darkColor,
@@ -117,72 +177,52 @@ export default function QrCodeGeneratorClient() {
       errorCorrectionLevel: ecLevel,
       logoDataUrl: logo || undefined,
     }),
-    [debouncedText, size, margin, darkColor, lightColor, ecLevel, logo]
+    [payload, size, margin, darkColor, lightColor, ecLevel, logo]
   );
 
-  // Data URL üretimi
+  // Generate blob URL
   useEffect(() => {
-    if (!debouncedText.trim()) {
+    if (!payload) {
       setQrUrl(null);
       setError(null);
       return;
     }
-    let cancelled = false;
+    let canceled = false;
     generateQrDataUrl(options)
       .then((url) => {
-        if (!cancelled) {
+        if (!canceled) {
           setQrUrl(url);
           setError(null);
         }
       })
       .catch(() => {
-        if (!cancelled) setError("❌ Failed to generate QR code.");
+        if (!canceled) setError("❌ Failed to generate QR code.");
       });
     return () => {
-      cancelled = true;
+      canceled = true;
     };
-  }, [options, debouncedText]);
+  }, [options, payload]);
 
-  // Canvas'a render
+  // Render canvas preview
   useEffect(() => {
-    if (!qrUrl || !canvasRef.current) return;
-    generateQrCanvas(options)
-      .then((canvas) => {
-        const ctx = canvasRef.current!.getContext("2d");
-        if (!ctx) return;
-        canvasRef.current!.width = canvas.width;
-        canvasRef.current!.height = canvas.height;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(canvas, 0, 0);
-      })
-      .catch(() => setError("❌ Failed to render QR code."));
+    if (qrUrl && canvasRef.current) {
+      renderToCanvas(options, canvasRef.current).catch(() =>
+        setError("❌ Preview render failed.")
+      );
+    }
   }, [qrUrl, options]);
 
-  const copyQr = async () => {
+  const download = () => {
     if (!qrUrl) return;
-    try {
-      await navigator.clipboard.writeText(qrUrl);
-      alert("✅ QR code URL copied!");
-    } catch {
-      alert("❌ Failed to copy URL.");
-    }
-  };
-
-  const downloadQr = () => {
-    if (!qrUrl) return;
-    const dataWithMeta = embedPngMetadata(qrUrl);
     const a = document.createElement("a");
-    a.href = dataWithMeta;
+    a.href = qrUrl;
     a.download = "qr-code.png";
     a.click();
   };
 
   const handleLogo = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) {
-      setLogo(null);
-      return;
-    }
+    if (!file) return setLogo(null);
     const reader = new FileReader();
     reader.onload = () => setLogo(reader.result as string);
     reader.readAsDataURL(file);
@@ -194,7 +234,7 @@ export default function QrCodeGeneratorClient() {
       aria-labelledby="qr-heading"
       className="space-y-16 text-gray-900 antialiased"
     >
-      {/* Başlık & Açıklama */}
+      {/* Heading & Description */}
       <div className="text-center sm:px-0 space-y-4">
         <h1
           id="qr-heading"
@@ -208,172 +248,207 @@ export default function QrCodeGeneratorClient() {
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Create custom QR codes—enter any text or URL, adjust size, colors, add a
-          logo, and download instantly, all in your browser.
+          Generate high-resolution QR codes for URLs, text, vCards and Wi-Fi credentials with color and size options.
         </p>
       </div>
 
-      {/* Kontroller */}
       <div className="max-w-3xl mx-auto space-y-8 sm:px-0">
-        <div className="space-y-6">
+        {/* Type selector */}
+        <div>
+          <label className="block mb-1 font-medium text-gray-800">Type</label>
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value as DataType)}
+            className="input-base w-full"
+          >
+            <option value="text">Text</option>
+            <option value="url">URL</option>
+            <option value="vcard">vCard</option>
+            <option value="wifi">Wi-Fi</option>
+          </select>
+        </div>
+
+        {/* Conditional inputs */}
+        {type === "text" && (
           <div>
-            <label
-              htmlFor="qr-text"
-              className="block mb-1 font-medium text-gray-800"
-            >
-              Text or URL
-            </label>
+            <label className="block mb-1 font-medium text-gray-800">Text</label>
             <input
-              id="qr-text"
               type="text"
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Enter text or link…"
-              className="
-                w-full p-3 border border-gray-300 rounded-md bg-white
-                focus:outline-none focus:ring-2 focus:ring-[#7c3aed]
-                transition
-              "
+              className="input-base w-full"
+              placeholder="Enter any text…"
             />
           </div>
-
+        )}
+        {type === "url" && (
           <div>
-            <label
-              htmlFor="qr-size"
-              className="block mb-1 font-medium text-gray-800"
-            >
-              Size: <span className="font-semibold">{size}px</span>
-            </label>
+            <label className="block mb-1 font-medium text-gray-800">URL</label>
             <input
-              id="qr-size"
+              type="url"
+              value={urlValue}
+              onChange={(e) => setUrlValue(e.target.value)}
+              className="input-base w-full"
+              placeholder="https://example.com"
+            />
+          </div>
+        )}
+        {type === "vcard" && (
+          <div className="grid sm:grid-cols-2 gap-4">
+            <input
+              type="text"
+              value={vcardName}
+              onChange={(e) => setVcardName(e.target.value)}
+              placeholder="Name"
+              className="input-base"
+            />
+            <input
+              type="text"
+              value={vcardOrg}
+              onChange={(e) => setVcardOrg(e.target.value)}
+              placeholder="Organization"
+              className="input-base"
+            />
+            <input
+              type="email"
+              value={vcardEmail}
+              onChange={(e) => setVcardEmail(e.target.value)}
+              placeholder="Email"
+              className="input-base"
+            />
+            <input
+              type="tel"
+              value={vcardPhone}
+              onChange={(e) => setVcardPhone(e.target.value)}
+              placeholder="Phone"
+              className="input-base"
+            />
+          </div>
+        )}
+        {type === "wifi" && (
+          <div className="grid sm:grid-cols-3 gap-4">
+            <input
+              type="text"
+              value={wifiSsid}
+              onChange={(e) => setWifiSsid(e.target.value)}
+              placeholder="SSID"
+              className="input-base"
+            />
+            <select
+              value={wifiAuth}
+              onChange={(e) => setWifiAuth(e.target.value as WifiAuthType)}
+              className="input-base"
+            >
+              <option value="WPA">WPA/WPA2</option>
+              <option value="WEP">WEP</option>
+              <option value="nopass">None</option>
+            </select>
+            <input
+              type="password"
+              value={wifiPassword}
+              onChange={(e) => setWifiPassword(e.target.value)}
+              placeholder="Password"
+              className="input-base"
+            />
+          </div>
+        )}
+
+        {/* Common style controls */}
+        <div className="grid sm:grid-cols-2 gap-4">
+          <label className="block">
+            Size: <span className="font-semibold">{size}px</span>
+            <input
               type="range"
               min={128}
               max={512}
               step={16}
               value={size}
-              onChange={(e) => setSize(parseInt(e.target.value, 10))}
+              onChange={(e) => setSize(+e.target.value)}
               className="w-full"
             />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label
-                htmlFor="qr-margin"
-                className="block mb-1 font-medium text-gray-800"
-              >
-                Margin
-              </label>
-              <input
-                id="qr-margin"
-                type="number"
-                min={0}
-                max={10}
-                value={margin}
-                onChange={(e) => setMargin(parseInt(e.target.value, 10))}
-                className="input-base w-full"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="qr-ec"
-                className="block mb-1 font-medium text-gray-800"
-              >
-                Error Correction
-              </label>
-              <select
-                id="qr-ec"
-                value={ecLevel}
-                onChange={(e) =>
-                  setEcLevel(e.target.value as ErrorCorrectionLevel)
-                }
-                className="input-base w-full"
-              >
-                <option value="L">L - 7%</option>
-                <option value="M">M - 15%</option>
-                <option value="Q">Q - 25%</option>
-                <option value="H">H - 30%</option>
-              </select>
-            </div>
-
-            <div>
-              <label
-                htmlFor="qr-dark"
-                className="block mb-1 font-medium text-gray-800"
-              >
-                Foreground
-              </label>
-              <input
-                id="qr-dark"
-                type="color"
-                value={darkColor}
-                onChange={(e) => setDarkColor(e.target.value)}
-                className="h-10 w-full rounded"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="qr-light"
-                className="block mb-1 font-medium text-gray-800"
-              >
-                Background
-              </label>
-              <input
-                id="qr-light"
-                type="color"
-                value={lightColor}
-                onChange={(e) => setLightColor(e.target.value)}
-                className="h-10 w-full rounded"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label
-                htmlFor="qr-logo"
-                className="block mb-1 font-medium text-gray-800"
-              >
-                Logo (optional)
-              </label>
-              <input
-                id="qr-logo"
-                type="file"
-                accept="image/*"
-                onChange={handleLogo}
-                className="input-base w-full"
-              />
-            </div>
-          </div>
-
-          {error && (
-            <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
-              {error}
-            </div>
-          )}
+          </label>
+          <label className="block">
+            Margin:
+            <input
+              type="number"
+              min={0}
+              max={10}
+              value={margin}
+              onChange={(e) => setMargin(+e.target.value)}
+              className="input-base w-full"
+            />
+          </label>
+          <label className="block">
+            Foreground:
+            <input
+              type="color"
+              value={darkColor}
+              onChange={(e) => setDarkColor(e.target.value)}
+              className="w-full h-10"
+            />
+          </label>
+          <label className="block">
+            Background:
+            <input
+              type="color"
+              value={lightColor}
+              onChange={(e) => setLightColor(e.target.value)}
+              className="w-full h-10"
+            />
+          </label>
+          <label className="block sm:col-span-2">
+            Error Correction:
+            <select
+              value={ecLevel}
+              onChange={(e) => setEcLevel(e.target.value as ErrorCorrectionLevel)}
+              className="input-base w-full"
+            >
+              <option value="L">L – 7%</option>
+              <option value="M">M – 15%</option>
+              <option value="Q">Q – 25%</option>
+              <option value="H">H – 30%</option>
+            </select>
+          </label>
+          <label className="block sm:col-span-2">
+            Logo (optional):
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleLogo}
+              className="input-base w-full"
+            />
+          </label>
         </div>
+
+        {error && (
+          <div className="p-4 bg-red-50 border-red-200 text-red-700 rounded">
+            {error}
+          </div>
+        )}
       </div>
 
-      {/* Önizleme & Butonlar */}
+      {/* Preview & Actions */}
       {qrUrl && (
-        <div className="mt-12 max-w-3xl mx-auto text-center space-y-6">
+        <div className="
+          mt-12 max-w-3xl mx-auto text-center space-y-6
+        ">
           <canvas
             ref={canvasRef}
             width={size}
             height={size}
+            className="mx-auto border rounded"
             aria-label="QR code preview"
-            className="border rounded-md mx-auto"
           />
           <div className="flex justify-center gap-4">
             <button
-              onClick={copyQr}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition font-medium"
+              onClick={() => navigator.clipboard.writeText(qrUrl)}
+              className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
             >
               Copy URL
             </button>
             <button
-              onClick={downloadQr}
-              className="px-6 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 transition font-medium"
+              onClick={download}
+              className="px-6 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
             >
               Download PNG
             </button>

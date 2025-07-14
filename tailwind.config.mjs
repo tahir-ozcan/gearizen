@@ -1,12 +1,18 @@
-const defaultTheme = require("tailwindcss/defaultTheme");
-const typography = require("@tailwindcss/typography");
+// tailwind.config.mjs
+
+import defaultTheme from "tailwindcss/defaultTheme";
+import typography from "@tailwindcss/typography";
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+const config = {
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
     "./lib/**/*.{ts,tsx}",
+
+    // Eğer globals.css veya başka css’leriniz varsa:
+    "./app/**/*.css",
+    "./components/**/*.css",
   ],
   theme: {
     container: {
@@ -45,3 +51,5 @@ module.exports = {
   },
   plugins: [typography],
 };
+
+export default config;

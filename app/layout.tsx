@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AnalyticsLoader from "./components/AnalyticsLoader";
 import { Inter } from "next/font/google";
+import { Info } from "lucide-react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -102,13 +103,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <AnalyticsLoader />
       </head>
       <body className="flex min-h-screen flex-col">
-        {/* Skip link */}
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 px-4 py-2 bg-indigo-600 text-white rounded-md z-50"
-        >
-          Skip to main content
-        </a>
+        {/* Temporary launch notice */}
+        <div className="bg-indigo-50 border-b border-indigo-200 text-indigo-700 px-4 py-3 flex items-center justify-center">
+          <Info className="w-5 h-5 mr-2" aria-hidden="true" />
+          <span className="text-sm font-medium">
+            We just launched our website; some tools may be buggy or missing but
+            we&#39;ll fix them shortly! 🙂
+          </span>
+        </div>
 
         {/* Header */}
         <Header />
@@ -121,7 +123,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           aria-label="Main content"
           className="flex-grow"
         >
-          {/* Top and bottom padding increased for clear separation from header/footer */}
           <div className="max-w-7xl mx-auto px-4 md:px-6 pt-16 pb-20 lg:pt-24 lg:pb-28">
             {children}
           </div>

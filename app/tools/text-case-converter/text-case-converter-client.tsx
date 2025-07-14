@@ -102,12 +102,13 @@ export default function TextCaseConverterClient() {
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mx-auto max-w-3xl text-lg sm:text-xl text-gray-700 leading-relaxed">
-          Paste or type any text, choose a case style, and convert instantly. Copy or clear with one click—all client-side.
+          Switch between UPPERCASE, lowercase, Title Case, snake_case, camelCase and more with one click. Paste or type any text, convert instantly, then copy or clear—all client-side.
         </p>
       </div>
 
       {/* Input & Options */}
       <div className="max-w-3xl mx-auto space-y-8 sm:px-0">
+        {/* Text Input */}
         <div className="flex flex-col">
           <label
             htmlFor="case-input"
@@ -132,6 +133,7 @@ export default function TextCaseConverterClient() {
           <p className="mt-1 text-xs text-gray-500">{inputCount} characters</p>
         </div>
 
+        {/* Case Style Radios */}
         <div className="flex flex-wrap justify-center gap-4">
           {CASE_OPTIONS.map(({ label, value }) => (
             <label key={value} className="inline-flex items-center space-x-2">

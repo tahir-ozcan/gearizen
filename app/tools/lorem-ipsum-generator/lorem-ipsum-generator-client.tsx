@@ -6,10 +6,9 @@ import { useState, ChangeEvent } from "react";
 type LoremMode = "paragraphs" | "sentences" | "words";
 
 /**
- * Generate simple Lorem Ipsum text.
- * - "words": returns the first `count` words.
- * - "sentences": returns the first `count` sentences.
- * - "paragraphs": returns `count` paragraphs (each 4 sentences).
+ * Lorem Ipsum Generator Tool
+ *
+ * Produce realistic placeholder text of any length—control paragraphs, words and formatting for design mockups. 100% client-side, no signup required.
  */
 function generateLorem(count: number, mode: LoremMode): string {
   const baseSentence =
@@ -17,33 +16,29 @@ function generateLorem(count: number, mode: LoremMode): string {
   const sentencePool = [
     baseSentence,
     "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-    "Nisi ut aliquip ex ea commodo consequat.",
-    "Duis aute irure dolor in reprehenderit in voluptate velit esse.",
-    "Cillum dolore eu fugiat nulla pariatur.",
-    "Excepteur sint occaecat cupidatat non proident."
+    "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+    "Excepteur sint occaecat cupidatat non proident.",
   ];
-  const allWords = baseSentence
+
+  const allWords = sentencePool
+    .join(" ")
     .replace(/[.]/g, "")
     .split(/\s+/);
 
   if (mode === "words") {
-    return allWords
-      .slice(0, count)
-      .join(" ")
-      .trim() + (count > 0 ? "…" : "");
+    const slice = allWords.slice(0, count);
+    return slice.join(" ") + (slice.length < count ? "" : "…");
   }
 
   if (mode === "sentences") {
-    return sentencePool
-      .slice(0, count)
-      .join(" ");
+    return sentencePool.slice(0, count).join(" ");
   }
 
   // paragraphs
   const paragraphs: string[] = [];
   for (let i = 0; i < count; i++) {
-    // repeat first 4 sentences per paragraph
+    // use first 4 sentences for each paragraph
     paragraphs.push(sentencePool.slice(0, 4).join(" "));
   }
   return paragraphs.join("\n\n");
@@ -78,7 +73,7 @@ export default function LoremIpsumGeneratorClient() {
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Instantly generate filler text—words, sentences or paragraphs—for your designs or drafts, all client-side.
+          Produce realistic placeholder text of any length—control paragraphs, words and formatting for design mockups.
         </p>
       </div>
 

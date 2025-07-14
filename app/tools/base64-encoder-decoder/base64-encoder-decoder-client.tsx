@@ -89,7 +89,11 @@ export default function Base64EncoderDecoderClient() {
         setOutput(decodeText(input));
       }
     } catch {
-      setError(mode === "encode" ? "❌ Encoding failed." : "❌ Decoding failed.");
+      setError(
+        mode === "encode"
+          ? "❌ Encoding failed."
+          : "❌ Decoding failed."
+      );
     }
   }
 
@@ -162,7 +166,9 @@ export default function Base64EncoderDecoderClient() {
                 focus:ring-2 focus:ring-[#7c3aed] font-mono resize-y transition
               "
             />
-            <p className="mt-1 text-xs text-gray-500">{inputCount} characters</p>
+            <p className="mt-1 text-xs text-gray-500">
+              {inputCount} characters
+            </p>
           </div>
 
           {/* Output */}
@@ -201,7 +207,9 @@ export default function Base64EncoderDecoderClient() {
                 <ClipboardCopy className="w-6 h-6" />
               </button>
             </div>
-            <p className="mt-1 text-xs text-gray-500">{outputCount} characters</p>
+            <p className="mt-1 text-xs text-gray-500">
+              {outputCount} characters
+            </p>
           </div>
         </div>
 
@@ -229,7 +237,7 @@ export default function Base64EncoderDecoderClient() {
           </button>
           <button
             type="button"
-            onClick={() => setMode(m => (m === "encode" ? "decode" : "encode"))}
+            onClick={() => setMode((m) => (m === "encode" ? "decode" : "encode"))}
             className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition text-sm font-medium text-gray-700"
           >
             {mode === "encode" ? "Switch to Decode" : "Switch to Encode"}

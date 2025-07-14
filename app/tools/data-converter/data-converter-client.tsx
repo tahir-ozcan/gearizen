@@ -21,14 +21,14 @@ function xmlToJson(node: Node): unknown {
     const el = node as Element;
     if (el.attributes.length > 0) {
       const attrs: Record<string, string> = {};
-      Array.from(el.attributes).forEach(attr => {
+      Array.from(el.attributes).forEach((attr) => {
         attrs[attr.name] = attr.value;
       });
       obj["@attributes"] = attrs;
     }
   }
   if (node.hasChildNodes()) {
-    Array.from(node.childNodes).forEach(child => {
+    Array.from(node.childNodes).forEach((child) => {
       const key = child.nodeName;
       const value = xmlToJson(child);
       if (child.nodeType === Node.TEXT_NODE && value === "") {
@@ -61,7 +61,7 @@ function jsonToXml(value: unknown, nodeName = "root"): string {
     return `<${nodeName}>${escaped}</${nodeName}>`;
   }
   if (Array.isArray(value)) {
-    return value.map(item => jsonToXml(item, nodeName)).join("");
+    return value.map((item) => jsonToXml(item, nodeName)).join("");
   }
   let xml = `<${nodeName}>`;
   for (const [key, val] of Object.entries(value)) {
@@ -101,8 +101,10 @@ export default function DataConverterClient() {
     e.preventDefault();
     setError(null);
     setOutput("");
+
     try {
       let data: unknown;
+
       // parse input
       if (from === "json") {
         data = JSON.parse(input);
@@ -234,7 +236,10 @@ export default function DataConverterClient() {
               value={input}
               onChange={handleInputChange}
               placeholder={`Paste ${from.toUpperCase()} data here…`}
-              className="w-full h-64 p-4 border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-[#7c3aed] font-mono resize-y transition"
+              className="
+                w-full h-64 p-4 border border-gray-300 rounded-md bg-white
+                focus:ring-2 focus:ring-[#7c3aed] font-mono resize-y transition
+              "
             />
             <p className="mt-1 text-xs text-gray-500">{inputCount} characters</p>
           </div>
@@ -250,14 +255,20 @@ export default function DataConverterClient() {
                 value={output}
                 readOnly
                 placeholder="Converted data appears here…"
-                className="w-full h-64 pl-4 pr-12 py-4 border border-gray-300 rounded-md bg-gray-50 focus:ring-2 focus:ring-[#7c3aed] font-mono resize-y transition"
+                className="
+                  w-full h-64 pl-4 pr-12 py-4 border border-gray-300 rounded-md bg-gray-50
+                  focus:ring-2 focus:ring-[#7c3aed] font-mono resize-y transition
+                "
               />
               <button
                 type="button"
                 onClick={copyOutput}
                 disabled={!output}
                 aria-label="Copy output"
-                className="absolute top-2 right-2 p-2 text-gray-500 hover:text-[#7c3aed] disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition"
+                className="
+                  absolute top-2 right-2 p-2 text-gray-500 hover:text-[#7c3aed]
+                  disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition
+                "
               >
                 <ClipboardCopy className="w-6 h-6" />
               </button>

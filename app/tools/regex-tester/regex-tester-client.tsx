@@ -1,66 +1,81 @@
 // app/tools/regex-tester/regex-tester-client.tsx
 "use client";
 
-import { useState, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 
 /**
  * Regex Tester Tool
  *
- * Enter a regular expression with optional flags and sample text to highlight and list all matches instantly—100% client-side.
+ * Build, test, and debug regular expressions with real-time match highlighting
+ * and a library of common patterns—100% client-side.
  */
+
+interface CommonPattern {
+  name: string;
+  pattern: string;
+  flags: string;
+}
+
+const COMMON_PATTERNS: CommonPattern[] = [
+  { name: "Email address", pattern: `\\b[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,}\\b`, flags: "gi" },
+  { name: "URL", pattern: `https?://[\\w./?=&%-]+`, flags: "gi" },
+  { name: "Digits", pattern: `\\d+`, flags: "g" },
+  { name: "Hex color", pattern: `#[0-9A-Fa-f]{3,6}\\b`, flags: "g" },
+  { name: "Whitespace", pattern: `\\s+`, flags: "g" },
+];
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 export default function RegexTesterClient() {
   const [pattern, setPattern] = useState("");
-  const [flags, setFlags] = useState("");
+  const [flags, setFlags] = useState("g");
   const [testInput, setTestInput] = useState("");
-  const [matches, setMatches] = useState<string[] | null>(null);
+  const [matches, setMatches] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [highlightHtml, setHighlightHtml] = useState<string>("");
 
-  function handlePatternChange(e: ChangeEvent<HTMLInputElement>) {
-    setPattern(e.target.value);
-    setError(null);
-    setMatches(null);
+  // Apply a common pattern from the library
+  function applyCommon(cp: CommonPattern) {
+    setPattern(cp.pattern);
+    setFlags(cp.flags);
   }
 
-  function handleFlagsChange(e: ChangeEvent<HTMLInputElement>) {
-    setFlags(e.target.value);
-    setError(null);
-    setMatches(null);
-  }
-
-  function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    setTestInput(e.target.value);
-    setMatches(null);
-  }
-
-  function runTest() {
-    if (!pattern.trim()) {
-      setError("Please enter a regex pattern.");
+  // Run the regex and update matches & highlighting
+  useEffect(() => {
+    // Show raw text if pattern is empty
+    if (!pattern) {
       setMatches([]);
+      setHighlightHtml(escapeHtml(testInput));
+      setError(null);
       return;
     }
+
     try {
       const regex = new RegExp(pattern, flags);
-      const found = Array.from(testInput.matchAll(regex), (m) => m[0]);
+      const found = Array.from(testInput.matchAll(regex), m => m[0]);
       setMatches(found);
       setError(null);
+
+      const escaped = escapeHtml(testInput);
+      // Wrap each match in <mark>
+      const highlighted = escaped.replace(
+        regex,
+        m => `<mark>${escapeHtml(m)}</mark>`
+      );
+      setHighlightHtml(highlighted);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid regex");
       setMatches([]);
+      setHighlightHtml(escapeHtml(testInput));
     }
-  }
+  }, [pattern, flags, testInput]);
 
-  async function copyMatches() {
-    if (!matches || matches.length === 0) return;
-    try {
-      await navigator.clipboard.writeText(matches.join("\n"));
-      alert("✅ Matches copied to clipboard!");
-    } catch {
-      alert("❌ Failed to copy matches.");
-    }
-  }
-
-  const hasMatches = matches !== null;
-  const hasResults = hasMatches && matches.length > 0;
+  const hasMatches = matches.length > 0;
 
   return (
     <section
@@ -82,8 +97,26 @@ export default function RegexTesterClient() {
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mx-auto max-w-2xl text-lg sm:text-xl text-gray-700 leading-relaxed">
-          Enter a regular expression, optional flags, and sample text to find and list all matches—no server, fully client-side.
+          Build, test and debug regular expressions with real-time match highlighting and a library of common patterns.
         </p>
+      </div>
+
+      {/* Common Patterns Library */}
+      <div className="max-w-2xl mx-auto space-y-6 sm:px-0">
+        <label className="block mb-1 font-medium text-gray-800">
+          Common Patterns
+        </label>
+        <div className="grid grid-cols-2 gap-2">
+          {COMMON_PATTERNS.map(cp => (
+            <button
+              key={cp.name}
+              onClick={() => applyCommon(cp)}
+              className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm text-gray-800 transition"
+            >
+              {cp.name}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Inputs */}
@@ -98,7 +131,7 @@ export default function RegexTesterClient() {
               id="pattern"
               type="text"
               value={pattern}
-              onChange={handlePatternChange}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setPattern(e.target.value)}
               placeholder="e.g. \\b\\w+\\b"
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7c3aed] transition"
             />
@@ -111,7 +144,7 @@ export default function RegexTesterClient() {
               id="flags"
               type="text"
               value={flags}
-              onChange={handleFlagsChange}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setFlags(e.target.value)}
               placeholder="e.g. gi"
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7c3aed] transition"
             />
@@ -126,26 +159,39 @@ export default function RegexTesterClient() {
           <textarea
             id="test-input"
             value={testInput}
-            onChange={handleInputChange}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setTestInput(e.target.value)}
             placeholder="Paste or type text to test…"
             className="w-full h-40 p-4 border border-gray-300 rounded-lg font-mono text-sm resize-y focus:ring-2 focus:ring-[#7c3aed] transition"
+          />
+        </div>
+
+        {/* Preview */}
+        <div>
+          <label className="block text-sm font-medium text-gray-800 mb-1">
+            Preview
+          </label>
+          <pre
+            className="w-full h-40 p-4 border border-gray-300 rounded-lg bg-gray-50 overflow-auto font-mono text-sm"
+            dangerouslySetInnerHTML={{ __html: highlightHtml }}
           />
         </div>
 
         {/* Actions */}
         <div className="flex flex-wrap justify-center gap-4">
           <button
-            type="button"
-            onClick={runTest}
-            className="inline-flex items-center px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
+            onClick={() => {}}
+            className="inline-flex items-center px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
           >
-            Run Test
+            Test
           </button>
           <button
-            type="button"
-            onClick={copyMatches}
-            disabled={!hasResults}
-            className="inline-flex items-center px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition font-medium disabled:opacity-50"
+            onClick={async () => {
+              if (!hasMatches) return;
+              await navigator.clipboard.writeText(matches.join("\n"));
+              alert("✅ Matches copied to clipboard!");
+            }}
+            disabled={!hasMatches}
+            className="inline-flex items-center px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus-visible:ring-2 focus-visible:ring-green-500 transition font-medium disabled:opacity-50"
           >
             Copy Matches
           </button>
@@ -159,24 +205,20 @@ export default function RegexTesterClient() {
         )}
 
         {/* Results */}
-        {hasMatches && (
-          <div className="mt-8">
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">
-              {matches!.length} Match{matches!.length !== 1 ? "es" : ""}
-            </h2>
-            {hasResults ? (
-              <ul className="list-disc pl-5 space-y-1 text-gray-700">
-                {matches!.map((m, i) => (
-                  <li key={i} className="font-mono text-sm">
-                    {m}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-600 italic">No matches found.</p>
-            )}
-          </div>
-        )}
+        <div>
+          <h2 className="text-lg font-semibold text-gray-800 mb-2">
+            {matches.length} Match{matches.length !== 1 ? "es" : ""}
+          </h2>
+          {matches.length > 0 ? (
+            <ul className="list-disc pl-5 space-y-1 text-gray-700 font-mono text-sm">
+              {matches.map((m, i) => (
+                <li key={i}>{m}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-600 italic">No matches found.</p>
+          )}
+        </div>
       </div>
     </section>
   );

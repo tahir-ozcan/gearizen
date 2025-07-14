@@ -6,8 +6,7 @@ import { useState, ChangeEvent, useMemo } from "react";
 /**
  * SEO Meta Tag Generator Tool
  *
- * Create optimized HTML meta tags for title, description, keywords,
- * Open Graph and Twitter Cards—copy ready to paste in your <head> section.
+ * Generate optimized meta tags, Open Graph and Twitter card snippets to boost search visibility and social sharing.
  */
 export default function SeoMetaTagGeneratorClient() {
   const [title, setTitle] = useState("");
@@ -21,34 +20,42 @@ export default function SeoMetaTagGeneratorClient() {
 
   const metaTags = useMemo(() => {
     const lines: string[] = [];
+
     if (title) {
       lines.push(`<title>${title}</title>`);
       lines.push(`<meta name="title" content="${title}" />`);
       lines.push(`<meta property="og:title" content="${title}" />`);
       lines.push(`<meta name="twitter:title" content="${title}" />`);
     }
+
     if (description) {
       lines.push(`<meta name="description" content="${description}" />`);
       lines.push(`<meta property="og:description" content="${description}" />`);
       lines.push(`<meta name="twitter:description" content="${description}" />`);
     }
+
     if (keywords) {
       lines.push(`<meta name="keywords" content="${keywords}" />`);
     }
+
     if (url) {
       lines.push(`<link rel="canonical" href="${url}" />`);
       lines.push(`<meta property="og:url" content="${url}" />`);
       lines.push(`<meta name="twitter:url" content="${url}" />`);
     }
+
     if (image) {
       lines.push(`<meta property="og:image" content="${image}" />`);
       lines.push(`<meta name="twitter:image" content="${image}" />`);
     }
+
+    // Always include these defaults
     lines.push(`<meta property="og:type" content="website" />`);
     lines.push(`<meta property="og:site_name" content="Gearizen" />`);
     lines.push(`<meta property="og:locale" content="en_US" />`);
     lines.push(`<meta name="twitter:card" content="${twitterCard}" />`);
     lines.push(`<meta name="twitter:site" content="@gearizen" />`);
+
     return lines.join("\n");
   }, [title, description, keywords, url, image, twitterCard]);
 
@@ -83,8 +90,7 @@ export default function SeoMetaTagGeneratorClient() {
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mx-auto max-w-3xl text-lg sm:text-xl text-gray-700 leading-relaxed">
-          Generate optimized HTML meta tags for your page’s title, description,
-          keywords, Open Graph and Twitter Cards—copy ready to paste in your{" "}
+          Generate optimized meta tags, Open Graph and Twitter card snippets to boost search visibility and social sharing—copy ready to paste in your{" "}
           {"<head>"} section.
         </p>
       </div>
@@ -92,7 +98,10 @@ export default function SeoMetaTagGeneratorClient() {
       {/* Form Inputs */}
       <div className="max-w-lg mx-auto space-y-6 sm:px-0">
         <div>
-          <label htmlFor="meta-title" className="block text-sm font-medium text-gray-800 mb-1">
+          <label
+            htmlFor="meta-title"
+            className="block text-sm font-medium text-gray-800 mb-1"
+          >
             Page Title
           </label>
           <input
@@ -106,7 +115,10 @@ export default function SeoMetaTagGeneratorClient() {
         </div>
 
         <div>
-          <label htmlFor="meta-description" className="block text-sm font-medium text-gray-800 mb-1">
+          <label
+            htmlFor="meta-description"
+            className="block text-sm font-medium text-gray-800 mb-1"
+          >
             Description
           </label>
           <textarea
@@ -120,7 +132,10 @@ export default function SeoMetaTagGeneratorClient() {
         </div>
 
         <div>
-          <label htmlFor="meta-keywords" className="block text-sm font-medium text-gray-800 mb-1">
+          <label
+            htmlFor="meta-keywords"
+            className="block text-sm font-medium text-gray-800 mb-1"
+          >
             Keywords
           </label>
           <input
@@ -134,7 +149,10 @@ export default function SeoMetaTagGeneratorClient() {
         </div>
 
         <div>
-          <label htmlFor="meta-url" className="block text-sm font-medium text-gray-800 mb-1">
+          <label
+            htmlFor="meta-url"
+            className="block text-sm font-medium text-gray-800 mb-1"
+          >
             Canonical URL
           </label>
           <input
@@ -148,7 +166,10 @@ export default function SeoMetaTagGeneratorClient() {
         </div>
 
         <div>
-          <label htmlFor="meta-image" className="block text-sm font-medium text-gray-800 mb-1">
+          <label
+            htmlFor="meta-image"
+            className="block text-sm font-medium text-gray-800 mb-1"
+          >
             Social Preview Image URL
           </label>
           <input
@@ -162,7 +183,9 @@ export default function SeoMetaTagGeneratorClient() {
         </div>
 
         <div>
-          <span className="block text-sm font-medium text-gray-800 mb-1">Twitter Card Type</span>
+          <span className="block text-sm font-medium text-gray-800 mb-1">
+            Twitter Card Type
+          </span>
           <div className="flex items-center space-x-4">
             <label className="flex items-center space-x-2">
               <input

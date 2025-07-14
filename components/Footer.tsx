@@ -25,20 +25,20 @@ interface LinkItem {
   label: string;
   href: string;
   external?: boolean;
-  icon?: ReactNode;
+  icon: ReactNode;
 }
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
-  const siteLinks: LinkItem[] = [
+  const siteLinks = [
     { label: "Home", href: "/" },
     { label: "About Us", href: "/about" },
     { label: "All Tools", href: "/tools" },
     { label: "Contact Us", href: "/contact" },
   ];
 
-  const popularTools: LinkItem[] = [
+  const popularTools = [
     { label: "JSON Formatter", href: "/tools/json-formatter" },
     { label: "URL Shortener", href: "/tools/url-shortener" },
     { label: "Lorem Ipsum Generator", href: "/tools/lorem-ipsum-generator" },
@@ -46,13 +46,13 @@ export default function Footer() {
     { label: "Markdown Editor", href: "/tools/markdown-editor" },
   ];
 
-  const legalLinks: LinkItem[] = [
+  const legalLinks = [
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms of Service", href: "/terms" },
     { label: "Cookie Policy", href: "/cookies" },
   ];
 
-  const builtWith: LinkItem[] = [
+  const builtWith = [
     { label: "TypeScript", href: "https://www.typescriptlang.org", external: true },
     { label: "Next.js", href: "https://nextjs.org", external: true },
     { label: "Tailwind CSS", href: "https://tailwindcss.com", external: true },
@@ -71,7 +71,7 @@ export default function Footer() {
       label: "X",
       href: "https://x.com/gearizen",
       external: true,
-      icon: <FaX className="w-6 h-6 text-[#1DA1F2]" aria-hidden="true" />,
+      icon: <FaX className="w-6 h-6" aria-hidden="true" />,
     },
     {
       label: "LinkedIn",
@@ -88,6 +88,19 @@ export default function Footer() {
     name: "Gearizen",
     logo: "https://gearizen.com/favicon.png",
     sameAs: socialLinks.map((l) => l.href),
+  };
+
+  const getSocialClasses = (label: string) => {
+    switch (label) {
+      case "GitHub":
+        return "text-gray-600 hover:text-gray-800";
+      case "X":
+        return "text-[#1DA1F2] hover:text-[#0d8ddb]";
+      case "LinkedIn":
+        return "text-[#0077B5] hover:text-[#005582]";
+      default:
+        return "text-gray-500 hover:text-gray-700";
+    }
   };
 
   return (
@@ -111,15 +124,21 @@ export default function Footer() {
                 height={32}
                 loading="lazy"
               />
-              <span className="ml-2 text-xl font-extrabold bg-clip-text text-transparent
-                               bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]">
+              <span
+                className="ml-2 text-xl font-extrabold bg-clip-text text-transparent
+                           bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]"
+              >
                 Gearizen
               </span>
             </Link>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Instant, privacy-first web tools for developers, creators, and beyond. No signup. No tracking. 100% client-side.
+              Instant, privacy-first web tools for developers, creators, and
+              beyond. No signup. No tracking. 100% client-side.
             </p>
-            <nav aria-label="Social media links" className="mt-4 flex space-x-4">
+            <nav
+              aria-label="Social media links"
+              className="mt-4 flex space-x-4"
+            >
               {socialLinks.map(({ href, label, external, icon }) => (
                 <a
                   key={href}
@@ -127,7 +146,7 @@ export default function Footer() {
                   target={external ? "_blank" : undefined}
                   rel={external ? "noopener noreferrer" : undefined}
                   aria-label={label}
-                  className="text-gray-500 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 transition-colors"
+                  className={`${getSocialClasses(label)} transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2`}
                 >
                   {icon}
                 </a>
@@ -137,7 +156,10 @@ export default function Footer() {
 
           {/* Site Pages */}
           <nav aria-labelledby="footer-site-pages">
-            <h3 id="footer-site-pages" className="text-lg font-semibold text-gray-900 mb-4">
+            <h3
+              id="footer-site-pages"
+              className="text-lg font-semibold text-gray-900 mb-4"
+            >
               Site
             </h3>
             <ul className="space-y-2 text-sm text-gray-600">
@@ -156,7 +178,10 @@ export default function Footer() {
 
           {/* Popular Tools */}
           <nav aria-labelledby="footer-popular-tools">
-            <h3 id="footer-popular-tools" className="text-lg font-semibold text-gray-900 mb-4">
+            <h3
+              id="footer-popular-tools"
+              className="text-lg font-semibold text-gray-900 mb-4"
+            >
               Popular Tools
             </h3>
             <ul className="space-y-2 text-sm text-gray-600">
@@ -175,7 +200,10 @@ export default function Footer() {
 
           {/* Legal */}
           <nav aria-labelledby="footer-legal">
-            <h3 id="footer-legal" className="text-lg font-semibold text-gray-900 mb-4">
+            <h3
+              id="footer-legal"
+              className="text-lg font-semibold text-gray-900 mb-4"
+            >
               Legal
             </h3>
             <ul className="space-y-2 text-sm text-gray-600">
@@ -194,7 +222,10 @@ export default function Footer() {
 
           {/* Built With */}
           <nav aria-labelledby="footer-built-with">
-            <h3 id="footer-built-with" className="text-lg font-semibold text-gray-900 mb-4">
+            <h3
+              id="footer-built-with"
+              className="text-lg font-semibold text-gray-900 mb-4"
+            >
               Built With
             </h3>
             <ul className="space-y-2 text-sm text-gray-600">
@@ -219,7 +250,10 @@ export default function Footer() {
           <p>© {currentYear} Gearizen. All rights reserved.</p>
           <p className="mt-2 sm:mt-0 flex items-center">
             Made with
-            <Heart className="w-4 h-4 text-red-500 mx-1" aria-hidden="true" />
+            <Heart
+              className="w-4 h-4 text-red-500 mx-1"
+              aria-hidden="true"
+            />
             in the browser.
           </p>
         </div>

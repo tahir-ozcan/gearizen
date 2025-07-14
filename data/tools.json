@@ -4,139 +4,162 @@
       "href": "/tools/password-generator",
       "icon": "Key",
       "title": "Strong Password Generator",
-      "description": "Instantly generate secure, customizable passwords client-side with options for length, complexity and entropy visualization."
+      "description": "Instantly generate secure, customizable passwords client-side with options for length, complexity and entropy visualization.",
+      "category": "Generators"
     },
     {
       "href": "/tools/uuid-generator",
       "icon": "Fingerprint",
       "title": "UUID Generator",
-      "description": "Create RFC4122-compliant UUIDs (v1, v4, v5) instantly, with optional namespace support."
+      "description": "Create RFC4122-compliant UUIDs (v1, v4, v5) instantly, with optional namespace support.",
+      "category": "Generators"
     },
     {
       "href": "/tools/lorem-ipsum-generator",
       "icon": "AlignLeft",
       "title": "Lorem Ipsum Generator",
-      "description": "Produce realistic placeholder text of any length—control paragraphs, words and formatting for design mockups."
+      "description": "Produce realistic placeholder text of any length—control paragraphs, words and formatting for design mockups.",
+      "category": "Generators"
     },
     {
       "href": "/tools/text-counter",
       "icon": "Type",
       "title": "Text Counter",
-      "description": "Get real-time counts of words, characters, sentences and lines for any text input with detailed analytics."
+      "description": "Get real-time counts of words, characters, sentences and lines for any text input with detailed analytics.",
+      "category": "Analyzers"
     },
     {
       "href": "/tools/text-case-converter",
       "icon": "Type",
       "title": "Text Case Converter",
-      "description": "Switch between UPPERCASE, lowercase, Title Case, snake_case, camelCase and more with one click."
+      "description": "Switch between UPPERCASE, lowercase, Title Case, snake_case, camelCase and more with one click.",
+      "category": "Converters"
     },
     {
       "href": "/tools/markdown-converter",
       "icon": "BookOpen",
       "title": "Markdown Converter",
-      "description": "Live-edit Markdown and convert to clean HTML or export as Markdown, complete with syntax highlighting."
+      "description": "Live-edit Markdown and convert to clean HTML or export as Markdown, complete with syntax highlighting.",
+      "category": "Converters"
     },
     {
       "href": "/tools/text-diff",
       "icon": "FileText",
       "title": "Text Diff Checker",
-      "description": "Compare two text blocks side-by-side and highlight additions, deletions and changes for effortless proofreading."
+      "description": "Compare two text blocks side-by-side and highlight additions, deletions and changes for effortless proofreading.",
+      "category": "Analyzers"
     },
     {
       "href": "/tools/regex-tester",
       "icon": "Scissors",
       "title": "Regex Tester",
-      "description": "Build, test and debug regular expressions with real-time match highlighting and a library of common patterns."
+      "description": "Build, test and debug regular expressions with real-time match highlighting and a library of common patterns.",
+      "category": "Analyzers"
     },
     {
       "href": "/tools/json-formatter",
       "icon": "Code",
       "title": "JSON Formatter & Validator",
-      "description": "Validate, beautify, minify and lint JSON instantly in your browser with real-time error reporting."
+      "description": "Validate, beautify, minify and lint JSON instantly in your browser with real-time error reporting.",
+      "category": "Formatters"
     },
     {
       "href": "/tools/data-converter",
       "icon": "Braces",
       "title": "Data Converter: CSV, JSON, YAML & XML",
-      "description": "Transform data between CSV, JSON, YAML and XML formats in seconds—even large datasets—all client-side."
+      "description": "Transform data between CSV, JSON, YAML and XML formats in seconds—even large datasets—all client-side.",
+      "category": "Converters"
     },
     {
       "href": "/tools/code-formatter-minifier",
       "icon": "Cpu",
       "title": "Code Formatter & Minifier",
-      "description": "Beautify or compress HTML, CSS and JavaScript code for readability or performance gains—no uploads, no server."
+      "description": "Beautify or compress HTML, CSS and JavaScript code for readability or performance gains—no uploads, no server.",
+      "category": "Formatters"
     },
     {
       "href": "/tools/seo-meta-tag-generator",
       "icon": "Tag",
       "title": "SEO Meta Tag Generator",
-      "description": "Generate optimized meta tags, Open Graph and Twitter card snippets to boost search visibility and social sharing."
+      "description": "Generate optimized meta tags, Open Graph and Twitter card snippets to boost search visibility and social sharing.",
+      "category": "SEO"
     },
     {
       "href": "/tools/sitemap-generator",
       "icon": "FileText",
       "title": "Sitemap Generator",
-      "description": "Create XML sitemaps with unlimited URLs, customizable changefreq and priority—improve SEO indexing fast."
+      "description": "Create XML sitemaps with unlimited URLs, customizable changefreq and priority—improve SEO indexing fast.",
+      "category": "SEO"
     },
     {
       "href": "/tools/url-tools",
       "icon": "Link2",
       "title": "URL Tools: Encode, Parse & Slugify",
-      "description": "Encode/decode URLs, parse components and generate SEO-friendly slugs directly in your browser."
+      "description": "Encode/decode URLs, parse components and generate SEO-friendly slugs directly in your browser.",
+      "category": "Transformers"
     },
     {
       "href": "/tools/base64-encoder-decoder",
       "icon": "Paperclip",
       "title": "Base64 Encoder/Decoder",
-      "description": "Convert text and files to and from Base64 with drag-and-drop support—no server, fully client-side."
+      "description": "Convert text and files to and from Base64 with drag-and-drop support—no server, fully client-side.",
+      "category": "Encoders"
     },
     {
       "href": "/tools/jwt-hash-generator",
       "icon": "Shield",
       "title": "JWT & Hash Generator",
-      "description": "Decode JWTs and generate cryptographic hashes (MD5, SHA-1, SHA-256, bcrypt) with adjustable parameters."
+      "description": "Decode JWTs and generate cryptographic hashes (MD5, SHA-1, SHA-256, bcrypt) with adjustable parameters.",
+      "category": "Security"
     },
     {
       "href": "/tools/html-to-pdf",
       "icon": "Globe",
       "title": "HTML to PDF Converter",
-      "description": "Render any webpage or HTML snippet into a PDF document client-side with custom layout and margins."
+      "description": "Render any webpage or HTML snippet into a PDF document client-side with custom layout and margins.",
+      "category": "Converters"
     },
     {
       "href": "/tools/pdf-toolkit",
       "icon": "FileArchive",
       "title": "PDF Toolkit: Compress & Convert",
-      "description": "Shrink PDF file sizes without quality loss and extract text to Word documents—all in-browser and offline."
+      "description": "Shrink PDF file sizes without quality loss and extract text to Word documents—all in-browser and offline.",
+      "category": "Formatters"
     },
     {
       "href": "/tools/image-toolkit",
       "icon": "ImageIcon",
       "title": "Image Toolkit: Compress & Resize",
-      "description": "Optimize JPEG/PNG images and resize with optional aspect-ratio lock—fast, free and privacy-focused."
+      "description": "Optimize JPEG/PNG images and resize with optional aspect-ratio lock—fast, free and privacy-focused.",
+      "category": "Transformers"
     },
     {
       "href": "/tools/qr-code-generator",
       "icon": "QrCode",
       "title": "QR Code Generator",
-      "description": "Generate high-resolution QR codes for URLs, text, vCards and Wi-Fi credentials with color and size options."
+      "description": "Generate high-resolution QR codes for URLs, text, vCards and Wi-Fi credentials with color and size options.",
+      "category": "Generators"
     },
     {
       "href": "/tools/unit-converter",
       "icon": "ArrowRightLeft",
       "title": "Unit Converter",
-      "description": "Convert length, weight, temperature, volume, time and more between metric & imperial units instantly."
+      "description": "Convert length, weight, temperature, volume, time and more between metric & imperial units instantly.",
+      "category": "Converters"
     },
     {
       "href": "/tools/color-toolkit",
       "icon": "Palette",
       "title": "Color Toolkit: Converter & Contrast Checker",
-      "description": "Translate colors between HEX, RGB, HSL & CMYK and verify WCAG-compliant contrast ratios easily."
+      "description": "Translate colors between HEX, RGB, HSL & CMYK and verify WCAG-compliant contrast ratios easily.",
+      "category": "Analyzers"
     },
     {
       "href": "/tools/time-converter",
       "icon": "CalendarCheck2",
       "title": "Time Converter: UNIX & Timezone",
-      "description": "Convert UNIX timestamps to human-readable dates and adjust across world time zones seamlessly."
+      "description": "Convert UNIX timestamps to human-readable dates and adjust across world time zones seamlessly.",
+      "category": "Converters"
     }
   ]
 }

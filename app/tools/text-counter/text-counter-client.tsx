@@ -1,4 +1,4 @@
-// app/tools/text-counter/text-counter-converter-client.tsx
+// app/tools/text-counter/text-counter-client.tsx
 "use client";
 
 import { useState, useRef, ChangeEvent } from "react";
@@ -20,6 +20,16 @@ function countCharacters(text: string, ignoreSpaces: boolean): number {
   return text.length;
 }
 
+function countSentences(text: string): number {
+  // simple split on ., !, ? followed by space or EOL
+  return (text.match(/[\w\)][.?!](\s|$)/g) || []).length;
+}
+
+function countLines(text: string): number {
+  if (!text) return 0;
+  return text.split(/\r?\n/).length;
+}
+
 function estimateReadingTime(text: string, wpm: number): number {
   const words = countWords(text);
   return words === 0 ? 0 : Math.max(1, Math.ceil(words / wpm));
@@ -31,8 +41,11 @@ export default function TextCounterClient() {
   const [wpm, setWpm] = useState(200);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // computed stats
   const words = countWords(text);
   const chars = countCharacters(text, ignoreSpaces);
+  const sentences = countSentences(text);
+  const lines = countLines(text);
   const reading = estimateReadingTime(text, wpm);
 
   const clearAll = () => {
@@ -56,11 +69,11 @@ export default function TextCounterClient() {
             text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
           "
         >
-          Word & Character Counter
+          Text Counter
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Paste or type text below to instantly see word count, character count, and estimated reading time—all client-side, no signup required.
+          Get real-time counts of words, characters, sentences and lines for any text input with detailed analytics—all client-side, no signup required.
         </p>
       </div>
 
@@ -87,11 +100,11 @@ export default function TextCounterClient() {
               onChange={() => setIgnoreSpaces((v) => !v)}
               className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
             />
-            <span>Ignore spaces</span>
+            <span>Ignore spaces in character count</span>
           </label>
 
           <label className="inline-flex items-center space-x-2 text-sm">
-            <span>WPM:</span>
+            <span>Reading speed (WPM):</span>
             <input
               type="number"
               min={50}
@@ -122,10 +135,27 @@ export default function TextCounterClient() {
         </div>
 
         {/* Results */}
-        <div className="flex flex-wrap justify-center gap-8 text-lg font-medium">
-          <span>{words.toLocaleString()} words</span>
-          <span>{chars.toLocaleString()} characters</span>
-          <span>{reading.toLocaleString()} min read</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+          <div>
+            <div className="text-3xl font-bold">{words.toLocaleString()}</div>
+            <div className="text-sm text-gray-600">words</div>
+          </div>
+          <div>
+            <div className="text-3xl font-bold">{chars.toLocaleString()}</div>
+            <div className="text-sm text-gray-600">characters</div>
+          </div>
+          <div>
+            <div className="text-3xl font-bold">{sentences.toLocaleString()}</div>
+            <div className="text-sm text-gray-600">sentences</div>
+          </div>
+          <div>
+            <div className="text-3xl font-bold">{lines.toLocaleString()}</div>
+            <div className="text-sm text-gray-600">lines</div>
+          </div>
+          <div className="sm:col-span-4 mt-4">
+            <div className="text-2xl font-medium">{reading.toLocaleString()} min read</div>
+            <div className="text-sm text-gray-500">estimated reading time</div>
+          </div>
         </div>
       </div>
     </section>

@@ -7,8 +7,8 @@ import { Trash2, ClipboardCopy, Download } from "lucide-react";
 /**
  * Markdown Converter Tool
  *
- * Live-edit Markdown and convert to clean HTML with instant preview.
- * Copy or download HTML—all client-side, no signup required.
+ * Live-edit Markdown and convert to clean HTML with instant preview,
+ * copy or download HTML or original Markdown—100% client-side, no signup required.
  */
 
 /**
@@ -17,9 +17,9 @@ import { Trash2, ClipboardCopy, Download } from "lucide-react";
  */
 async function renderMarkdown(md: string): Promise<string> {
   const { marked } = await import("marked");
-  // marked.parse can return Promise<string> in recent versions, so await it
+  // marked.parse may return Promise<string>, so await it
   const raw = await marked.parse(md);
-  // Minimal sanitization: strip out <script> tags
+  // strip out any <script> tags for safety
   return raw.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
 }
 
@@ -31,7 +31,7 @@ export default function MarkdownConverterClient() {
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Re-render HTML whenever the Markdown changes
+  // Re-render HTML on Markdown change
   useEffect(() => {
     let canceled = false;
     setError(null);
@@ -52,7 +52,6 @@ export default function MarkdownConverterClient() {
     };
   }, [markdown]);
 
-  // Handlers
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setMarkdown(e.target.value);
   };
@@ -85,6 +84,17 @@ export default function MarkdownConverterClient() {
     URL.revokeObjectURL(url);
   };
 
+  const downloadMd = () => {
+    if (!markdown) return;
+    const blob = new Blob([markdown], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "source.md";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const inputCount = markdown.length.toLocaleString();
   const outputCount = html.length.toLocaleString();
 
@@ -108,8 +118,7 @@ export default function MarkdownConverterClient() {
         </h1>
         <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Live-edit Markdown and convert to clean HTML with instant preview. Copy or download
-          the result—100% client-side, no signup required.
+          Live-edit Markdown and convert to clean HTML with instant preview, copy or download HTML or original Markdown.
         </p>
       </div>
 
@@ -210,6 +219,18 @@ export default function MarkdownConverterClient() {
         </button>
         <button
           type="button"
+          onClick={downloadMd}
+          className="
+            inline-flex items-center gap-2 px-6 py-2 bg-gray-100 text-gray-700 rounded-md
+            hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300
+            transition
+          "
+        >
+          <Download className="w-5 h-5" />
+          Download Markdown
+        </button>
+        <button
+          type="button"
           onClick={clearAll}
           className="
             inline-flex items-center gap-2 px-6 py-2 bg-gray-100 text-gray-700 rounded-md
@@ -226,7 +247,7 @@ export default function MarkdownConverterClient() {
       <div
         className="
           max-w-3xl mx-auto prose prose-indigo p-4 border border-gray-300
-          rounded-lg bg-gray-50 overflow-auto
+          rounded-lg bg-gray-50 overflow-auto markdown-preview
         "
         dangerouslySetInnerHTML={{ __html: html }}
       />

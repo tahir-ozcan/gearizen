@@ -17,7 +17,7 @@ import {
 /**
  * Code Formatter & Minifier Tool
  *
- * Beautify or compress your HTML, CSS & JavaScript code for readability or performance—
+ * Beautify or compress your HTML, CSS and JavaScript code for readability or performance—
  * all client-side, no uploads.
  */
 export default function CodeFormatterMinifierClient() {
