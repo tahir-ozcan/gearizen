@@ -1,7 +1,7 @@
 // app/tools/qr-code-generator/qr-code-generator-client.tsx
 "use client";
 
-import { useState, useMemo, useRef, ChangeEvent } from "react";
+import { useState, useMemo, useRef, useEffect, ChangeEvent } from "react";
 import QRCode from "qrcode";
 
 type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
@@ -18,7 +18,7 @@ interface QrOptions {
   logoDataUrl?: string;
 }
 
-/** 
+/**
  * Build the raw payload string for the QR code,
  * based on the selected data type and inputs.
  */
@@ -51,14 +51,14 @@ function buildPayload(
 }
 
 /**
- * Draw QR code to the canvas, then overlay logo if provided,
- * and return the resulting data URL.
+ * Draw the QR code onto the given canvas, apply logo if provided,
+ * and return a PNG data URL.
  */
 async function drawQrToCanvas(
   canvas: HTMLCanvasElement,
   opts: QrOptions
 ): Promise<string> {
-  // 1) Draw the QR into the canvas with margin, size, colors, error correction
+  // Draw QR code
   await QRCode.toCanvas(canvas, opts.data, {
     errorCorrectionLevel: opts.errorCorrectionLevel,
     margin: opts.margin,
@@ -69,17 +69,16 @@ async function drawQrToCanvas(
     },
   });
 
-  // 2) If a logo was provided, draw it centered
+  // Overlay logo if provided
   if (opts.logoDataUrl) {
     const ctx = canvas.getContext("2d");
     if (ctx) {
       const img = new Image();
       img.src = opts.logoDataUrl;
-      await new Promise<void>((res) => {
-        img.onload = () => res();
-        img.onerror = () => res();
+      await new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
       });
-      // logo boyutu, QR kod genişliğinin %20’si kadar olsun
       const logoSize = opts.width * 0.2;
       const x = (opts.width - logoSize) / 2;
       const y = (opts.width - logoSize) / 2;
@@ -87,7 +86,7 @@ async function drawQrToCanvas(
     }
   }
 
-  // 3) Export canvas to PNG data URL
+  // Export as PNG data URL
   return canvas.toDataURL("image/png");
 }
 
@@ -112,55 +111,43 @@ export default function QrCodeGeneratorClient() {
   // Canvas ref for rendering
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Build the raw payload string
+  // Sample QR content when inputs are empty
+  const initialSample = "https://gearizen.com";
+
+  // Build the payload string from inputs
   const payload = useMemo(
-    () =>
-      buildPayload(
-        type,
-        text,
-        urlValue,
-        vcard,
-        wifi
-      ),
+    () => buildPayload(type, text, urlValue, vcard, wifi),
     [type, text, urlValue, vcard, wifi]
   );
 
-  // Build options
-  const options = useMemo<QrOptions>(
-    () => ({
-      data: payload,
+  // Automatically regenerate QR whenever any option changes
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      setError("❌ Canvas not available.");
+      setQrDataUrl(null);
+      return;
+    }
+
+    const opts: QrOptions = {
+      data: payload || initialSample,
       width: size,
       margin,
       darkColor,
       lightColor,
       errorCorrectionLevel: ecLevel,
       logoDataUrl: logoDataUrl || undefined,
-    }),
-    [payload, size, margin, darkColor, lightColor, ecLevel, logoDataUrl]
-  );
+    };
 
-  /** Generate & render the QR code */
-  const generateQr = async () => {
-    if (!payload) {
-      setError("❌ Please enter data for the selected type before generating.");
-      setQrDataUrl(null);
-      return;
-    }
     setError(null);
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      setError("❌ Canvas not available.");
-      return;
-    }
-    try {
-      const dataUrl = await drawQrToCanvas(canvas, options);
-      setQrDataUrl(dataUrl);
-    } catch (e) {
-      console.error(e);
-      setError("❌ QR code generation failed. Please try again.");
-      setQrDataUrl(null);
-    }
-  };
+    drawQrToCanvas(canvas, opts)
+      .then((dataUrl) => setQrDataUrl(dataUrl))
+      .catch((e) => {
+        console.error(e);
+        setError("❌ QR code generation failed. Please try again.");
+        setQrDataUrl(null);
+      });
+  }, [payload, size, margin, darkColor, lightColor, ecLevel, logoDataUrl]);
 
   /** Handle logo file upload */
   const handleLogo = (e: ChangeEvent<HTMLInputElement>) => {
@@ -187,7 +174,7 @@ export default function QrCodeGeneratorClient() {
 
   return (
     <section id="qr-code-generator" aria-labelledby="qr-heading" className="space-y-16 text-gray-900 antialiased">
-      {/* Heading */}
+      {/* Heading & Description */}
       <div className="text-center space-y-6 sm:px-0">
         <h1
           id="qr-heading"
@@ -201,7 +188,7 @@ export default function QrCodeGeneratorClient() {
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Generate high-resolution QR codes for text, URLs, vCards or Wi-Fi credentials. Adjust size, margin, colors, error correction, and optionally add your logo. Then click “Generate”.
+          Generate high-resolution QR codes for text, URLs, vCards or Wi-Fi credentials. Adjust size, margin, colors, error correction, and optionally add your logo. The preview updates automatically.
         </p>
       </div>
 
@@ -372,22 +359,6 @@ export default function QrCodeGeneratorClient() {
               className="input-base w-full"
             />
           </label>
-        </div>
-
-        {/* Generate Button */}
-        <div className="text-center">
-          <button
-            onClick={generateQr}
-            className="
-              inline-block
-              bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
-              text-white font-medium
-              px-6 py-3 rounded-full
-              transition transform hover:scale-105
-            "
-          >
-            Generate QR Code
-          </button>
         </div>
 
         {/* Error Message */}
