@@ -2,8 +2,6 @@
 
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Suspense } from "react";
-import Spinner from "@/components/Spinner";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 import JsonLd from "@/app/components/JsonLd";
 import ContactClient from "./contact-client";
@@ -115,9 +113,7 @@ export default function ContactPage() {
       <BreadcrumbJsonLd pageTitle="Contact Us" pageUrl="https://gearizen.com/contact" />
 
       {/* Main content */}
-      <Suspense fallback={<Spinner className="mx-auto mt-10" />}>
-        <ContactClient />
-      </Suspense>
+      <ContactClient />
     </>
   );
 }
