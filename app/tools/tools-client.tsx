@@ -114,23 +114,6 @@ export default function ToolsClient() {
               </button>
             );
           })}
-
-          {/* Filtreyi Sıfırla */}
-          {selectedCategory !== "All Tools" && (
-            <button
-              onClick={() => setSelectedCategory("All Tools")}
-              aria-label="Reset category filter"
-              className="
-                flex items-center px-4 py-2 rounded-full text-sm font-medium
-                text-gray-700 bg-white border border-gray-300
-                hover:bg-gradient-to-r hover:from-[#7c3aed] hover:via-[#ec4899] hover:to-[#fbbf24]
-                hover:text-white transition
-              "
-            >
-              <ArrowsRightLeftIcon className="h-4 w-4 mr-1" />
-              Reset
-            </button>
-          )}
         </div>
 
         {/* Arama Kutusu */}
@@ -161,10 +144,9 @@ export default function ToolsClient() {
       {/* Sonuçlar Grid’i */}
       <section className="space-y-6 sm:px-0">
         <div className="flex flex-col">
+          {/* Her durumda araç sayısını göster */}
           <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800">
-            {query || selectedCategory !== "All Tools"
-              ? `Showing ${filtered.length} ${filtered.length === 1 ? "tool" : "tools"}`
-              : "Browse All Tools"}
+            Showing {filtered.length} {filtered.length === 1 ? "tool" : "tools"}
           </h2>
           <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         </div>
