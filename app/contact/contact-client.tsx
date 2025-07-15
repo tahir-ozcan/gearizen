@@ -1,10 +1,6 @@
 // app/contact/contact-client.tsx
 
-export interface ContactClientProps {
-  success: boolean;
-}
-
-export default function ContactClient({ success }: ContactClientProps) {
+export default function ContactClient() {
   return (
     <section
       id="contact-gearizen"
@@ -36,23 +32,6 @@ export default function ContactClient({ success }: ContactClientProps) {
           .
         </p>
       </div>
-
-      {/* Success Message */}
-      {success && (
-        <div
-          role="status"
-          className="
-            mx-auto max-w-md
-            bg-green-50 border border-green-200
-            text-green-800 p-6 rounded-lg text-center
-            shadow-sm
-          "
-        >
-          <p className="font-semibold text-lg">
-            Thank you! Your message has been sent.
-          </p>
-        </div>
-      )}
     </section>
   );
 }

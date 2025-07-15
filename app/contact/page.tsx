@@ -50,13 +50,7 @@ export const metadata: Metadata = {
   },
 };
 
-interface PageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
-export default function ContactPage({ searchParams }: PageProps) {
-  const success = searchParams.success === "1";
-
+export default function ContactPage() {
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -129,7 +123,7 @@ export default function ContactPage({ searchParams }: PageProps) {
       />
 
       {/* Contact content */}
-      <ContactClient success={success} />
+      <ContactClient />
     </>
   );
 }
