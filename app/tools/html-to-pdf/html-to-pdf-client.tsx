@@ -8,7 +8,7 @@ export default function HtmlToPdfClient() {
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState<boolean>(false);
 
-  // new controls for layout
+  // Layout kontrolleri
   const [margin, setMargin] = useState<number>(0.5);
   const [format, setFormat] = useState<"letter" | "a4">("letter");
   const [orientation, setOrientation] = useState<"portrait" | "landscape">(
@@ -31,20 +31,45 @@ export default function HtmlToPdfClient() {
 
     setProcessing(true);
     try {
-      // dynamic import
+      // Dinamik import
       const { default: html2pdf } = await import("html2pdf.js");
-      // inject HTML
+
+      // Sayfa boyutunu piksele çevir (96dpi)
+      const dpi = 96;
+      const sizeIn = format === "letter"
+        ? { width: 8.5, height: 11 }
+        : { width: 8.27, height: 11.69 };
+      // orientation’a göre swap
+      const pageW = orientation === "portrait" ? sizeIn.width : sizeIn.height;
+      const pageH = orientation === "portrait" ? sizeIn.height : sizeIn.width;
+
+      // Önizleme konteynerini hazırlama
+      previewRef.current.style.width = `${pageW * dpi}px`;
+      previewRef.current.style.minHeight = `${pageH * dpi}px`;
+      previewRef.current.style.background = "#ffffff";
       previewRef.current.innerHTML = htmlInput;
+
       await html2pdf()
         .set({
-          margin,                // controlled margin (in inches)
+          margin, // inç
           filename: "document.pdf",
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2 },
-          jsPDF: { unit: "in", format, orientation },
+          image: { type: "jpeg", quality: 1.0 },
+          html2canvas: {
+            scale: 3,
+            logging: false,
+            dpi: dpi * 2,
+            letterRendering: true,
+          },
+          jsPDF: {
+            unit: "in",
+            format,
+            orientation,
+            compressPdf: true,
+          },
         })
         .from(previewRef.current)
-        .save();
+        .save(); // sadece indirme tetiklenir
+
     } catch (err) {
       console.error(err);
       setError(
@@ -61,7 +86,7 @@ export default function HtmlToPdfClient() {
       aria-labelledby="html-to-pdf-heading"
       className="space-y-16 text-gray-900 antialiased"
     >
-      {/* Heading & Description */}
+      {/* Başlık & Açıklama */}
       <div className="text-center space-y-6 sm:px-0">
         <h1
           id="html-to-pdf-heading"
@@ -75,16 +100,13 @@ export default function HtmlToPdfClient() {
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Render any webpage or HTML snippet into a PDF document client-side with custom
-          layout and margins.
+          Render any webpage or HTML snippet into a high-quality PDF entirely
+          client-side, with custom margins, format, and orientation.
         </p>
       </div>
 
-      {/* Input & Layout Controls */}
+      {/* HTML Giriş & Düzen Ayarları */}
       <div className="max-w-3xl mx-auto space-y-8 sm:px-0">
-        <label htmlFor="html-input" className="sr-only">
-          HTML Input
-        </label>
         <textarea
           id="html-input"
           value={htmlInput}
@@ -93,16 +115,19 @@ export default function HtmlToPdfClient() {
           rows={10}
           className="
             w-full p-4 border border-gray-300 rounded-md bg-white
-            focus:outline-none focus:ring-2 focus:ring-[#7c3aed]
+            focus:outline-none focus:ring-2 focus:ring-indigo-500
             font-mono text-sm resize-y transition
           "
         />
 
-        {/* layout settings */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Margin */}
           <div>
-            <label htmlFor="margin-input" className="block text-sm font-medium text-gray-800">
-              Margin (in)
+            <label
+              htmlFor="margin-input"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
+              Margin (inches)
             </label>
             <input
               id="margin-input"
@@ -112,25 +137,43 @@ export default function HtmlToPdfClient() {
               max={2}
               value={margin}
               onChange={(e) => setMargin(Number(e.target.value))}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#7c3aed] transition"
+              className="
+                w-full p-2 border border-gray-300 rounded-md
+                focus:outline-none focus:ring-2 focus:ring-indigo-500
+                transition
+              "
             />
           </div>
+
+          {/* Page Format */}
           <div>
-            <label htmlFor="format-select" className="block text-sm font-medium text-gray-800">
+            <label
+              htmlFor="format-select"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
               Page Format
             </label>
             <select
               id="format-select"
               value={format}
               onChange={(e) => setFormat(e.target.value as "letter" | "a4")}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#7c3aed] transition"
+              className="
+                w-full p-2 border border-gray-300 rounded-md
+                focus:outline-none focus:ring-2 focus:ring-indigo-500
+                transition
+              "
             >
               <option value="letter">Letter</option>
               <option value="a4">A4</option>
             </select>
           </div>
+
+          {/* Orientation */}
           <div>
-            <label htmlFor="orient-select" className="block text-sm font-medium text-gray-800">
+            <label
+              htmlFor="orient-select"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
               Orientation
             </label>
             <select
@@ -139,7 +182,11 @@ export default function HtmlToPdfClient() {
               onChange={(e) =>
                 setOrientation(e.target.value as "portrait" | "landscape")
               }
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#7c3aed] transition"
+              className="
+                w-full p-2 border border-gray-300 rounded-md
+                focus:outline-none focus:ring-2 focus:ring-indigo-500
+                transition
+              "
             >
               <option value="portrait">Portrait</option>
               <option value="landscape">Landscape</option>
@@ -147,12 +194,14 @@ export default function HtmlToPdfClient() {
           </div>
         </div>
 
+        {/* Hata Mesajı */}
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-center">
             {error}
           </div>
         )}
 
+        {/* Generate Butonu */}
         <div className="text-center">
           <button
             type="button"
@@ -160,8 +209,9 @@ export default function HtmlToPdfClient() {
             disabled={processing}
             className={`
               px-6 py-3 bg-indigo-600 text-white rounded-md
-              hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500
-              transition font-medium ${processing ? "opacity-60 cursor-not-allowed" : ""}
+              hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-indigo-500
+              transition font-medium
+              ${processing ? "opacity-50 cursor-not-allowed" : ""}
             `}
           >
             {processing ? "Generating PDF…" : "Generate PDF"}
@@ -169,7 +219,7 @@ export default function HtmlToPdfClient() {
         </div>
       </div>
 
-      {/* Hidden preview container for html2pdf */}
+      {/* Gizli preview konteyneri (html2pdf.js için) */}
       <div ref={previewRef} className="hidden" />
     </section>
   );

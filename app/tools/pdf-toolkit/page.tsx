@@ -1,61 +1,139 @@
 // app/tools/pdf-toolkit/page.tsx
-import { Metadata } from "next";
+
+import type { Metadata } from "next";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
+import Script from "next/script";
 import PdfToolkitWrapper from "./pdf-toolkit-wrapper-client";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
-  title: "PDF Toolkit | Gearizen",
+  title: "PDF Toolkit: Compress & Extract Text | Gearizen",
   description:
-    "Shrink PDF file sizes without quality loss and extract text to Word documents—all in-browser and offline—100% client-side, no signup required.",
+    "Shrink PDF file sizes without quality loss and extract text into editable Word documents—fully in-browser and offline. 100% client-side, privacy-first, zero signup, lightning-fast.",
   keywords: [
-    "PDF compress",
-    "PDF shrink",
+    "PDF toolkit",
+    "PDF compressor",
+    "shrink PDF",
+    "PDF shrinker",
     "extract text from PDF",
-    "pdf-lib",
-    "pdfjs",
+    "PDF to Word converter",
     "client-side PDF tool",
-    "free online PDF tool",
-    "Gearizen PDF Toolkit",
+    "online PDF compressor",
+    "offline PDF tool",
+    "free PDF toolkit",
+    "privacy-first PDF tool",
+    "Gearizen PDF Toolkit"
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
   robots: { index: true, follow: true },
   alternates: { canonical: "https://gearizen.com/tools/pdf-toolkit" },
   openGraph: {
-    title: "PDF Toolkit | Gearizen",
+    title: "PDF Toolkit: Compress & Extract Text | Gearizen",
     description:
-      "Use Gearizen’s PDF Toolkit to compress PDFs without quality loss and extract their text into Word documents—all running entirely in your browser.",
+      "Shrink PDF file sizes without quality loss and extract text into editable Word documents—fully in-browser and offline. 100% client-side, privacy-first, zero signup, lightning-fast.",
     url: "https://gearizen.com/tools/pdf-toolkit",
     siteName: "Gearizen",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "/og-placeholder.svg",
+        url: "https://gearizen.com/og/pdf-toolkit.png",
         width: 1200,
         height: 630,
-        alt: "Gearizen PDF Toolkit: Compress & Convert",
-      },
-    ],
+        alt: "Gearizen PDF Toolkit Preview"
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "PDF Toolkit | Gearizen",
+    title: "PDF Toolkit: Compress & Extract Text | Gearizen",
     description:
-      "Compress PDFs and extract text to Word instantly in your browser with Gearizen’s PDF Toolkit—no backend, no signup.",
+      "Shrink PDF file sizes without quality loss and extract text into editable Word documents—fully in-browser and offline. 100% client-side, privacy-first, zero signup, lightning-fast.",
     creator: "@gearizen",
-    images: ["/og-placeholder.svg"],
-  },
+    images: ["https://gearizen.com/og/pdf-toolkit.png"]
+  }
 };
 
 export default function PdfToolkitPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        name: "PDF Toolkit: Compress & Extract Text | Gearizen",
+        url: "https://gearizen.com/tools/pdf-toolkit",
+        description:
+          "Shrink PDF file sizes without quality loss and extract text into editable Word documents—fully in-browser and offline. 100% client-side, privacy-first, zero signup, lightning-fast.",
+        publisher: {
+          "@type": "Organization",
+          name: "Gearizen",
+          url: "https://gearizen.com",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://gearizen.com/logo.png"
+          }
+        },
+        breadcrumb: {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: "https://gearizen.com"
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "Tools",
+              item: "https://gearizen.com/tools"
+            },
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: "PDF Toolkit",
+              item: "https://gearizen.com/tools/pdf-toolkit"
+            }
+          ]
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        name: "PDF Toolkit",
+        url: "https://gearizen.com/tools/pdf-toolkit",
+        applicationCategory: "DeveloperTool",
+        operatingSystem: "All",
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD"
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "Gearizen",
+          url: "https://gearizen.com"
+        }
+      }
+    ]
+  };
+
   return (
     <>
+      {/* JSON-LD structured data */}
+      <Script id="ld-json" type="application/ld+json" strategy="afterInteractive">
+        {JSON.stringify(structuredData)}
+      </Script>
+
+      {/* Breadcrumb */}
       <BreadcrumbJsonLd
         pageTitle="PDF Toolkit"
         pageUrl="https://gearizen.com/tools/pdf-toolkit"
       />
-      <PdfToolkitWrapper />
+
+      {/* Main client component */}
+      <main>
+        <PdfToolkitWrapper />
+      </main>
     </>
   );
 }

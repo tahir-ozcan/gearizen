@@ -1,19 +1,26 @@
 // app/contact/page.tsx
 
-import ContactClient from "./contact-client";
+import type { Metadata } from "next";
+import Script from "next/script";
+import { Suspense } from "react";
+import Spinner from "@/components/Spinner";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
+import JsonLd from "@/app/components/JsonLd";
+import ContactClient from "./contact-client";
 
-export const metadata = {
+export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
-  title: "Contact Us | Gearizen",
+  title: "Contact Us | Gearizen — Free, Privacy-First Web Tools",
   description:
-    "Get in touch with Gearizen—your source for free, client-side web tools. Share feedback, questions, or feature requests to help us improve.",
+    "Have questions, feedback, or feature requests? Reach out to Gearizen—your source for free, client-side web tools. Fast, private, zero signup.",
   keywords: [
     "Gearizen contact",
     "free online tools support",
     "client-side tools help",
     "developer tools feedback",
     "privacy-focused web tools",
+    "feature requests",
+    "tool support",
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
   robots: { index: true, follow: true },
@@ -28,7 +35,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-placeholder.svg",
+        url: "https://gearizen.com/og/contact.png",
         width: 1200,
         height: 630,
         alt: "Contact Gearizen – Free Client-Side Tools",
@@ -41,20 +48,73 @@ export const metadata = {
     description:
       "Reach out to Gearizen for support, feedback, or feature requests. 100% client-side, privacy-focused web tools.",
     creator: "@gearizen",
-    images: ["/og-placeholder.svg"],
+    images: ["https://gearizen.com/og/contact.png"],
   },
 };
 
-import { Suspense } from "react";
-import Spinner from "../../components/Spinner";
-
 export default function ContactPage() {
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Gearizen",
+    url: "https://gearizen.com",
+    logo: "https://gearizen.com/logo.png",
+    sameAs: [
+      "https://twitter.com/gearizen",
+      "https://github.com/gearizen",
+      "https://linkedin.com/company/gearizen"
+    ]
+  };
+
+  const pageJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "Contact Us",
+    url: "https://gearizen.com/contact",
+    description:
+      "Have questions, feedback, or feature requests? Reach out to Gearizen—your source for free, client-side web tools. Fast, private, zero signup.",
+    publisher: {
+      "@type": "Organization",
+      name: "Gearizen",
+      url: "https://gearizen.com",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://gearizen.com/logo.png"
+      }
+    },
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://gearizen.com"
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Contact",
+          item: "https://gearizen.com/contact"
+        }
+      ]
+    }
+  };
+
   return (
     <>
-      <BreadcrumbJsonLd
-        pageTitle="Contact Us"
-        pageUrl="https://gearizen.com/contact"
-      />
+      {/* Organization structured data */}
+      <JsonLd data={orgJsonLd} />
+
+      {/* WebPage structured data */}
+      <Script id="webpage-ld" type="application/ld+json" strategy="afterInteractive">
+        {JSON.stringify(pageJsonLd)}
+      </Script>
+
+      {/* Breadcrumb */}
+      <BreadcrumbJsonLd pageTitle="Contact Us" pageUrl="https://gearizen.com/contact" />
+
+      {/* Main content */}
       <Suspense fallback={<Spinner className="mx-auto mt-10" />}>
         <ContactClient />
       </Suspense>

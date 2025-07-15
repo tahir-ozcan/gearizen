@@ -105,7 +105,7 @@ export default function Footer() {
 
   return (
     <footer role="contentinfo" className="bg-white border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 md:px-6 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand & Social */}
           <section aria-labelledby="footer-brand">

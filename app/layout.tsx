@@ -18,10 +18,10 @@ export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: {
     default: "Gearizen – Free Client-Side Digital Tools",
-    template: "%s | Gearizen",
+    template: "%s",
   },
   description:
-    "Gearizen offers fast, free, privacy-first web tools—password generators, JSON formatters, QR code creators, converters, compressors, validators, and more, all 100% client-side and signup-free.",
+    "Gearizen provides fast, free, privacy-first web tools—password generators, JSON formatters, QR code creators, converters, compressors, validators, and more. 100% client-side, no signup required.",
   keywords: [
     "Gearizen",
     "free online tools",
@@ -79,17 +79,28 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       className={`${inter.className} bg-white text-gray-900 antialiased scroll-smooth`}
-      suppressHydrationWarning
     >
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
 
-        {/* Favicon */}
-        <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
-        <link rel="alternate icon" href="/favicon.ico" type="image/x-icon" />
+        {/* Favicons */}
+        <link
+          rel="icon"
+          href="/favicon.png"
+          type="image/png"
+          sizes="32x32"
+        />
+        <link
+          rel="alternate icon"
+          href="/favicon.ico"
+          type="image/x-icon"
+        />
 
-        {/* Preconnect to analytics and ads domains */}
+        {/* Preconnect for analytics & ads */}
         <link
           rel="preconnect"
           href="https://www.googletagmanager.com"
@@ -101,35 +112,42 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           crossOrigin="anonymous"
         />
 
-        {/* Google AdSense account metadata */}
+        {/* AdSense publisher ID */}
         <meta
           name="google-adsense-account"
           content="ca-pub-2108375251131552"
         />
 
-        {/* Analytics Loader (e.g. Google Analytics, GTM scripts) */}
+        {/* Analytics scripts */}
         <AnalyticsLoader />
       </head>
       <body className="flex min-h-screen flex-col">
-        {/* Launch notice */}
-        <div className="bg-indigo-50 border-b border-indigo-200 text-indigo-700 px-4 py-3 flex justify-center">
-          <Info className="w-5 h-5 mr-2 flex-shrink-0" aria-hidden="true" />
+        {/* Launch banner */}
+        <aside className="bg-indigo-50 border-b border-indigo-200 text-indigo-700 px-4 py-3 flex justify-center">
+          <Info
+            className="flex-shrink-0 mr-2 h-5 w-5"
+            aria-hidden="true"
+          />
           <div className="text-sm font-medium text-center">
-            We just launched our website; some tools may be buggy or missing but we’ll fix them shortly!
-            <br />
-            <span className="font-normal block mt-1">
-              Last updated: July 14, 2025 at 22:00 (GMT+3). For feedback, please{" "}
-              <a href="/contact" className="underline">
-                visit our Contact page
-              </a>.
-            </span>
+            We just launched our site! Some tools may be incomplete or buggy
+            — we’re fixing them now.
+            <p className="mt-1 font-normal">
+              Last updated: July 15, 2025 at 17:49 (GMT+3). Feedback?{" "}
+              <a
+                href="/contact"
+                className="underline hover:text-indigo-800"
+              >
+                Contact us
+              </a>
+              .
+            </p>
           </div>
-        </div>
+        </aside>
 
         {/* Header */}
         <Header />
 
-        {/* Main content area */}
+        {/* Main content */}
         <main
           id="main-content"
           role="main"
@@ -137,7 +155,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           aria-label="Main content"
           className="flex-grow"
         >
-          <div className="max-w-7xl mx-auto px-4 md:px-6 pt-16 pb-20 lg:pt-24 lg:pb-28">
+          <div className="mx-auto max-w-7xl px-6 pt-16 pb-20 lg:pt-24 lg:pb-28">
             {children}
           </div>
         </main>

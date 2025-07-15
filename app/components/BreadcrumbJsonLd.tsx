@@ -1,21 +1,21 @@
 // app/components/BreadcrumbJsonLd.tsx
-"use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import JsonLd from "./JsonLd";
 
 export interface BreadcrumbJsonLdProps {
-  /** The title of the current page, used as the last breadcrumb item’s name */
+  /** The title of the current page (last breadcrumb label) */
   pageTitle: string;
-  /** The canonical URL of the current page, used as the last breadcrumb item’s link */
+  /** The canonical URL of the current page (last breadcrumb link) */
   pageUrl: string;
 }
 
 /**
  * BreadcrumbJsonLd
  *
- * Renders a JSON-LD `<script>` tag describing a breadcrumb trail for search engines,
- * following schema.org’s BreadcrumbList specification.
+ * Renders a JSON-LD `<script>` in the document head describing a BreadcrumbList
+ * according to schema.org. Improves SEO by letting search engines understand
+ * your site’s hierarchy.
  *
  * Usage:
  * ```tsx
@@ -25,34 +25,39 @@ export interface BreadcrumbJsonLdProps {
  * />
  * ```
  */
-export default function BreadcrumbJsonLd({
+const BreadcrumbJsonLd: React.FC<BreadcrumbJsonLdProps> = ({
   pageTitle,
   pageUrl,
-}: BreadcrumbJsonLdProps) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://gearizen.com/",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Tools",
-        item: "https://gearizen.com/tools",
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: pageTitle,
-        item: pageUrl,
-      },
-    ],
-  };
+}) => {
+  const jsonLd = useMemo(
+    () => ({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://gearizen.com/",
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Tools",
+          item: "https://gearizen.com/tools",
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: pageTitle,
+          item: pageUrl,
+        },
+      ],
+    }),
+    [pageTitle, pageUrl]
+  );
 
-  return <JsonLd data={jsonLd} />;
-}
+  return <JsonLd data={jsonLd} id="breadcrumb-jsonld" />;
+};
+
+export default BreadcrumbJsonLd;

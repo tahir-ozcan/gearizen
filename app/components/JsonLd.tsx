@@ -1,31 +1,46 @@
 // app/components/JsonLd.tsx
-"use client";
 
 import React from "react";
+import Head from "next/head";
 
+export type JsonLdData = Record<string, unknown> | Record<string, unknown>[];
+
+/**
+ * JsonLdProps
+ *
+ * @param data A JSON-LD object or array of objects following schema.org vocab.
+ * @param id   Optional. The id attribute for the <script> tag. Defaults to "jsonld".
+ */
 export interface JsonLdProps {
-  /**
-   * A JSON-LD object or array of objects conforming to schema.org vocabulary.
-   * This will be serialized and injected into the page as structured data.
-   */
-  data: Record<string, unknown> | Record<string, unknown>[];
+  data: JsonLdData;
+  id?: string;
 }
 
 /**
  * JsonLd
  *
- * Inserts a `<script type="application/ld+json">` tag into the document head
- * containing your JSON-LD data for SEO. Use this for breadcrumbs, FAQs, events, etc.
+ * Renders a <script type="application/ld+json"> tag inside the document <head>,
+ * injecting your structured data for SEO. Use for breadcrumbs, FAQs, events, etc.
+ *
+ * This component is a server component by default, so JSON-LD is rendered
+ * into the initial HTML <head> for optimal SEO.
  */
-const JsonLd: React.FC<JsonLdProps> = ({ data }) => {
-  // Pretty-print with 2-space indent in development tools
-  const json = JSON.stringify(data, null, 2);
+const JsonLd: React.FC<JsonLdProps> = ({ data, id = "jsonld" }) => {
+  // Serialize once per render; no pretty-printing in production for compactness
+  const json = React.useMemo(
+    () => JSON.stringify(data),
+    [data]
+  );
 
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: json }}
-    />
+    <Head>
+      <script
+        id={id}
+        type="application/ld+json"
+        // dangerouslySetInnerHTML is necessary to inject raw JSON-LD
+        dangerouslySetInnerHTML={{ __html: json }}
+      />
+    </Head>
   );
 };
 

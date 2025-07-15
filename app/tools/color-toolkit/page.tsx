@@ -2,23 +2,32 @@
 
 import ColorToolkitClient from "./color-toolkit-client";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
+import Script from "next/script";
 
 export const metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "Color Toolkit | Gearizen",
   description:
-    "Enter any HEX, RGB, or HSL color to convert between formats, generate complementary colors, tints and shades—all client-side with Gearizen’s Color Toolkit.",
+    "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Generate complementary, analogous, and triadic palettes, tints & shades, and verify WCAG-compliant contrast ratios—100% client-side, privacy-first, zero signup, instant results.",
   keywords: [
     "color converter",
     "hex to rgb",
     "rgb to hex",
-    "hsl converter",
-    "complementary color",
+    "hsl to rgb",
+    "rgb to hsl",
+    "cmyk converter",
+    "complementary colors",
+    "analogous colors",
+    "triadic palette",
     "color tints",
     "color shades",
+    "contrast checker",
+    "WCAG compliance",
+    "color accessibility",
     "online color tool",
     "client-side color toolkit",
-    "Gearizen color tools",
+    "privacy-first color tool",
+    "Gearizen color tools"
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
   robots: { index: true, follow: true },
@@ -26,38 +35,115 @@ export const metadata = {
   openGraph: {
     title: "Color Toolkit | Gearizen",
     description:
-      "Use Gearizen’s free, client-side Color Toolkit to convert HEX, RGB & HSL formats, and generate complementary colors, tints & shades—no signup required.",
+      "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Generate complementary, analogous, and triadic palettes, tints & shades, and verify WCAG-compliant contrast ratios—100% client-side, privacy-first, zero signup, instant results.",
     url: "https://gearizen.com/tools/color-toolkit",
     siteName: "Gearizen",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "/og-placeholder.svg",
+        url: "https://gearizen.com/og/color-toolkit.png",
         width: 1200,
         height: 630,
-        alt: "Gearizen Color Toolkit",
-      },
-    ],
+        alt: "Gearizen Color Toolkit Preview"
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
     title: "Color Toolkit | Gearizen",
     description:
-      "Instantly convert and explore colors in HEX, RGB & HSL with Gearizen’s client-side Color Toolkit—copy codes or generate tints & shades in your browser.",
+      "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Generate complementary, analogous, and triadic palettes, tints & shades, and verify WCAG-compliant contrast ratios—100% client-side, privacy-first, zero signup, instant results.",
     creator: "@gearizen",
-    images: ["/og-placeholder.svg"],
-  },
+    images: ["https://gearizen.com/og/color-toolkit.png"],
+    imageAlt: "Gearizen Color Toolkit Preview"
+  }
 };
 
 export default function ColorToolkitPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        name: "Color Toolkit | Gearizen",
+        url: "https://gearizen.com/tools/color-toolkit",
+        description:
+          "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Generate complementary, analogous, and triadic palettes, tints & shades, and verify WCAG-compliant contrast ratios—100% client-side, privacy-first, zero signup, instant results.",
+        publisher: {
+          "@type": "Organization",
+          name: "Gearizen",
+          url: "https://gearizen.com",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://gearizen.com/logo.png"
+          }
+        },
+        breadcrumb: {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: "https://gearizen.com"
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: "Tools",
+              item: "https://gearizen.com/tools"
+            },
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: "Color Toolkit",
+              item: "https://gearizen.com/tools/color-toolkit"
+            }
+          ]
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        name: "Color Toolkit",
+        url: "https://gearizen.com/tools/color-toolkit",
+        applicationCategory: "DesignTool",
+        operatingSystem: "All",
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD"
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "Gearizen",
+          url: "https://gearizen.com"
+        }
+      }
+    ]
+  };
+
   return (
     <>
+      {/* JSON-LD for structured data */}
+      <Script
+        id="ld-json"
+        type="application/ld+json"
+        strategy="afterInteractive"
+      >
+        {JSON.stringify(structuredData)}
+      </Script>
+
+      {/* Breadcrumb structured data */}
       <BreadcrumbJsonLd
         pageTitle="Color Toolkit"
         pageUrl="https://gearizen.com/tools/color-toolkit"
       />
-      <ColorToolkitClient />
+
+      {/* Main client component */}
+      <main>
+        <ColorToolkitClient />
+      </main>
     </>
   );
 }

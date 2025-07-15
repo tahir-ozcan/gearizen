@@ -103,7 +103,7 @@ export default function Header() {
       `}
       role="banner"
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-4 md:px-6">
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-6 md:px-6">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <Image
