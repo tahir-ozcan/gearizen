@@ -2,7 +2,8 @@
 "use client";
 
 import { useState, useRef, ChangeEvent, useEffect } from "react";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, type SaveOptions } from "pdf-lib";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 
 type LoadingState = "idle" | "compress" | "extract";
 
@@ -15,25 +16,25 @@ export default function PdfToolkitClient() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Configure PDF.js worker on client once
+  // Configure PDF.js worker once on mount
   useEffect(() => {
-    import("pdfjs-dist/legacy/build/pdf").then((pdfjsLib) => {
-      pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.8.162/pdf.worker.min.js";
-    });
+    // Hardcode to match your installed pdfjs-dist version
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://unpkg.com/pdfjs-dist@3.8.162/legacy/build/pdf.worker.min.js";
   }, []);
 
-  /** Trigger hidden file input */
+  /** Open file chooser */
   function handleBrowseClick() {
     fileInputRef.current?.click();
   }
 
-  /** When PDF file selected */
+  /** Handle PDF selection */
   function handleUploadChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
     setCompressedUrl(null);
     setExtractedText("");
     setError(null);
+
     if (!file) {
       setUploadFile(null);
       return;
@@ -46,7 +47,7 @@ export default function PdfToolkitClient() {
     setUploadFile(file);
   }
 
-  /** Compress PDF and prepare view/download URLs */
+  /** Compress the PDF (object streams for mild compression) */
   async function handleCompressPdf() {
     if (!uploadFile) return;
     setLoading("compress");
@@ -55,7 +56,11 @@ export default function PdfToolkitClient() {
     try {
       const buffer = await uploadFile.arrayBuffer();
       const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
-      const bytes = await pdfDoc.save({ useObjectStreams: true });
+
+      // pdf-lib's SaveOptions: useObjectStreams gives some compression
+      const options: SaveOptions = { useObjectStreams: true };
+      const bytes = await pdfDoc.save(options);
+
       const blob = new Blob([bytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       setCompressedUrl(url);
@@ -75,7 +80,7 @@ export default function PdfToolkitClient() {
     a.click();
   }
 
-  /** View compressed PDF in new tab */
+  /** View compressed PDF */
   function handleViewCompressed() {
     if (!compressedUrl) return;
     window.open(compressedUrl, "_blank");
@@ -89,7 +94,6 @@ export default function PdfToolkitClient() {
     setExtractedText("");
     try {
       const buffer = await uploadFile.arrayBuffer();
-      const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf");
       const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
 
       let fullText = "";
@@ -101,8 +105,10 @@ export default function PdfToolkitClient() {
           .map((item) => item.str);
         fullText += strings.join(" ") + "\n\n";
       }
+
       setExtractedText(fullText.trim());
 
+      // Download as .doc
       const blob = new Blob([fullText], { type: "application/msword" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -123,7 +129,7 @@ export default function PdfToolkitClient() {
       aria-labelledby="pdf-toolkit-heading"
       className="space-y-16 text-gray-900 antialiased"
     >
-      {/* Başlık & Açıklama */}
+      {/* Header */}
       <div className="text-center space-y-4">
         <h1
           id="pdf-toolkit-heading"
@@ -135,8 +141,7 @@ export default function PdfToolkitClient() {
         <div className="mx-auto mt-2 h-1 w-32 rounded-full
                         bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Shrink PDF file sizes without quality loss and extract text to Word documents—
-          all in-browser and offline, no signup required.
+          Shrink PDF file sizes without quality loss and extract text to Word documents—all in-browser and offline, no signup required.
         </p>
       </div>
 
@@ -150,7 +155,6 @@ export default function PdfToolkitClient() {
           className="hidden"
         />
         <button
-          type="button"
           onClick={handleBrowseClick}
           className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700
                      focus:ring-2 focus:ring-blue-500 transition"
@@ -164,7 +168,7 @@ export default function PdfToolkitClient() {
         )}
       </div>
 
-      {/* Error Message */}
+      {/* Error */}
       {error && (
         <div className="max-w-3xl mx-auto p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
           {error}
@@ -175,7 +179,6 @@ export default function PdfToolkitClient() {
       {uploadFile && (
         <div className="max-w-3xl mx-auto flex flex-wrap gap-4">
           <button
-            type="button"
             onClick={handleCompressPdf}
             disabled={loading !== "idle"}
             className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700
@@ -187,7 +190,6 @@ export default function PdfToolkitClient() {
           {compressedUrl && (
             <>
               <button
-                type="button"
                 onClick={handleViewCompressed}
                 className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700
                            focus:ring-2 focus:ring-indigo-500 transition"
@@ -195,7 +197,6 @@ export default function PdfToolkitClient() {
                 View Compressed
               </button>
               <button
-                type="button"
                 onClick={handleDownloadCompressed}
                 className="px-6 py-2 bg-green-800 text-white rounded-md hover:bg-green-900
                            focus:ring-2 focus:ring-green-700 transition"
@@ -206,7 +207,6 @@ export default function PdfToolkitClient() {
           )}
 
           <button
-            type="button"
             onClick={handleExtractText}
             disabled={loading !== "idle"}
             className="px-6 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700
