@@ -2,12 +2,10 @@
 "use client";
 
 import { useState, type FC, type SVGProps } from "react";
-// Arama ve reset ikonları için Heroicons
 import {
   MagnifyingGlassIcon,
   ArrowsRightLeftIcon,
 } from "@heroicons/react/24/outline";
-// Kategori ikonları için lucide-react
 import {
   Key,
   ArrowRightLeft,
@@ -30,7 +28,7 @@ import { getToolsData, type Tool } from "@/lib/tools-data";
 export default function ToolsClient() {
   const { tools } = getToolsData();
 
-  // İkon eşleştirmesi yapılan kategoriler
+  // Kategori → İkon eşleştirmesi
   const iconMap: Record<string, FC<SVGProps<SVGSVGElement>>> = {
     Generators: Key,
     Converters: ArrowRightLeft,
@@ -46,18 +44,21 @@ export default function ToolsClient() {
     Optimizers: Droplet,
   };
 
-  // Tüm benzersiz kategorileri al, alfabetik sırala
-  const rawCategories = Array.from(new Set(tools.map((t) => t.category))).sort();
+  // JSON'deki tüm farklı kategorileri al ve alfabetik sırala
+  const rawCategories = Array.from(
+    new Set(tools.map((t) => t.category))
+  ).sort();
 
-  // "All Tools" ögesi ve sonrasında gerçek kategoriler
+  // "All Tools" + her bir kategori
   const categories = ["All Tools", ...rawCategories];
 
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("All Tools");
+  const [selectedCategory, setSelectedCategory] =
+    useState<string>("All Tools");
 
   const query = search.trim().toLowerCase();
 
-  // Hem kategori hem arama terimine göre filtrele
+  // Kategori + metin aramasına göre filtre
   const filtered = tools.filter((tool) => {
     const inCategory =
       selectedCategory === "All Tools" || tool.category === selectedCategory;
@@ -70,7 +71,7 @@ export default function ToolsClient() {
 
   return (
     <div className="space-y-20 text-gray-900 antialiased">
-      {/* Hero + Kategori Seçimi + Arama */}
+      {/* Başlık + Açıklama */}
       <section
         aria-labelledby="all-tools-heading"
         className="text-center space-y-6 sm:px-0"
@@ -87,10 +88,10 @@ export default function ToolsClient() {
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Explore our suite of {tools.length} privacy-first, client-side utilities—everything from generators to converters, formatters and optimizers.
+          Explore our suite of {tools.length} privacy-first, client-side utilities—from generators to converters, formatters and optimizers.
         </p>
 
-        {/* Kategori Butonları */}
+        {/* Kategori Filtre Butonları */}
         <div className="flex flex-wrap justify-center gap-2">
           {categories.map((cat) => {
             const Icon = iconMap[cat] ?? ArrowsRightLeftIcon;
@@ -119,7 +120,12 @@ export default function ToolsClient() {
             <button
               onClick={() => setSelectedCategory("All Tools")}
               aria-label="Reset category filter"
-              className="flex items-center px-4 py-2 rounded-full text-sm text-gray-500 bg-gray-50 hover:bg-gray-200 transition"
+              className="
+                flex items-center px-4 py-2 rounded-full text-sm font-medium
+                text-gray-700 bg-white border border-gray-300
+                hover:bg-gradient-to-r hover:from-[#7c3aed] hover:via-[#ec4899] hover:to-[#fbbf24]
+                hover:text-white transition
+              "
             >
               <ArrowsRightLeftIcon className="h-4 w-4 mr-1" />
               Reset
@@ -152,7 +158,7 @@ export default function ToolsClient() {
         </div>
       </section>
 
-      {/* Sonuçlar */}
+      {/* Sonuçlar Grid’i */}
       <section className="space-y-6 sm:px-0">
         <div className="flex flex-col">
           <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800">
