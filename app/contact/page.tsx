@@ -2,14 +2,9 @@
 
 import type { Metadata } from "next";
 import Script from "next/script";
-import dynamic from "next/dynamic";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 import JsonLd from "@/app/components/JsonLd";
-
-// Load form as a pure client module (no SSR)
-const ContactClient = dynamic(() => import("./contact-client"), {
-  ssr: false,
-});
+import ContactClient from "./contact-client";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -55,7 +50,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ContactPage() {
+interface PageProps {
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export default function ContactPage({ searchParams }: PageProps) {
+  const success = searchParams.success === "1";
+
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -78,7 +79,7 @@ export default function ContactPage() {
     name: "Contact Us",
     url: "https://gearizen.com/contact",
     description:
-      "Have questions, feedback, or feature requests? Reach out to Gearizen—your source for free, client-side web tools. Fast, private, zero signup.",
+      "Have questions or feedback? Reach out to Gearizen—your source for free, client-side web tools. Fast, private, zero signup.",
     publisher: {
       "@type": "Organization",
       name: "Gearizen",
@@ -113,15 +114,22 @@ export default function ContactPage() {
       <JsonLd data={orgJsonLd} />
 
       {/* WebPage structured data */}
-      <Script id="contact-page-ld" type="application/ld+json" strategy="afterInteractive">
+      <Script
+        id="contact-page-ld"
+        type="application/ld+json"
+        strategy="afterInteractive"
+      >
         {JSON.stringify(pageJsonLd)}
       </Script>
 
       {/* Breadcrumb */}
-      <BreadcrumbJsonLd pageTitle="Contact" pageUrl="https://gearizen.com/contact" />
+      <BreadcrumbJsonLd
+        pageTitle="Contact"
+        pageUrl="https://gearizen.com/contact"
+      />
 
-      {/* Pure client component */}
-      <ContactClient />
+      {/* Contact content */}
+      <ContactClient success={success} />
     </>
   );
 }

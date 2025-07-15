@@ -1,16 +1,15 @@
 // app/contact/contact-client.tsx
-"use client";
 
-import { useSearchParams } from "next/navigation";
+export interface ContactClientProps {
+  success: boolean;
+}
 
-export default function ContactClient() {
-  const success = useSearchParams().get("success") === "1";
-
+export default function ContactClient({ success }: ContactClientProps) {
   return (
     <section
       id="contact-gearizen"
       aria-labelledby="contact-heading"
-      className="space-y-12 text-gray-900 antialiased"
+      className="space-y-20 text-gray-900 antialiased"
     >
       {/* Hero / Heading */}
       <div className="text-center space-y-6 sm:px-0">
