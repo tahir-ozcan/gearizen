@@ -11,7 +11,7 @@ export default function PdfToolkitClient() {
   const [loading, setLoading] = useState<"idle" | "compress" | "extract">("idle");
   const [error, setError] = useState<string | null>(null);
   const [extractedText, setExtractedText] = useState("");
-  const [compressedUrl, setCompressedUrl] = useState<string | null>(null);
+  const [compressedBlob, setCompressedBlob] = useState<Blob | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // PDF.js worker configuration
@@ -28,7 +28,7 @@ export default function PdfToolkitClient() {
   function handleUploadChange(e: ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0] ?? null;
     setError(null);
-    setCompressedUrl(null);
+    setCompressedBlob(null);
     setExtractedText("");
     if (!f) {
       setUploadFile(null);
@@ -47,18 +47,31 @@ export default function PdfToolkitClient() {
     if (!uploadFile) return;
     setLoading("compress");
     setError(null);
-    setCompressedUrl(null);
+    setCompressedBlob(null);
     try {
       const buf = await uploadFile.arrayBuffer();
       const pdfDoc = await PDFDocument.load(buf, { ignoreEncryption: true });
       const bytes = await pdfDoc.save({ useObjectStreams: true } as SaveOptions);
-      const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
-      setCompressedUrl(url);
+      const blob = new Blob([bytes], { type: "application/pdf" });
+      setCompressedBlob(blob);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "❌ Compression failed.");
     } finally {
       setLoading("idle");
     }
+  }
+
+  // Download compressed PDF
+  function handleDownloadCompressed() {
+    if (!compressedBlob || !uploadFile) return;
+    const url = URL.createObjectURL(compressedBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `compressed-${uploadFile.name}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   // Extract text and convert to Word
@@ -90,7 +103,7 @@ export default function PdfToolkitClient() {
               new TextRun({
                 text: pageText,
                 font: "Times New Roman",
-                size: 24,    // 12pt
+                size: 24, // 12pt
               }),
             ],
             spacing: { after: 200 },
@@ -185,23 +198,9 @@ export default function PdfToolkitClient() {
             {loading === "compress" ? "Compressing…" : "Compress PDF"}
           </button>
 
-          {compressedUrl && (
+          {compressedBlob && (
             <button
-              onClick={() => {
-                // force download only
-                fetch(compressedUrl)
-                  .then(res => res.blob())
-                  .then(blob => {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = `compressed-${uploadFile.name}`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                  });
-              }}
+              onClick={handleDownloadCompressed}
               className="px-5 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
             >
               Download Compressed
@@ -222,7 +221,7 @@ export default function PdfToolkitClient() {
       {extractedText && (
         <div className="max-w-2xl mx-auto space-y-6 sm:px-0">
           <h2 className="text-2xl font-semibold text-gray-800 tracking-tight">Extracted Text Preview</h2>
-          <div className="mt-1 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
           <textarea
             rows={6}
             readOnly
