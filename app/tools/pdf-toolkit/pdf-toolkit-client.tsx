@@ -138,7 +138,7 @@ export default function PdfToolkitClient() {
           PDF Toolkit: Compress &amp; Convert
         </h1>
         <div className="mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-        <div className="mx-auto max-w-2xl space-y-4 text-base sm:text-lg leading-relaxed text-gray-700 font-serif">
+        <div className="mx-auto max-w-2xl space-y-4 text-base sm:text-lg leading-relaxed text-gray-700">
           <p>
             Shrink PDF file sizes without any loss in quality and produce Word documents that mirror your PDF’s original
             typography and layout—entirely in-browser, offline, and with no signup required.
