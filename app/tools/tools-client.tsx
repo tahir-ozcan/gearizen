@@ -1,44 +1,63 @@
 // app/tools/tools-client.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, type FC, type SVGProps } from "react";
+// Arama ve reset ikonları için Heroicons
 import {
   MagnifyingGlassIcon,
   ArrowsRightLeftIcon,
-  ArrowPathIcon,
-  Cog6ToothIcon,
-  CodeBracketIcon,
-  SparklesIcon,
 } from "@heroicons/react/24/outline";
+// Kategori ikonları için lucide-react
+import {
+  Key,
+  ArrowRightLeft,
+  Code,
+  Tag,
+  Braces,
+  Paperclip,
+  Shield,
+  Palette,
+  Calculator,
+  FileText,
+  Scissors,
+  Droplet,
+} from "lucide-react";
+
 import Input from "@/components/Input";
 import ToolCard from "@/components/ToolCard";
-import { getToolsData, Tool } from "@/lib/tools-data";
+import { getToolsData, type Tool } from "@/lib/tools-data";
 
 export default function ToolsClient() {
   const { tools } = getToolsData();
 
-  // Define icon mapping for categories
-  const iconMap: Record<string, React.FC<React.SVGProps<SVGSVGElement>>> = {
-    "All Tools": ArrowsRightLeftIcon,
-    Converters: ArrowPathIcon,
-    Generators: Cog6ToothIcon,
-    Formatters: CodeBracketIcon,
-    Optimizers: SparklesIcon,
+  // İkon eşleştirmesi yapılan kategoriler
+  const iconMap: Record<string, FC<SVGProps<SVGSVGElement>>> = {
+    Generators: Key,
+    Converters: ArrowRightLeft,
+    Formatters: Code,
+    SEO: Tag,
+    Transformers: Braces,
+    Encoders: Paperclip,
+    Security: Shield,
+    Design: Palette,
+    Analytics: Calculator,
+    Compare: FileText,
+    Testers: Scissors,
+    Optimizers: Droplet,
   };
 
-  // Extract only categories that we support via iconMap (besides "All Tools")
+  // Tüm benzersiz kategorileri al, alfabetik sırala
   const rawCategories = Array.from(new Set(tools.map((t) => t.category))).sort();
-  const categories = [
-    "All Tools",
-    ...rawCategories.filter((c) => Object.keys(iconMap).includes(c)),
-  ];
+
+  // "All Tools" ögesi ve sonrasında gerçek kategoriler
+  const categories = ["All Tools", ...rawCategories];
 
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All Tools");
 
   const query = search.trim().toLowerCase();
 
-  // Filter by BOTH category and search text
+  // Hem kategori hem arama terimine göre filtrele
   const filtered = tools.filter((tool) => {
     const inCategory =
       selectedCategory === "All Tools" || tool.category === selectedCategory;
@@ -51,7 +70,7 @@ export default function ToolsClient() {
 
   return (
     <div className="space-y-20 text-gray-900 antialiased">
-      {/* Hero + Category Chips + Search */}
+      {/* Hero + Kategori Seçimi + Arama */}
       <section
         aria-labelledby="all-tools-heading"
         className="text-center space-y-6 sm:px-0"
@@ -67,15 +86,14 @@ export default function ToolsClient() {
           All Gearizen Tools
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
           Explore our suite of {tools.length} privacy-first, client-side utilities—everything from generators to converters, formatters and optimizers.
         </p>
 
-        {/* Category Chips */}
+        {/* Kategori Butonları */}
         <div className="flex flex-wrap justify-center gap-2">
           {categories.map((cat) => {
-            const Icon = iconMap[cat];
+            const Icon = iconMap[cat] ?? ArrowsRightLeftIcon;
             const isActive = selectedCategory === cat;
             return (
               <button
@@ -96,7 +114,7 @@ export default function ToolsClient() {
             );
           })}
 
-          {/* Reset Filter */}
+          {/* Filtreyi Sıfırla */}
           {selectedCategory !== "All Tools" && (
             <button
               onClick={() => setSelectedCategory("All Tools")}
@@ -109,7 +127,7 @@ export default function ToolsClient() {
           )}
         </div>
 
-        {/* Search Box */}
+        {/* Arama Kutusu */}
         <div className="mt-6 flex justify-center">
           <div className="relative w-full max-w-lg">
             <MagnifyingGlassIcon
@@ -134,7 +152,7 @@ export default function ToolsClient() {
         </div>
       </section>
 
-      {/* Results Grid */}
+      {/* Sonuçlar */}
       <section className="space-y-6 sm:px-0">
         <div className="flex flex-col">
           <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800">
