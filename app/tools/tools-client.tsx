@@ -21,7 +21,6 @@ import {
   Droplet,
 } from "lucide-react";
 
-import Input from "@/components/Input";
 import ToolCard from "@/components/ToolCard";
 import { getToolsData, type Tool } from "@/lib/tools-data";
 
@@ -123,7 +122,7 @@ export default function ToolsClient() {
               className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
               aria-hidden="true"
             />
-            <Input
+            <input
               id="tool-search"
               type="search"
               value={search}
@@ -133,7 +132,7 @@ export default function ToolsClient() {
               className="
                 pl-12 pr-4 py-3 w-full bg-white rounded-full
                 border border-gray-300 shadow-sm
-                focus:ring-2 focus:border-[#7c3aed]/50 focus:border-[#7c3aed]
+                focus:outline-2 outline-[#7c3aed]
                 transition ease-in-out duration-200
               "
             />
