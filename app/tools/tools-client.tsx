@@ -2,7 +2,14 @@
 "use client";
 
 import { useState } from "react";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import {
+  MagnifyingGlassIcon,
+  ArrowsRightLeftIcon,
+  ArrowPathIcon,
+  Cog6ToothIcon,
+  CodeBracketIcon,
+  SparklesIcon,
+} from "@heroicons/react/24/outline";
 import Input from "@/components/Input";
 import ToolCard from "@/components/ToolCard";
 import { getToolsData, Tool } from "@/lib/tools-data";
@@ -10,18 +17,31 @@ import { getToolsData, Tool } from "@/lib/tools-data";
 export default function ToolsClient() {
   const { tools } = getToolsData();
 
-  // Build a sorted, de-duped category list, with an "All" option up front
-  const categories = ["All", ...Array.from(new Set(tools.map((t) => t.category))).sort()];
+  // Define icon mapping for categories
+  const iconMap: Record<string, React.FC<React.SVGProps<SVGSVGElement>>> = {
+    "All Tools": ArrowsRightLeftIcon,
+    Converters: ArrowPathIcon,
+    Generators: Cog6ToothIcon,
+    Formatters: CodeBracketIcon,
+    Optimizers: SparklesIcon,
+  };
+
+  // Extract only categories that we support via iconMap (besides "All Tools")
+  const rawCategories = Array.from(new Set(tools.map((t) => t.category))).sort();
+  const categories = [
+    "All Tools",
+    ...rawCategories.filter((c) => Object.keys(iconMap).includes(c)),
+  ];
 
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [selectedCategory, setSelectedCategory] = useState<string>("All Tools");
 
   const query = search.trim().toLowerCase();
 
   // Filter by BOTH category and search text
   const filtered = tools.filter((tool) => {
     const inCategory =
-      selectedCategory === "All" || tool.category === selectedCategory;
+      selectedCategory === "All Tools" || tool.category === selectedCategory;
     const inText =
       !query ||
       tool.title.toLowerCase().includes(query) ||
@@ -54,22 +74,39 @@ export default function ToolsClient() {
 
         {/* Category Chips */}
         <div className="flex flex-wrap justify-center gap-2">
-          {categories.map((cat) => (
+          {categories.map((cat) => {
+            const Icon = iconMap[cat];
+            const isActive = selectedCategory === cat;
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`
+                  flex items-center px-5 py-2 rounded-full text-sm font-medium transition
+                  ${
+                    isActive
+                      ? "bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] text-white shadow-lg"
+                      : "bg-gray-100 text-gray-700 hover:bg-gradient-to-r hover:from-[#7c3aed] hover:via-[#ec4899] hover:to-[#fbbf24] hover:text-white"
+                  }
+                `}
+              >
+                <Icon className="h-5 w-5 mr-2" />
+                {cat}
+              </button>
+            );
+          })}
+
+          {/* Reset Filter */}
+          {selectedCategory !== "All Tools" && (
             <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`
-                px-4 py-1 rounded-full text-sm font-medium transition
-                ${
-                  selectedCategory === cat
-                    ? "bg-indigo-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }
-              `}
+              onClick={() => setSelectedCategory("All Tools")}
+              aria-label="Reset category filter"
+              className="flex items-center px-4 py-2 rounded-full text-sm text-gray-500 bg-gray-50 hover:bg-gray-200 transition"
             >
-              {cat}
+              <ArrowsRightLeftIcon className="h-4 w-4 mr-1" />
+              Reset
             </button>
-          ))}
+          )}
         </div>
 
         {/* Search Box */}
@@ -89,7 +126,7 @@ export default function ToolsClient() {
               className="
                 pl-12 pr-4 py-3 w-full bg-white rounded-full
                 border border-gray-300 shadow-sm
-                focus:ring-2 focus:ring-[#7c3aed]/30 focus:border-[#7c3aed]
+                focus:ring-2 focus:border-[#7c3aed]/50 focus:border-[#7c3aed]
                 transition ease-in-out duration-200
               "
             />
@@ -101,7 +138,7 @@ export default function ToolsClient() {
       <section className="space-y-6 sm:px-0">
         <div className="flex flex-col">
           <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800">
-            {query || selectedCategory !== "All"
+            {query || selectedCategory !== "All Tools"
               ? `Showing ${filtered.length} ${filtered.length === 1 ? "tool" : "tools"}`
               : "Browse All Tools"}
           </h2>
@@ -111,7 +148,7 @@ export default function ToolsClient() {
         {filtered.length === 0 ? (
           <p className="text-center text-gray-600">
             No tools found
-            {selectedCategory !== "All" && ` in ${selectedCategory}`}
+            {selectedCategory !== "All Tools" && ` in ${selectedCategory}`}
             {query && ` for “${search}”`}.
           </p>
         ) : (
