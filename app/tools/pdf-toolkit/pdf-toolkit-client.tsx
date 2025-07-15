@@ -71,7 +71,7 @@ export default function PdfToolkitClient() {
       const buf = await uploadFile.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
 
-      // Build paragraphs array
+      // Build paragraphs array & preview
       const paragraphs: Paragraph[] = [];
       let previewText = "";
 
@@ -83,17 +83,15 @@ export default function PdfToolkitClient() {
           .map(item => item.str)
           .join(" ");
 
-        // Add to preview
         previewText += pageText + "\n\n";
 
-        // Create paragraph for this page
         paragraphs.push(
           new Paragraph({
             children: [
               new TextRun({
                 text: pageText,
                 font: "Times New Roman",
-                size: 24,    // 12pt
+                size: 24,      // 12pt
               }),
             ],
             spacing: { after: 200 },
@@ -103,16 +101,11 @@ export default function PdfToolkitClient() {
 
       setExtractedText(previewText.trim());
 
-      // Create document with sections
+      // Create Word document
       const doc = new Document({
-        sections: [
-          {
-            children: paragraphs,
-          },
-        ],
+        sections: [{ children: paragraphs }],
       });
 
-      // Pack to blob and trigger download
       const blob = await Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -133,10 +126,10 @@ export default function PdfToolkitClient() {
     <section
       id="pdf-toolkit"
       aria-labelledby="pdf-toolkit-heading"
-      className="space-y-12 antialiased text-gray-900 px-4 md:px-0"
+      className="space-y-20 text-gray-900 antialiased"
     >
       {/* Heading & Description */}
-      <div className="text-center max-w-3xl mx-auto space-y-4">
+      <div className="text-center space-y-6 sm:px-0">
         <h1
           id="pdf-toolkit-heading"
           className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
@@ -144,15 +137,17 @@ export default function PdfToolkitClient() {
         >
           PDF Toolkit: Compress &amp; Convert
         </h1>
-        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-        <p className="mt-4 text-lg sm:text-xl font-serif leading-relaxed text-gray-700 max-w-2xl mx-auto">
-          Shrink PDF file sizes without any loss in quality, and generate beautifully styled Word documents
-          that retain your original formatting—all completely offline, in-browser, and without sign-up.
-        </p>
+        <div className="mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <div className="mx-auto max-w-2xl space-y-4 text-base sm:text-lg leading-relaxed text-gray-700 font-serif">
+          <p>
+            Shrink PDF file sizes without any loss in quality and produce Word documents that mirror your PDF’s original
+            typography and layout—entirely in-browser, offline, and with no signup required.
+          </p>
+        </div>
       </div>
 
       {/* File Selection */}
-      <div className="max-w-md mx-auto flex flex-col items-center gap-4">
+      <div className="max-w-md mx-auto flex flex-col items-center space-y-4">
         <input
           ref={fileInputRef}
           type="file"
@@ -168,20 +163,20 @@ export default function PdfToolkitClient() {
           {uploadFile ? "Change PDF…" : "Select PDF…"}
         </button>
         {uploadFile && (
-          <p className="text-sm text-gray-600 truncate w-full text-center font-mono">
+          <p className="text-sm text-gray-600 font-mono text-center truncate w-full">
             {uploadFile.name} — {(uploadFile.size / 1024).toFixed(1)} KB
           </p>
         )}
       </div>
 
-      {/* Error Message */}
+      {/* Error */}
       {error && (
         <div className="max-w-md mx-auto p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-center font-serif">
           {error}
         </div>
       )}
 
-      {/* Action Buttons */}
+      {/* Actions */}
       {uploadFile && (
         <div className="max-w-md mx-auto flex flex-wrap justify-center gap-4">
           <button
@@ -193,20 +188,28 @@ export default function PdfToolkitClient() {
           </button>
 
           {compressedUrl && (
-            <button
-              onClick={() => {
-                const a = document.createElement("a");
-                a.href = compressedUrl;
-                a.download = `compressed-${uploadFile.name}`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                setTimeout(() => URL.revokeObjectURL(compressedUrl), 1000);
-              }}
-              className="px-5 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
-            >
-              Download Compressed
-            </button>
+            <>
+              <button
+                onClick={() => {
+                  const a = document.createElement("a");
+                  a.href = compressedUrl;
+                  a.download = `compressed-${uploadFile.name}`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  setTimeout(() => URL.revokeObjectURL(compressedUrl), 1000);
+                }}
+                className="px-5 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
+              >
+                Download Compressed
+              </button>
+              <button
+                onClick={() => window.open(compressedUrl, "_blank")}
+                className="px-5 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 transition font-medium"
+              >
+                View Compressed
+              </button>
+            </>
           )}
 
           <button
@@ -221,8 +224,9 @@ export default function PdfToolkitClient() {
 
       {/* Extracted Text Preview */}
       {extractedText && (
-        <div className="max-w-2xl mx-auto prose prose-indigo">
-          <h2 className="text-lg font-semibold text-gray-800">Extracted Text Preview</h2>
+        <div className="max-w-2xl mx-auto space-y-4 sm:px-0">
+          <h2 className="text-2xl font-semibold text-gray-800 tracking-tight">Extracted Text Preview</h2>
+          <div className="mt-1 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
           <textarea
             rows={6}
             readOnly
