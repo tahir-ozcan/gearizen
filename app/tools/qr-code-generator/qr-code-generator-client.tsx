@@ -1,19 +1,9 @@
 // app/tools/qr-code-generator/qr-code-generator-client.tsx
 "use client";
 
-import { useState, useEffect, useMemo, ChangeEvent } from "react";
+import { useState, useMemo, ChangeEvent } from "react";
 import Image from "next/image";
 import QRCodeStyling from "qr-code-styling";
-
-/** Debounce Hook */
-function useDebounce<T>(value: T, delay = 300): T {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const handler = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-  return debounced;
-}
 
 type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 type DataType = "text" | "url" | "vcard" | "wifi";
@@ -29,7 +19,10 @@ interface QrOptions {
   logo?: string;
 }
 
-/** Build QR payload based on selected type */
+/**
+ * Build the raw payload string for the QR code,
+ * based on the selected data type and inputs.
+ */
 function buildPayload(
   type: DataType,
   text: string,
@@ -58,7 +51,9 @@ function buildPayload(
   }
 }
 
-/** Generate a PNG blob URL for the QR code */
+/**
+ * Generate a QR code as a PNG blob URL using qr-code-styling.
+ */
 async function generateQrBlob(opts: QrOptions): Promise<string> {
   const qr = new QRCodeStyling({
     data: opts.data,
@@ -76,7 +71,7 @@ async function generateQrBlob(opts: QrOptions): Promise<string> {
 }
 
 export default function QrCodeGeneratorClient() {
-  // State
+  // --- State for all inputs ---
   const [type, setType] = useState<DataType>("text");
   const [text, setText] = useState("");
   const [urlValue, setUrlValue] = useState("");
@@ -88,24 +83,17 @@ export default function QrCodeGeneratorClient() {
   const [lightColor, setLightColor] = useState("#ffffff");
   const [ecLevel, setEcLevel] = useState<ErrorCorrectionLevel>("M");
   const [logo, setLogo] = useState<string | null>(null);
+
+  // State for generated result
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Debounce inputs
-  const debouncedInputs = useDebounce({ type, text, urlValue, vcard, wifi }, 300);
-
-  // Build payload and options
+  // Memoize payload string and options object
   const payload = useMemo(
-    () =>
-      buildPayload(
-        debouncedInputs.type,
-        debouncedInputs.text,
-        debouncedInputs.urlValue,
-        debouncedInputs.vcard,
-        debouncedInputs.wifi
-      ),
-    [debouncedInputs]
+    () => buildPayload(type, text, urlValue, vcard, wifi),
+    [type, text, urlValue, vcard, wifi]
   );
+
   const options = useMemo<QrOptions>(
     () => ({
       data: payload,
@@ -119,30 +107,24 @@ export default function QrCodeGeneratorClient() {
     [payload, size, margin, darkColor, lightColor, ecLevel, logo]
   );
 
-  // Generate QR code blob URL when options change
-  useEffect(() => {
+  // Generate QR on button click
+  const generateQr = async () => {
     if (!payload) {
       setQrUrl(null);
-      setError(null);
+      setError("❌ Please enter some data to generate a QR code.");
       return;
     }
-    let canceled = false;
-    generateQrBlob(options)
-      .then((url) => {
-        if (!canceled) {
-          setQrUrl(url);
-          setError(null);
-        }
-      })
-      .catch(() => {
-        if (!canceled) setError("❌ Failed to generate QR code.");
-      });
-    return () => {
-      canceled = true;
-    };
-  }, [options, payload]);
+    setError(null);
+    try {
+      const url = await generateQrBlob(options);
+      setQrUrl(url);
+    } catch {
+      setQrUrl(null);
+      setError("❌ Failed to generate QR code. Please try again.");
+    }
+  };
 
-  // Handle logo file upload
+  // Handle optional logo upload
   const handleLogo = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) {
@@ -150,21 +132,19 @@ export default function QrCodeGeneratorClient() {
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => {
-      setLogo(reader.result as string);
-    };
+    reader.onload = () => setLogo(reader.result as string);
     reader.readAsDataURL(file);
   };
 
-  // Download the QR code PNG
+  // Download the generated QR as a PNG
   const download = () => {
     if (!qrUrl) return;
-    const a = document.createElement("a");
-    a.href = qrUrl;
-    a.download = `qr-code-${type}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const link = document.createElement("a");
+    link.href = qrUrl;
+    link.download = `qr-code-${type}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -173,20 +153,24 @@ export default function QrCodeGeneratorClient() {
       <div className="text-center space-y-6 sm:px-0">
         <h1
           id="qr-heading"
-          className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight"
+          className="
+            bg-clip-text text-transparent
+            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+            text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
+          "
         >
           QR Code Generator
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Generate high-resolution QR codes for text, URLs, vCards, and Wi-Fi credentials—all in your browser. Customize size, colors,
-          error correction, and add a logo.
+          Generate high-resolution QR codes for text, URLs, vCards, and Wi-Fi credentials—all in your browser. Customize size,
+          colors, error correction, and optionally add your logo. Click “Generate” when you’re ready.
         </p>
       </div>
 
       {/* Controls */}
       <div className="max-w-3xl mx-auto space-y-8 sm:px-0">
-        {/* Type selector */}
+        {/* Data Type Selector */}
         <div>
           <label className="block mb-1 font-medium text-gray-800">Type</label>
           <select
@@ -201,7 +185,7 @@ export default function QrCodeGeneratorClient() {
           </select>
         </div>
 
-        {/* Conditional inputs */}
+        {/* Conditional Inputs */}
         {type === "text" && (
           <div>
             <label className="block mb-1 font-medium text-gray-800">Text</label>
@@ -210,10 +194,11 @@ export default function QrCodeGeneratorClient() {
               value={text}
               onChange={(e) => setText(e.target.value)}
               className="input-base w-full"
-              placeholder="Enter text…"
+              placeholder="Enter any text…"
             />
           </div>
         )}
+
         {type === "url" && (
           <div>
             <label className="block mb-1 font-medium text-gray-800">URL</label>
@@ -226,13 +211,14 @@ export default function QrCodeGeneratorClient() {
             />
           </div>
         )}
+
         {type === "vcard" && (
           <div className="grid sm:grid-cols-2 gap-4">
             <input
               type="text"
               value={vcard.name}
               onChange={(e) => setVcard({ ...vcard, name: e.target.value })}
-              placeholder="Name"
+              placeholder="Full Name"
               className="input-base"
             />
             <input
@@ -246,18 +232,19 @@ export default function QrCodeGeneratorClient() {
               type="email"
               value={vcard.email}
               onChange={(e) => setVcard({ ...vcard, email: e.target.value })}
-              placeholder="Email"
+              placeholder="Email Address"
               className="input-base"
             />
             <input
               type="tel"
               value={vcard.phone}
               onChange={(e) => setVcard({ ...vcard, phone: e.target.value })}
-              placeholder="Phone"
+              placeholder="Phone Number"
               className="input-base"
             />
           </div>
         )}
+
         {type === "wifi" && (
           <div className="grid sm:grid-cols-3 gap-4">
             <input
@@ -286,7 +273,7 @@ export default function QrCodeGeneratorClient() {
           </div>
         )}
 
-        {/* Style controls */}
+        {/* Style Controls */}
         <div className="grid sm:grid-cols-2 gap-4">
           <label className="block">
             Size: <span className="font-semibold">{size}px</span>
@@ -353,6 +340,23 @@ export default function QrCodeGeneratorClient() {
           </label>
         </div>
 
+        {/* Generate Button */}
+        <div className="text-center">
+          <button
+            onClick={generateQr}
+            className="
+              inline-block
+              bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+              text-white font-medium
+              px-6 py-3 rounded-full
+              transition transform hover:scale-105
+            "
+          >
+            Generate QR Code
+          </button>
+        </div>
+
+        {/* Error Message */}
         {error && (
           <div className="p-4 bg-red-50 border-red-200 text-red-700 rounded">
             {error}
