@@ -4,8 +4,6 @@
 import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { PDFDocument, type SaveOptions } from "pdf-lib";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
-// webpack will emit this worker file as an asset per your next.config.ts rule:
-import pdfWorkerUrl from "pdfjs-dist/legacy/build/pdf.worker.min.js?url";
 
 type LoadingState = "idle" | "compress" | "extract";
 
@@ -18,9 +16,9 @@ export default function PdfToolkitClient() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Wire up PDF.js's worker to the emitted URL
+  // Serve the worker from public/pdf.worker.min.js
   useEffect(() => {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
   }, []);
 
   function handleBrowseClick() {
@@ -28,19 +26,16 @@ export default function PdfToolkitClient() {
   }
 
   function handleUploadChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0] ?? null;
+    const f = e.target.files?.[0] ?? null;
     setError(null);
     setCompressedUrl(null);
     setExtractedText("");
-
-    if (!file) {
-      setUploadFile(null);
-    } else if (file.type !== "application/pdf") {
+    if (!f) return setUploadFile(null);
+    if (f.type !== "application/pdf") {
       setError("Please select a valid PDF file.");
-      setUploadFile(null);
-    } else {
-      setUploadFile(file);
+      return setUploadFile(null);
     }
+    setUploadFile(f);
   }
 
   async function handleCompressPdf() {
@@ -48,13 +43,11 @@ export default function PdfToolkitClient() {
     setLoading("compress");
     setError(null);
     setCompressedUrl(null);
-
     try {
-      const buffer = await uploadFile.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
+      const buf = await uploadFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(buf, { ignoreEncryption: true });
       const bytes = await pdfDoc.save({ useObjectStreams: true } as SaveOptions);
-      const blob = new Blob([bytes], { type: "application/pdf" });
-      setCompressedUrl(URL.createObjectURL(blob));
+      setCompressedUrl(URL.createObjectURL(new Blob([bytes], { type: "application/pdf" })));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Compression failed.");
     } finally {
@@ -82,23 +75,22 @@ export default function PdfToolkitClient() {
     setLoading("extract");
     setError(null);
     setExtractedText("");
-
     try {
-      const buffer = await uploadFile.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
-
-      let fullText = "";
+      const buf = await uploadFile.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      let txt = "";
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
-        const strings = content.items.map((itm) => itm.str);
-        fullText += strings.join(" ") + "\n\n";
+        txt +=
+          content.items
+            .filter((item): item is { str: string } => "str" in item)
+            .map((item) => item.str)
+            .join(" ") + "\n\n";
       }
+      setExtractedText(txt.trim());
 
-      setExtractedText(fullText.trim());
-
-      // download as Word doc
-      const blob = new Blob([fullText], { type: "application/msword" });
+      const blob = new Blob([txt], { type: "application/msword" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -116,18 +108,15 @@ export default function PdfToolkitClient() {
 
   return (
     <section className="space-y-12 text-gray-900 antialiased px-4 md:px-0">
-      {/* Header */}
       <div className="text-center space-y-4">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400">
           PDF Toolkit: Compress &amp; Convert
         </h1>
         <p className="text-gray-700 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
-          Shrink PDF file sizes without quality loss and extract text to Word documents—all in-browser
-          and offline, no signup required.
+          Shrink PDF file sizes without quality loss and extract text to Word documents—all in-browser and offline, no signup required.
         </p>
       </div>
 
-      {/* File chooser */}
       <div className="max-w-md mx-auto flex flex-col items-center gap-4">
         <input
           ref={fileInputRef}
@@ -149,14 +138,12 @@ export default function PdfToolkitClient() {
         )}
       </div>
 
-      {/* Error */}
       {error && (
         <div className="max-w-md mx-auto p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-center">
           {error}
         </div>
       )}
 
-      {/* Actions */}
       {uploadFile && (
         <div className="max-w-md mx-auto flex flex-wrap justify-center gap-3">
           <button
@@ -194,7 +181,6 @@ export default function PdfToolkitClient() {
         </div>
       )}
 
-      {/* Preview */}
       {extractedText && (
         <div className="max-w-md mx-auto space-y-2">
           <h2 className="text-lg font-medium text-gray-800">Extracted Text Preview</h2>

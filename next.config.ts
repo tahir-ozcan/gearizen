@@ -10,20 +10,10 @@ const ContentSecurityPolicy = [
 ].join(" ");
 
 const nextConfig: NextConfig = {
-  // 1. Webpack kuralı: `?url` ile import edilen pdf.worker.min.js’i asset/resource olarak paketle
-  webpack(config) {
-    config.module.rules.push({
-      test: /pdf\.worker\.min\.js$/,
-      resourceQuery: /url/,           // yalnızca `import '...pdf.worker.min.js?url'` için
-      type: "asset/resource",
-      generator: {
-        filename: "static/chunks/[name].[hash][ext]"
-      }
-    });
-    return config;
-  },
+  // Remove the worker rule; we serve from public/
+  // webpack(config) { … }  ← no longer needed
 
-  // 2. Tüm route’lara CSP header ekle
+  // Apply CSP headers
   async headers() {
     return [
       {
