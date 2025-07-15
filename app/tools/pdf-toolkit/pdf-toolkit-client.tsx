@@ -4,6 +4,8 @@
 import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { PDFDocument, type SaveOptions } from "pdf-lib";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
+// Bundler-friendly worker import (Next.js will emit a URL for us)
+import pdfWorker from "pdfjs-dist/legacy/build/pdf.worker.min.js?url";
 
 type LoadingState = "idle" | "compress" | "extract";
 
@@ -16,9 +18,9 @@ export default function PdfToolkitClient() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Configure PDF.js worker once on mount (serving from public/)
+  // Configure PDF.js worker once on mount
   useEffect(() => {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
   }, []);
 
   /** Open file chooser */
@@ -75,7 +77,8 @@ export default function PdfToolkitClient() {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(compressedUrl);
+    // revoke after a slight delay to ensure download has started
+    setTimeout(() => URL.revokeObjectURL(compressedUrl), 1000);
   }
 
   /** View compressed PDF */
@@ -115,7 +118,7 @@ export default function PdfToolkitClient() {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Text extraction failed.");
     } finally {
