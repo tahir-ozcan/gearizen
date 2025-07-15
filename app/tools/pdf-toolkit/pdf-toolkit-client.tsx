@@ -1,63 +1,54 @@
 // app/tools/pdf-toolkit/pdf-toolkit-client.tsx
 "use client";
 
-import { useState, useRef, ChangeEvent, useEffect } from "react";
+import { useState, useRef, useEffect, ChangeEvent } from "react";
 import { PDFDocument, type SaveOptions } from "pdf-lib";
 import { Document, Packer, Paragraph, TextRun } from "docx";
+import { GlobalWorkerOptions, getDocument } from "pdfjs-dist/legacy/build/pdf";
 
 export default function PdfToolkitClient() {
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  // --- State ---
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<"idle" | "compress" | "extract">("idle");
   const [error, setError] = useState<string | null>(null);
   const [extractedText, setExtractedText] = useState("");
   const [compressedBlob, setCompressedBlob] = useState<Blob | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [pdfjsLib, setPdfjsLib] = useState<typeof import("pdfjs-dist/legacy/build/pdf") | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // PDF.js’i dinamik import et ve worker konfigürasyonunu yap
+  // --- PDF.js worker setup ---
   useEffect(() => {
-    import("pdfjs-dist/legacy/build/pdf")
-      .then((mod) => {
-        mod.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
-        setPdfjsLib(mod);
-      })
-      .catch((err) => {
-        console.error("PDF.js yüklenirken hata:", err);
-        setError("PDF işleme modülü yüklenemedi.");
-      });
+    GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
   }, []);
 
-  // Dosya seçme penceresini aç
-  function handleBrowseClick() {
-    fileInputRef.current?.click();
+  // --- Handlers ---
+  function handleSelectClick() {
+    inputRef.current?.click();
   }
 
-  // Dosya yüklendiğinde çalışır
-  function handleUploadChange(e: ChangeEvent<HTMLInputElement>) {
+  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0] ?? null;
     setError(null);
     setCompressedBlob(null);
     setExtractedText("");
     if (!f) {
-      setUploadFile(null);
+      setFile(null);
       return;
     }
     if (f.type !== "application/pdf") {
       setError("❌ Please select a valid PDF file.");
-      setUploadFile(null);
+      setFile(null);
       return;
     }
-    setUploadFile(f);
+    setFile(f);
   }
 
-  // PDF sıkıştırma işlemi
-  async function handleCompressPdf() {
-    if (!uploadFile) return;
+  async function handleCompress() {
+    if (!file) return;
     setLoading("compress");
     setError(null);
     setCompressedBlob(null);
     try {
-      const buf = await uploadFile.arrayBuffer();
+      const buf = await file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(buf, { ignoreEncryption: true });
       const bytes = await pdfDoc.save({ useObjectStreams: true } as SaveOptions);
       const blob = new Blob([bytes], { type: "application/pdf" });
@@ -69,64 +60,57 @@ export default function PdfToolkitClient() {
     }
   }
 
-  // Sıkıştırılmış PDF’i indir
   function handleDownloadCompressed() {
-    if (!compressedBlob || !uploadFile) return;
+    if (!compressedBlob || !file) return;
     const url = URL.createObjectURL(compressedBlob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `compressed-${uploadFile.name}`;
+    a.download = `compressed-${file.name}`;
+    a.rel = "noopener";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
 
-  // Metin çıkarma ve Word dökümanına dönüştürme
   async function handleExtractToWord() {
-    if (!uploadFile || !pdfjsLib) return;
+    if (!file) return;
     setLoading("extract");
     setError(null);
     setExtractedText("");
     try {
-      const buf = await uploadFile.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-
+      const buf = await file.arrayBuffer();
+      const pdf = await getDocument({ data: buf }).promise;
       const paragraphs: Paragraph[] = [];
-      let previewText = "";
+      let preview = "";
 
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
-        const pageText = content.items
+        const textItems = content.items
           .filter((item): item is { str: string } => "str" in item)
-          .map((item) => item.str)
-          .join(" ");
-
-        previewText += pageText + "\n\n";
-
+          .map((item) => item.str);
+        const pageText = textItems.join(" ");
+        preview += pageText + "\n\n";
         paragraphs.push(
           new Paragraph({
             children: [
-              new TextRun({
-                text: pageText,
-                font: "Times New Roman",
-                size: 24, // 12pt
-              }),
+              new TextRun({ text: pageText, font: "Times New Roman", size: 24 }),
             ],
             spacing: { after: 200 },
           })
         );
       }
 
-      setExtractedText(previewText.trim());
+      setExtractedText(preview.trim());
 
       const doc = new Document({ sections: [{ children: paragraphs }] });
       const blob = await Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = uploadFile.name.replace(/\.pdf$/i, ".docx");
+      a.download = file.name.replace(/\.pdf$/i, ".docx");
+      a.rel = "noopener";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -139,64 +123,74 @@ export default function PdfToolkitClient() {
   }
 
   return (
-    <section
-      id="pdf-toolkit"
-      aria-labelledby="pdf-toolkit-heading"
-      className="space-y-16 text-gray-900 antialiased"
-    >
-      {/* Başlık ve Açıklama */}
+    <section id="pdf-toolkit" aria-labelledby="pdf-toolkit-heading" className="space-y-16 text-gray-900 antialiased">
+      {/* Heading & Description */}
       <div className="text-center space-y-6 sm:px-0">
         <h1
           id="pdf-toolkit-heading"
-          className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
-                     text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight"
+          className="
+            bg-clip-text text-transparent
+            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+            text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
+          "
         >
           PDF Toolkit: Compress &amp; Convert
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-        <p className="mx-auto max-w-2xl space-y-4 text-base sm:text-lg leading-relaxed text-gray-700">
-          Shrink PDF file sizes without loss of quality, and produce Word documents that mirror your PDF’s original
-          typography and layout—entirely in-browser, offline, and with no signup required.
+        <p className="mx-auto max-w-2xl text-lg leading-relaxed text-gray-700">
+          Shrink PDF file sizes without quality loss, and extract text to Word documents—entirely in-browser, offline, 100% client-side, no signup.
         </p>
       </div>
 
-      {/* Dosya Seçimi */}
+      {/* File Selector */}
       <div className="max-w-md mx-auto flex flex-col items-center space-y-4">
         <input
-          ref={fileInputRef}
+          ref={inputRef}
           type="file"
           accept="application/pdf"
-          onChange={handleUploadChange}
+          onChange={handleFileChange}
           className="hidden"
         />
         <button
-          onClick={handleBrowseClick}
+          onClick={handleSelectClick}
           disabled={loading !== "idle"}
-          className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
+          className="
+            inline-block
+            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+            text-white font-medium
+            px-6 py-3 rounded-full
+            transition transform hover:scale-105 disabled:opacity-50
+          "
         >
-          {uploadFile ? "Change PDF…" : "Select PDF…"}
+          {file ? "Change PDF…" : "Select PDF…"}
         </button>
-        {uploadFile && (
-          <p className="text-sm text-gray-600 font-mono text-center truncate w-full">
-            {uploadFile.name} — {(uploadFile.size / 1024).toFixed(1)} KB
+        {file && (
+          <p className="text-sm text-gray-600 font-mono truncate w-full text-center">
+            {file.name} — {(file.size / 1024).toFixed(1)} KB
           </p>
         )}
       </div>
 
-      {/* Hata Mesajı */}
+      {/* Error Message */}
       {error && (
-        <div className="max-w-md mx-auto p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-center font-serif">
+        <div className="max-w-md mx-auto p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-center">
           {error}
         </div>
       )}
 
-      {/* İşlem Butonları */}
-      {uploadFile && (
+      {/* Action Buttons */}
+      {file && (
         <div className="max-w-md mx-auto flex flex-wrap justify-center gap-4">
           <button
-            onClick={handleCompressPdf}
+            onClick={handleCompress}
             disabled={loading !== "idle"}
-            className="px-5 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition font-medium"
+            className="
+              inline-block
+              bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+              text-white font-medium
+              px-6 py-3 rounded-full
+              transition transform hover:scale-105 disabled:opacity-50
+            "
           >
             {loading === "compress" ? "Compressing…" : "Compress PDF"}
           </button>
@@ -204,7 +198,12 @@ export default function PdfToolkitClient() {
           {compressedBlob && (
             <button
               onClick={handleDownloadCompressed}
-              className="px-5 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
+              className="
+                inline-block
+                border border-indigo-500 text-indigo-500 font-medium
+                px-6 py-3 rounded-full
+                transition hover:bg-indigo-50
+              "
             >
               Download Compressed
             </button>
@@ -212,24 +211,35 @@ export default function PdfToolkitClient() {
 
           <button
             onClick={handleExtractToWord}
-            disabled={loading !== "idle" || !pdfjsLib}
-            className="px-5 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition font-medium"
+            disabled={loading !== "idle"}
+            className="
+              inline-block
+              bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+              text-white font-medium
+              px-6 py-3 rounded-full
+              transition transform hover:scale-105 disabled:opacity-50
+            "
           >
-            {loading === "extract" ? "Converting to Word…" : "Extract Text to Word"}
+            {loading === "extract" ? "Converting…" : "Extract Text to Word"}
           </button>
         </div>
       )}
 
-      {/* Çıkarılan Metin Önizlemesi */}
+      {/* Extracted Text Preview */}
       {extractedText && (
         <div className="max-w-2xl mx-auto space-y-6 sm:px-0">
           <h2 className="text-2xl font-semibold text-gray-800 tracking-tight">Extracted Text Preview</h2>
-          <div className="mt-1 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <div className="h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
           <textarea
             rows={6}
             readOnly
             value={extractedText}
-            className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm resize-y focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
+            className="
+              w-full p-3 border border-gray-300 rounded-md
+              bg-gray-50 font-mono text-sm resize-y
+              focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500
+              transition
+            "
           />
         </div>
       )}
