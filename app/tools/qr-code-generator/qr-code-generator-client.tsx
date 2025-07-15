@@ -1,9 +1,8 @@
 // app/tools/qr-code-generator/qr-code-generator-client.tsx
 "use client";
 
-import { useState, useMemo, ChangeEvent } from "react";
-import Image from "next/image";
-import QRCodeStyling from "qr-code-styling";
+import { useState, useMemo, useRef, ChangeEvent } from "react";
+import QRCode from "qrcode";
 
 type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 type DataType = "text" | "url" | "vcard" | "wifi";
@@ -16,10 +15,10 @@ interface QrOptions {
   darkColor: string;
   lightColor: string;
   errorCorrectionLevel: ErrorCorrectionLevel;
-  logo?: string;
+  logoDataUrl?: string;
 }
 
-/**
+/** 
  * Build the raw payload string for the QR code,
  * based on the selected data type and inputs.
  */
@@ -52,26 +51,48 @@ function buildPayload(
 }
 
 /**
- * Generate a QR code as a PNG blob URL using qr-code-styling.
+ * Draw QR code to the canvas, then overlay logo if provided,
+ * and return the resulting data URL.
  */
-async function generateQrBlob(opts: QrOptions): Promise<string> {
-  const qr = new QRCodeStyling({
-    data: opts.data,
-    width: opts.width,
+async function drawQrToCanvas(
+  canvas: HTMLCanvasElement,
+  opts: QrOptions
+): Promise<string> {
+  // 1) Draw the QR into the canvas with margin, size, colors, error correction
+  await QRCode.toCanvas(canvas, opts.data, {
+    errorCorrectionLevel: opts.errorCorrectionLevel,
     margin: opts.margin,
-    dotsOptions: { color: opts.darkColor },
-    backgroundOptions: { color: opts.lightColor },
-    image: opts.logo,
-    imageOptions: { crossOrigin: "anonymous" },
-    qrOptions: { errorCorrectionLevel: opts.errorCorrectionLevel },
+    width: opts.width,
+    color: {
+      dark: opts.darkColor,
+      light: opts.lightColor,
+    },
   });
-  const rawData = await qr.getRawData("png");
-  const blob = new Blob([rawData], { type: "image/png" });
-  return URL.createObjectURL(blob);
+
+  // 2) If a logo was provided, draw it centered
+  if (opts.logoDataUrl) {
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      const img = new Image();
+      img.src = opts.logoDataUrl;
+      await new Promise<void>((res) => {
+        img.onload = () => res();
+        img.onerror = () => res();
+      });
+      // logo boyutu, QR kod genişliğinin %20’si kadar olsun
+      const logoSize = opts.width * 0.2;
+      const x = (opts.width - logoSize) / 2;
+      const y = (opts.width - logoSize) / 2;
+      ctx.drawImage(img, x, y, logoSize, logoSize);
+    }
+  }
+
+  // 3) Export canvas to PNG data URL
+  return canvas.toDataURL("image/png");
 }
 
 export default function QrCodeGeneratorClient() {
-  // --- State for all inputs ---
+  // --- Input State ---
   const [type, setType] = useState<DataType>("text");
   const [text, setText] = useState("");
   const [urlValue, setUrlValue] = useState("");
@@ -82,18 +103,29 @@ export default function QrCodeGeneratorClient() {
   const [darkColor, setDarkColor] = useState("#000000");
   const [lightColor, setLightColor] = useState("#ffffff");
   const [ecLevel, setEcLevel] = useState<ErrorCorrectionLevel>("M");
-  const [logo, setLogo] = useState<string | null>(null);
+  const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
 
-  // State for generated result
-  const [qrUrl, setQrUrl] = useState<string | null>(null);
+  // --- Result State ---
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Memoize payload string and options object
+  // Canvas ref for rendering
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Build the raw payload string
   const payload = useMemo(
-    () => buildPayload(type, text, urlValue, vcard, wifi),
+    () =>
+      buildPayload(
+        type,
+        text,
+        urlValue,
+        vcard,
+        wifi
+      ),
     [type, text, urlValue, vcard, wifi]
   );
 
+  // Build options
   const options = useMemo<QrOptions>(
     () => ({
       data: payload,
@@ -102,45 +134,51 @@ export default function QrCodeGeneratorClient() {
       darkColor,
       lightColor,
       errorCorrectionLevel: ecLevel,
-      logo: logo || undefined,
+      logoDataUrl: logoDataUrl || undefined,
     }),
-    [payload, size, margin, darkColor, lightColor, ecLevel, logo]
+    [payload, size, margin, darkColor, lightColor, ecLevel, logoDataUrl]
   );
 
-  // Generate QR on button click
+  /** Generate & render the QR code */
   const generateQr = async () => {
     if (!payload) {
-      setQrUrl(null);
-      setError("❌ Please enter some data to generate a QR code.");
+      setError("❌ Please enter data for the selected type before generating.");
+      setQrDataUrl(null);
       return;
     }
     setError(null);
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      setError("❌ Canvas not available.");
+      return;
+    }
     try {
-      const url = await generateQrBlob(options);
-      setQrUrl(url);
-    } catch {
-      setQrUrl(null);
-      setError("❌ Failed to generate QR code. Please try again.");
+      const dataUrl = await drawQrToCanvas(canvas, options);
+      setQrDataUrl(dataUrl);
+    } catch (e) {
+      console.error(e);
+      setError("❌ QR code generation failed. Please try again.");
+      setQrDataUrl(null);
     }
   };
 
-  // Handle optional logo upload
+  /** Handle logo file upload */
   const handleLogo = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) {
-      setLogo(null);
+      setLogoDataUrl(null);
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => setLogo(reader.result as string);
+    reader.onload = () => setLogoDataUrl(reader.result as string);
     reader.readAsDataURL(file);
   };
 
-  // Download the generated QR as a PNG
+  /** Download the current QR as PNG */
   const download = () => {
-    if (!qrUrl) return;
+    if (!qrDataUrl) return;
     const link = document.createElement("a");
-    link.href = qrUrl;
+    link.href = qrDataUrl;
     link.download = `qr-code-${type}.png`;
     document.body.appendChild(link);
     link.click();
@@ -149,7 +187,7 @@ export default function QrCodeGeneratorClient() {
 
   return (
     <section id="qr-code-generator" aria-labelledby="qr-heading" className="space-y-16 text-gray-900 antialiased">
-      {/* Heading & Description */}
+      {/* Heading */}
       <div className="text-center space-y-6 sm:px-0">
         <h1
           id="qr-heading"
@@ -163,14 +201,13 @@ export default function QrCodeGeneratorClient() {
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Generate high-resolution QR codes for text, URLs, vCards, and Wi-Fi credentials—all in your browser. Customize size,
-          colors, error correction, and optionally add your logo. Click “Generate” when you’re ready.
+          Generate high-resolution QR codes for text, URLs, vCards or Wi-Fi credentials. Adjust size, margin, colors, error correction, and optionally add your logo. Then click “Generate”.
         </p>
       </div>
 
       {/* Controls */}
       <div className="max-w-3xl mx-auto space-y-8 sm:px-0">
-        {/* Data Type Selector */}
+        {/* Type selector */}
         <div>
           <label className="block mb-1 font-medium text-gray-800">Type</label>
           <select
@@ -185,7 +222,7 @@ export default function QrCodeGeneratorClient() {
           </select>
         </div>
 
-        {/* Conditional Inputs */}
+        {/* Conditional inputs */}
         {type === "text" && (
           <div>
             <label className="block mb-1 font-medium text-gray-800">Text</label>
@@ -198,7 +235,6 @@ export default function QrCodeGeneratorClient() {
             />
           </div>
         )}
-
         {type === "url" && (
           <div>
             <label className="block mb-1 font-medium text-gray-800">URL</label>
@@ -211,7 +247,6 @@ export default function QrCodeGeneratorClient() {
             />
           </div>
         )}
-
         {type === "vcard" && (
           <div className="grid sm:grid-cols-2 gap-4">
             <input
@@ -244,7 +279,6 @@ export default function QrCodeGeneratorClient() {
             />
           </div>
         )}
-
         {type === "wifi" && (
           <div className="grid sm:grid-cols-3 gap-4">
             <input
@@ -273,7 +307,7 @@ export default function QrCodeGeneratorClient() {
           </div>
         )}
 
-        {/* Style Controls */}
+        {/* Style controls */}
         <div className="grid sm:grid-cols-2 gap-4">
           <label className="block">
             Size: <span className="font-semibold">{size}px</span>
@@ -288,11 +322,11 @@ export default function QrCodeGeneratorClient() {
             />
           </label>
           <label className="block">
-            Margin:
+            Margin: <span className="font-semibold">{margin}</span>
             <input
               type="number"
               min={0}
-              max={10}
+              max={20}
               value={margin}
               onChange={(e) => setMargin(+e.target.value)}
               className="input-base w-full"
@@ -364,33 +398,32 @@ export default function QrCodeGeneratorClient() {
         )}
       </div>
 
-      {/* Preview & Actions */}
-      {qrUrl && (
-        <div className="mt-12 max-w-3xl mx-auto text-center space-y-6">
-          <Image
-            src={qrUrl}
-            alt="QR code preview"
-            width={size}
-            height={size}
-            unoptimized
-            className="mx-auto border rounded"
-          />
-          <div className="flex justify-center gap-4">
-            <button
-              onClick={() => navigator.clipboard.writeText(qrUrl)}
-              className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
-            >
-              Copy URL
-            </button>
-            <button
-              onClick={download}
-              className="px-6 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
-            >
-              Download PNG
-            </button>
-          </div>
+      {/* Canvas Preview & Actions */}
+      <div className="mt-12 max-w-3xl mx-auto text-center space-y-6">
+        <canvas
+          ref={canvasRef}
+          width={size}
+          height={size}
+          className="mx-auto border rounded"
+          aria-label="QR code preview"
+        />
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={() => qrDataUrl && navigator.clipboard.writeText(qrDataUrl)}
+            disabled={!qrDataUrl}
+            className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition disabled:opacity-50"
+          >
+            Copy URL
+          </button>
+          <button
+            onClick={download}
+            disabled={!qrDataUrl}
+            className="px-6 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition disabled:opacity-50"
+          >
+            Download PNG
+          </button>
         </div>
-      )}
+      </div>
     </section>
   );
 }
