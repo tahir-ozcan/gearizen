@@ -3,14 +3,14 @@
 
 import { useState, useRef, useEffect, ChangeEvent } from "react";
 import { jsPDF } from "jspdf";
-// PDF.js runtime
+// PDF.js runtime & types
 import {
   getDocument,
   GlobalWorkerOptions,
   type PDFDocumentProxy,
   type PDFPageProxy,
-  type TextContent,
 } from "pdfjs-dist/legacy/build/pdf";
+import type { TextContent, TextItem, TextMarkedContent } from "pdfjs-dist/types/src/display/api";
 // Docx
 import {
   Document as DocxDocument,
@@ -22,10 +22,11 @@ import {
 
 type ExtractMode = "image" | "text";
 
-// Minimal local type for text‐content items
+// PDF.js getTextContent().items listesinden aldığımız minimal yapı
 interface PDFTextItem {
   str: string;
-  transform: [number, number, number, number, number, number];
+  transform: number[];
+  fontName?: string;
 }
 
 export default function PdfToolkitClient() {
@@ -38,12 +39,13 @@ export default function PdfToolkitClient() {
   const [extractMode, setExtractMode] = useState<ExtractMode>("image");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // PDF.js worker setup
+  // PDF.js worker
   useEffect(() => {
     GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
   }, []);
 
   // --- Handlers ---
+
   function handleSelectClick() {
     inputRef.current?.click();
   }
@@ -85,7 +87,7 @@ export default function PdfToolkitClient() {
         canvas.height = viewport.height;
         const ctx = canvas.getContext("2d");
         if (ctx) {
-          // @ts-expect-error render exists
+          // @ts-expect-error render exists at runtime
           const renderTask = page.render({ canvasContext: ctx, viewport });
           await renderTask.promise;
         }
@@ -121,7 +123,7 @@ export default function PdfToolkitClient() {
     URL.revokeObjectURL(url);
   }
 
-  /** Extract to Word—either as images or as real text */
+  /** Convert pages to Word—image or true text mode */
   async function handleExtractToWord() {
     if (!file) return;
     setLoading("extract");
@@ -136,7 +138,7 @@ export default function PdfToolkitClient() {
         const page: PDFPageProxy = await pdf.getPage(i);
 
         if (extractMode === "image") {
-          // image‐based
+          // page as image
           // @ts-expect-error getViewport exists at runtime
           const viewport = page.getViewport({ scale: 2 });
           const canvas = document.createElement("canvas");
@@ -144,13 +146,14 @@ export default function PdfToolkitClient() {
           canvas.height = viewport.height;
           const ctx = canvas.getContext("2d");
           if (ctx) {
-            // @ts-expect-error render exists
+            // @ts-expect-error render exists at runtime
             const renderTask = page.render({ canvasContext: ctx, viewport });
             await renderTask.promise;
           }
           const dataUrl = canvas.toDataURL("image/png");
           const base64 = dataUrl.split(",")[1];
           const buffer = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+
           children.push(
             new Paragraph({
               children: [
@@ -164,46 +167,65 @@ export default function PdfToolkitClient() {
             })
           );
         } else {
-          // text‐based
-          const textContent: TextContent = await page.getTextContent();
-          const items = textContent.items as PDFTextItem[];
+          // real text extraction
+          const textContent = (await page.getTextContent()) as TextContent;
+          // only TextItem’ları alın
+          const raw = textContent.items as (TextItem | TextMarkedContent)[];
+          const textItems: TextItem[] = raw.filter(
+            (it): it is TextItem => (it as TextItem).str !== undefined
+          );
+
+          // PDFTextItem[]’e çevir
+          const items: PDFTextItem[] = textItems.map((it) => ({
+            str: it.str,
+            transform: it.transform,
+            fontName: it.fontName,
+          }));
+
+          // satırları yeniden birleştir
           const lines: string[] = [];
           let currentLine = "";
           let lastY: number | null = null;
-
-          items.forEach((item) => {
+          for (const item of items) {
             const y = Math.round(item.transform[5]);
             if (lastY === null) {
               lastY = y;
+              currentLine = item.str;
             } else if (Math.abs(y - lastY) > 5) {
               lines.push(currentLine);
               currentLine = item.str;
               lastY = y;
-              return;
+            } else {
+              currentLine += item.str;
             }
-            currentLine += item.str;
-          });
+          }
           if (currentLine) lines.push(currentLine);
 
-          lines.forEach((text) => {
+          // örnek font ve boyut bul
+          const sample = items.find((it) => it.str.trim().length > 0);
+          const baseFont = sample?.fontName ?? "Times New Roman";
+          const baseScale = sample ? sample.transform[0] : 1;
+          const computedSize = Math.max(16, Math.round(baseScale * 24)); // half-point
+
+          for (const txt of lines) {
             children.push(
               new Paragraph({
                 children: [
                   new TextRun({
-                    text,
-                    font: "Times New Roman",
-                    size: 24, // 12pt
+                    text: txt,
+                    font: baseFont.replace(/[^a-zA-Z ]/g, ""),
+                    size: computedSize,
                   }),
                 ],
                 spacing: { after: 100 },
               })
             );
-          });
+          }
         }
       }
 
-      const doc = new DocxDocument({ sections: [{ children }] });
-      const blob = await Packer.toBlob(doc);
+      const docx = new DocxDocument({ sections: [{ children }] });
+      const blob = await Packer.toBlob(docx);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -226,60 +248,59 @@ export default function PdfToolkitClient() {
   }
 
   return (
-    <section id="pdf-toolkit" className="px-4 py-16 max-w-4xl mx-auto space-y-12">
-      {/* Heading */}
+    <section id="pdf-toolkit" className="px-4 py-16 max-w-3xl mx-auto space-y-12">
+      {/* Başlık */}
       <header className="text-center space-y-4">
-        <h1 className="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400">
-          PDF Toolkit: Compress & Convert
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900">
+          PDF Toolkit: Compress &amp; Convert
         </h1>
-        <p className="text-gray-700 text-lg">
-          Shrink PDF sizes or turn them into Word documents—either exact images or editable text—100% in-browser, no signup.
+        <p className="text-gray-600">
+          Compress PDF files or convert them to Word—preserve layout as images or extract editable text, entirely in-browser.
         </p>
       </header>
 
-      {/* File Selection */}
-      <div className="flex flex-col items-center space-y-3">
+      {/* Dosya Seçimi */}
+      <div className="flex flex-col items-center space-y-2">
         <input ref={inputRef} type="file" accept="application/pdf" onChange={handleFileChange} className="hidden" />
         <button
           onClick={handleSelectClick}
           disabled={loading !== "idle"}
-          className="px-8 py-3 bg-indigo-600 text-white rounded-full hover:opacity-80 transition-opacity disabled:opacity-50"
+          className="px-6 py-2 bg-indigo-600 text-white rounded hover:opacity-80 transition-opacity disabled:opacity-50"
         >
           {file ? "Change PDF…" : "Select PDF…"}
         </button>
         {file && (
-          <p className="text-gray-600 text-sm font-mono truncate">
-            {file.name} ({(file.size / 1024).toFixed(1)} KB)
+          <p className="text-sm text-gray-500 font-mono truncate">
+            {file.name} ({(file.size / 1024).toFixed(1)} KB)
           </p>
         )}
       </div>
 
-      {/* Options */}
+      {/* Ayarlar */}
       {file && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {/* JPEG Quality */}
+          {extractMode === "image" && (
+            <div>
+              <label className="block text-gray-700 mb-1">
+                JPEG Quality: <span className="font-semibold">{Math.round(jpegQuality * 100)}%</span>
+              </label>
+              <input
+                type="range"
+                min={10}
+                max={100}
+                step={5}
+                value={jpegQuality * 100}
+                onChange={(e) => setJpegQuality(Number(e.target.value) / 100)}
+                className="w-full"
+              />
+            </div>
+          )}
           <div>
-            <label className="block text-gray-800 mb-1">
-              JPEG Quality: <span className="font-semibold">{Math.round(jpegQuality * 100)}%</span>
-            </label>
-            <input
-              type="range"
-              min={10}
-              max={100}
-              step={5}
-              value={jpegQuality * 100}
-              onChange={(e) => setJpegQuality(+e.target.value / 100)}
-              className="w-full"
-            />
-          </div>
-
-          {/* Extraction Mode */}
-          <div>
-            <label className="block text-gray-800 mb-1">Extraction Mode:</label>
+            <label className="block text-gray-700 mb-1">Extraction Mode:</label>
             <select
               value={extractMode}
               onChange={handleModeChange}
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200"
             >
               <option value="image">Embed pages as images</option>
               <option value="text">Extract editable text</option>
@@ -288,20 +309,20 @@ export default function PdfToolkitClient() {
         </div>
       )}
 
-      {/* Error */}
+      {/* Hata Mesajı */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-center">
           {error}
         </div>
       )}
 
-      {/* Actions */}
+      {/* Butonlar */}
       {file && (
         <div className="flex flex-wrap justify-center gap-4">
           <button
             onClick={handleCompress}
             disabled={loading !== "idle"}
-            className="px-8 py-3 bg-green-600 text-white rounded-full hover:opacity-80 transition-opacity disabled:opacity-50"
+            className="px-6 py-2 bg-green-600 text-white rounded hover:opacity-80 transition-opacity disabled:opacity-50"
           >
             {loading === "compress" ? "Compressing…" : "Compress PDF"}
           </button>
@@ -309,7 +330,7 @@ export default function PdfToolkitClient() {
           {compressedBlob && (
             <button
               onClick={handleDownloadCompressed}
-              className="px-8 py-3 border border-indigo-600 text-indigo-600 rounded-full hover:bg-indigo-100 transition-opacity"
+              className="px-6 py-2 border border-indigo-600 text-indigo-600 rounded hover:bg-indigo-50 transition-opacity"
             >
               Download Compressed
             </button>
@@ -318,7 +339,7 @@ export default function PdfToolkitClient() {
           <button
             onClick={handleExtractToWord}
             disabled={loading !== "idle"}
-            className="px-8 py-3 bg-yellow-600 text-white rounded-full hover:opacity-80 transition-opacity disabled:opacity-50"
+            className="px-6 py-2 bg-yellow-600 text-white rounded hover:opacity-80 transition-opacity disabled:opacity-50"
           >
             {loading === "extract" ? "Converting…" : "Extract to Word"}
           </button>
