@@ -28,7 +28,6 @@ interface PDFTextItem {
 }
 
 export default function PdfToolkitClient() {
-  // ─── State ───────────────────────────────────────────────────────────────
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<"idle" | "compress" | "extract">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -37,12 +36,10 @@ export default function PdfToolkitClient() {
   const [extractMode, setExtractMode] = useState<ExtractMode>("image");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // ─── PDF.js worker configuration ─────────────────────────────────────────
   useEffect(() => {
     GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
   }, []);
 
-  // ─── Handlers ─────────────────────────────────────────────────────────────
   function handleSelectClick() {
     inputRef.current?.click();
   }
@@ -73,8 +70,6 @@ export default function PdfToolkitClient() {
       const arrayBuffer = await file.arrayBuffer();
       const pdf: PDFDocumentProxy = await getDocument({ data: arrayBuffer }).promise;
       const doc = new jsPDF({ unit: "pt", format: "a4" });
-
-      // Gizli canvas oluştur
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
 
@@ -86,8 +81,7 @@ export default function PdfToolkitClient() {
         canvas.height = viewport.height;
         if (ctx) {
           // @ts-expect-error render runtime
-          const renderTask = page.render({ canvasContext: ctx, viewport });
-          await renderTask.promise;
+          await page.render({ canvasContext: ctx, viewport }).promise;
         }
         const dataUrl = canvas.toDataURL("image/jpeg", jpegQuality);
         const props = doc.getImageProperties(dataUrl);
@@ -97,8 +91,7 @@ export default function PdfToolkitClient() {
         doc.addImage(dataUrl, "JPEG", 0, 0, pw, ph);
       }
 
-      const blob = doc.output("blob");
-      setCompressedBlob(blob);
+      setCompressedBlob(doc.output("blob"));
     } catch (err: unknown) {
       console.error(err);
       setError(err instanceof Error ? err.message : "❌ Compression failed.");
@@ -113,9 +106,7 @@ export default function PdfToolkitClient() {
     const a = document.createElement("a");
     a.href = url;
     a.download = `compressed-${file.name}`;
-    document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
 
@@ -128,10 +119,8 @@ export default function PdfToolkitClient() {
       const arrayBuffer = await file.arrayBuffer();
       const pdf: PDFDocumentProxy = await getDocument({ data: arrayBuffer }).promise;
       const children: Paragraph[] = [];
-
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      const reader = new FileReader();
 
       for (let i = 1; i <= pdf.numPages; i++) {
         const page: PDFPageProxy = await pdf.getPage(i);
@@ -144,8 +133,7 @@ export default function PdfToolkitClient() {
           canvas.height = viewport.height;
           if (ctx) {
             // @ts-expect-error render runtime
-            const renderTask = page.render({ canvasContext: ctx, viewport });
-            await renderTask.promise;
+            await page.render({ canvasContext: ctx, viewport }).promise;
           }
           const dataUrl = canvas.toDataURL("image/png");
           const base64 = dataUrl.split(",")[1];
@@ -173,7 +161,6 @@ export default function PdfToolkitClient() {
             fontName: it.fontName,
           }));
 
-          // Satır birleştirme
           const lines: string[] = [];
           let acc = "", lastY: number | null = null;
           for (const itm of items) {
@@ -188,7 +175,6 @@ export default function PdfToolkitClient() {
           }
           if (acc) lines.push(acc);
 
-          // Font/ölçek örneklemesi
           const sample = items.find(it => it.str.trim());
           const baseFont = sample?.fontName ?? "Times New Roman";
           const halfPt = Math.round((sample?.transform[0] ?? 1) * 24);
@@ -215,16 +201,13 @@ export default function PdfToolkitClient() {
         }
       }
 
-      // DOCX oluştur ve indir
       const docx = new DocxDocument({ sections: [{ children }] });
       const blob = await Packer.toBlob(docx);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = file.name.replace(/\.pdf$/i, ".docx");
-      document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (err: unknown) {
       console.error(err);
@@ -238,10 +221,8 @@ export default function PdfToolkitClient() {
     setExtractMode(e.target.value as ExtractMode);
   }
 
-  // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <section id="pdf-toolkit" className="space-y-16 text-gray-900 antialiased">
-      {/* Başlık & Açıklama */}
       <div className="text-center space-y-6 sm:px-0">
         <h1
           className="
@@ -260,16 +241,10 @@ export default function PdfToolkitClient() {
 
       <form onSubmit={(e: FormEvent) => e.preventDefault()} className="max-w-3xl mx-auto space-y-8 sm:px-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Sol sütun: Dosya & Ayarlar */}
+          {/* Sol sütun */}
           <div className="flex flex-col space-y-6">
             <div className="flex flex-col items-center">
-              <input
-                ref={inputRef}
-                type="file"
-                accept="application/pdf"
-                onChange={handleFileChange}
-                className="hidden"
-              />
+              <input ref={inputRef} type="file" accept="application/pdf" onChange={handleFileChange} className="hidden" />
               <button
                 type="button"
                 onClick={handleSelectClick}
@@ -289,32 +264,14 @@ export default function PdfToolkitClient() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {extractMode === "image" && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-800 mb-1">
-                      JPEG Quality
-                    </label>
-                    <input
-                      type="range"
-                      min={10}
-                      max={100}
-                      step={5}
-                      value={jpegQuality * 100}
-                      onChange={e => setJpegQuality(Number(e.target.value) / 100)}
-                      className="w-full"
-                    />
-                    <p className="mt-1 text-xs text-gray-500">
-                      {Math.round(jpegQuality * 100)}%
-                    </p>
+                    <label className="block text-sm font-medium text-gray-800 mb-1">JPEG Quality</label>
+                    <input type="range" min={10} max={100} step={5} value={jpegQuality * 100} onChange={e => setJpegQuality(Number(e.target.value) / 100)} className="w-full" />
+                    <p className="mt-1 text-xs text-gray-500">{Math.round(jpegQuality * 100)}%</p>
                   </div>
                 )}
                 <div>
-                  <label className="block text-sm font-medium text-gray-800 mb-1">
-                    Extraction Mode
-                  </label>
-                  <select
-                    value={extractMode}
-                    onChange={handleModeChange}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 transition"
-                  >
+                  <label className="block text-sm font-medium text-gray-800 mb-1">Extraction Mode</label>
+                  <select value={extractMode} onChange={handleModeChange} className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 transition">
                     <option value="image">Embed pages as images</option>
                     <option value="text">Extract editable text</option>
                   </select>
@@ -323,13 +280,9 @@ export default function PdfToolkitClient() {
             )}
           </div>
 
-          {/* Sağ sütun: Hata & Butonlar */}
+          {/* Sağ sütun */}
           <div className="flex flex-col justify-between">
-            {error && (
-              <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
-                {error}
-              </div>
-            )}
+            {error && <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">{error}</div>}
             {file && (
               <div className="flex flex-wrap items-center gap-4">
                 <button
