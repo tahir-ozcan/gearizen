@@ -16,11 +16,9 @@ export default function PdfToolkitClient() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Configure PDF.js worker once on mount
+  // Configure PDF.js worker once on mount (serving from public/)
   useEffect(() => {
-    // Hardcode to match your installed pdfjs-dist version
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://unpkg.com/pdfjs-dist@3.8.162/legacy/build/pdf.worker.min.js";
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
   }, []);
 
   /** Open file chooser */
@@ -47,7 +45,7 @@ export default function PdfToolkitClient() {
     setUploadFile(file);
   }
 
-  /** Compress the PDF (object streams for mild compression) */
+  /** Compress the PDF */
   async function handleCompressPdf() {
     if (!uploadFile) return;
     setLoading("compress");
@@ -56,11 +54,8 @@ export default function PdfToolkitClient() {
     try {
       const buffer = await uploadFile.arrayBuffer();
       const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
-
-      // pdf-lib's SaveOptions: useObjectStreams gives some compression
       const options: SaveOptions = { useObjectStreams: true };
       const bytes = await pdfDoc.save(options);
-
       const blob = new Blob([bytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       setCompressedUrl(url);
@@ -77,7 +72,10 @@ export default function PdfToolkitClient() {
     const a = document.createElement("a");
     a.href = compressedUrl;
     a.download = `compressed-${uploadFile.name}`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(compressedUrl);
   }
 
   /** View compressed PDF */
@@ -114,7 +112,9 @@ export default function PdfToolkitClient() {
       const a = document.createElement("a");
       a.href = url;
       a.download = `${uploadFile.name.replace(/\.pdf$/i, "")}.doc`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Text extraction failed.");
