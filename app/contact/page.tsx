@@ -2,9 +2,14 @@
 
 import type { Metadata } from "next";
 import Script from "next/script";
+import dynamic from "next/dynamic";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 import JsonLd from "@/app/components/JsonLd";
-import ContactClient from "./contact-client";
+
+// Load form as a pure client module (no SSR)
+const ContactClient = dynamic(() => import("./contact-client"), {
+  ssr: false,
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -115,7 +120,7 @@ export default function ContactPage() {
       {/* Breadcrumb */}
       <BreadcrumbJsonLd pageTitle="Contact" pageUrl="https://gearizen.com/contact" />
 
-      {/* Main client component */}
+      {/* Pure client component */}
       <ContactClient />
     </>
   );
