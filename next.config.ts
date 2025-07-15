@@ -1,3 +1,4 @@
+// next.config.ts
 import type { NextConfig } from "next";
 
 const ContentSecurityPolicy = [
@@ -10,10 +11,11 @@ const ContentSecurityPolicy = [
 ].join(" ");
 
 const nextConfig: NextConfig = {
-  // Remove the worker rule; we serve from public/
-  // webpack(config) { … }  ← no longer needed
+  // PDF.js worker'ı public klasöründen sunuyoruz:
+  // - node_modules/pdfjs-dist/legacy/build/pdf.worker.min.js dosyasını
+  //   projenizin kökünde `public/pdf.worker.min.js` olarak kopyalamayı unutmayın.
 
-  // Apply CSP headers
+  // Tüm sayfalara Content-Security-Policy başlığı ekleniyor
   async headers() {
     return [
       {
@@ -26,7 +28,9 @@ const nextConfig: NextConfig = {
         ]
       }
     ];
-  }
+  },
+
+  // Diğer isterseniz ek ayarlarınızı da buraya ekleyebilirsiniz
 };
 
 export default nextConfig;
