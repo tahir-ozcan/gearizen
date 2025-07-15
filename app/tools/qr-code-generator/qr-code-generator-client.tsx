@@ -1,27 +1,16 @@
 // app/tools/qr-code-generator/qr-code-generator-client.tsx
 "use client";
 
-import {
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-  ChangeEvent,
-} from "react";
+import { useState, useEffect, useMemo, ChangeEvent } from "react";
+import Image from "next/image";
 import QRCodeStyling from "qr-code-styling";
 
-/**
- * QR Code Generator Client
- *
- * Generate high-resolution QR codes for URLs, text, vCards, and Wi-Fi credentials with color and size options.
- */
-
-// Simple debounce hook
+/** Debounce Hook */
 function useDebounce<T>(value: T, delay = 300): T {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
-    const timer = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(timer);
+    const handler = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(handler);
   }, [value, delay]);
   return debounced;
 }
@@ -37,10 +26,10 @@ interface QrOptions {
   darkColor: string;
   lightColor: string;
   errorCorrectionLevel: ErrorCorrectionLevel;
-  logoDataUrl?: string;
+  logo?: string;
 }
 
-/** Build payload based on selected type */
+/** Build QR payload based on selected type */
 function buildPayload(
   type: DataType,
   text: string,
@@ -69,104 +58,54 @@ function buildPayload(
   }
 }
 
-/** Generate a blob URL for the QR code PNG */
-async function generateQrDataUrl(opts: QrOptions): Promise<string> {
+/** Generate a PNG blob URL for the QR code */
+async function generateQrBlob(opts: QrOptions): Promise<string> {
   const qr = new QRCodeStyling({
     data: opts.data,
     width: opts.width,
     margin: opts.margin,
     dotsOptions: { color: opts.darkColor },
     backgroundOptions: { color: opts.lightColor },
-    image: opts.logoDataUrl,
+    image: opts.logo,
     imageOptions: { crossOrigin: "anonymous" },
     qrOptions: { errorCorrectionLevel: opts.errorCorrectionLevel },
   });
-  const buffer = await qr.getRawData("png");
-  const blob = new Blob([buffer], { type: "image/png" });
+  const rawData = await qr.getRawData("png");
+  const blob = new Blob([rawData], { type: "image/png" });
   return URL.createObjectURL(blob);
 }
 
-/** Draw the QR onto our canvas for preview */
-async function renderToCanvas(
-  opts: QrOptions,
-  canvas: HTMLCanvasElement
-) {
-  const url = await generateQrDataUrl(opts);
-  const img = new Image();
-  img.crossOrigin = "anonymous";
-  await new Promise((res, rej) => {
-    img.onload = res;
-    img.onerror = rej;
-    img.src = url;
-  });
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas context failed");
-  canvas.width = opts.width;
-  canvas.height = opts.width;
-  ctx.clearRect(0, 0, opts.width, opts.width);
-  ctx.drawImage(img, 0, 0, opts.width, opts.width);
-  URL.revokeObjectURL(url);
-}
-
 export default function QrCodeGeneratorClient() {
+  // State
   const [type, setType] = useState<DataType>("text");
   const [text, setText] = useState("");
   const [urlValue, setUrlValue] = useState("");
-  const [vcardName, setVcardName] = useState("");
-  const [vcardOrg, setVcardOrg] = useState("");
-  const [vcardEmail, setVcardEmail] = useState("");
-  const [vcardPhone, setVcardPhone] = useState("");
-  const [wifiSsid, setWifiSsid] = useState("");
-  const [wifiAuth, setWifiAuth] = useState<WifiAuthType>("WPA");
-  const [wifiPassword, setWifiPassword] = useState("");
+  const [vcard, setVcard] = useState({ name: "", org: "", email: "", phone: "" });
+  const [wifi, setWifi] = useState({ ssid: "", auth: "WPA" as WifiAuthType, password: "" });
   const [size, setSize] = useState(256);
   const [margin, setMargin] = useState(1);
   const [darkColor, setDarkColor] = useState("#000000");
   const [lightColor, setLightColor] = useState("#ffffff");
   const [ecLevel, setEcLevel] = useState<ErrorCorrectionLevel>("M");
   const [logo, setLogo] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Debounce inputs
+  const debouncedInputs = useDebounce({ type, text, urlValue, vcard, wifi }, 300);
 
-  const debouncedInputs = useDebounce(
-    {
-      type,
-      text,
-      urlValue,
-      vcardName,
-      vcardOrg,
-      vcardEmail,
-      vcardPhone,
-      wifiSsid,
-      wifiAuth,
-      wifiPassword,
-    },
-    300
-  );
-
+  // Build payload and options
   const payload = useMemo(
     () =>
       buildPayload(
         debouncedInputs.type,
         debouncedInputs.text,
         debouncedInputs.urlValue,
-        {
-          name: debouncedInputs.vcardName,
-          org: debouncedInputs.vcardOrg,
-          email: debouncedInputs.vcardEmail,
-          phone: debouncedInputs.vcardPhone,
-        },
-        {
-          ssid: debouncedInputs.wifiSsid,
-          auth: debouncedInputs.wifiAuth,
-          password: debouncedInputs.wifiPassword,
-        }
+        debouncedInputs.vcard,
+        debouncedInputs.wifi
       ),
     [debouncedInputs]
   );
-
   const options = useMemo<QrOptions>(
     () => ({
       data: payload,
@@ -175,12 +114,12 @@ export default function QrCodeGeneratorClient() {
       darkColor,
       lightColor,
       errorCorrectionLevel: ecLevel,
-      logoDataUrl: logo || undefined,
+      logo: logo || undefined,
     }),
     [payload, size, margin, darkColor, lightColor, ecLevel, logo]
   );
 
-  // Generate blob URL
+  // Generate QR code blob URL when options change
   useEffect(() => {
     if (!payload) {
       setQrUrl(null);
@@ -188,7 +127,7 @@ export default function QrCodeGeneratorClient() {
       return;
     }
     let canceled = false;
-    generateQrDataUrl(options)
+    generateQrBlob(options)
       .then((url) => {
         if (!canceled) {
           setQrUrl(url);
@@ -203,55 +142,49 @@ export default function QrCodeGeneratorClient() {
     };
   }, [options, payload]);
 
-  // Render canvas preview
-  useEffect(() => {
-    if (qrUrl && canvasRef.current) {
-      renderToCanvas(options, canvasRef.current).catch(() =>
-        setError("❌ Preview render failed.")
-      );
+  // Handle logo file upload
+  const handleLogo = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setLogo(null);
+      return;
     }
-  }, [qrUrl, options]);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setLogo(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
+  // Download the QR code PNG
   const download = () => {
     if (!qrUrl) return;
     const a = document.createElement("a");
     a.href = qrUrl;
-    a.download = "qr-code.png";
+    a.download = `qr-code-${type}.png`;
+    document.body.appendChild(a);
     a.click();
-  };
-
-  const handleLogo = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return setLogo(null);
-    const reader = new FileReader();
-    reader.onload = () => setLogo(reader.result as string);
-    reader.readAsDataURL(file);
+    document.body.removeChild(a);
   };
 
   return (
-    <section
-      id="qr-code-generator"
-      aria-labelledby="qr-heading"
-      className="space-y-16 text-gray-900 antialiased"
-    >
+    <section id="qr-code-generator" aria-labelledby="qr-heading" className="space-y-16 text-gray-900 antialiased">
       {/* Heading & Description */}
       <div className="text-center space-y-6 sm:px-0">
         <h1
           id="qr-heading"
-          className="
-            bg-clip-text text-transparent
-            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
-            text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
-          "
+          className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight"
         >
           QR Code Generator
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Generate high-resolution QR codes for URLs, text, vCards and Wi-Fi credentials with color and size options.
+          Generate high-resolution QR codes for text, URLs, vCards, and Wi-Fi credentials—all in your browser. Customize size, colors,
+          error correction, and add a logo.
         </p>
       </div>
 
+      {/* Controls */}
       <div className="max-w-3xl mx-auto space-y-8 sm:px-0">
         {/* Type selector */}
         <div>
@@ -277,7 +210,7 @@ export default function QrCodeGeneratorClient() {
               value={text}
               onChange={(e) => setText(e.target.value)}
               className="input-base w-full"
-              placeholder="Enter any text…"
+              placeholder="Enter text…"
             />
           </div>
         )}
@@ -297,29 +230,29 @@ export default function QrCodeGeneratorClient() {
           <div className="grid sm:grid-cols-2 gap-4">
             <input
               type="text"
-              value={vcardName}
-              onChange={(e) => setVcardName(e.target.value)}
+              value={vcard.name}
+              onChange={(e) => setVcard({ ...vcard, name: e.target.value })}
               placeholder="Name"
               className="input-base"
             />
             <input
               type="text"
-              value={vcardOrg}
-              onChange={(e) => setVcardOrg(e.target.value)}
+              value={vcard.org}
+              onChange={(e) => setVcard({ ...vcard, org: e.target.value })}
               placeholder="Organization"
               className="input-base"
             />
             <input
               type="email"
-              value={vcardEmail}
-              onChange={(e) => setVcardEmail(e.target.value)}
+              value={vcard.email}
+              onChange={(e) => setVcard({ ...vcard, email: e.target.value })}
               placeholder="Email"
               className="input-base"
             />
             <input
               type="tel"
-              value={vcardPhone}
-              onChange={(e) => setVcardPhone(e.target.value)}
+              value={vcard.phone}
+              onChange={(e) => setVcard({ ...vcard, phone: e.target.value })}
               placeholder="Phone"
               className="input-base"
             />
@@ -329,15 +262,15 @@ export default function QrCodeGeneratorClient() {
           <div className="grid sm:grid-cols-3 gap-4">
             <input
               type="text"
-              value={wifiSsid}
-              onChange={(e) => setWifiSsid(e.target.value)}
+              value={wifi.ssid}
+              onChange={(e) => setWifi({ ...wifi, ssid: e.target.value })}
               placeholder="SSID"
               className="input-base"
             />
             <select
-              value={wifiAuth}
-              onChange={(e) => setWifiAuth(e.target.value as WifiAuthType)}
-              className="input-base"
+              value={wifi.auth}
+              onChange={(e) => setWifi({ ...wifi, auth: e.target.value as WifiAuthType })}
+              className="input-base w-full"
             >
               <option value="WPA">WPA/WPA2</option>
               <option value="WEP">WEP</option>
@@ -345,15 +278,15 @@ export default function QrCodeGeneratorClient() {
             </select>
             <input
               type="password"
-              value={wifiPassword}
-              onChange={(e) => setWifiPassword(e.target.value)}
+              value={wifi.password}
+              onChange={(e) => setWifi({ ...wifi, password: e.target.value })}
               placeholder="Password"
               className="input-base"
             />
           </div>
         )}
 
-        {/* Common style controls */}
+        {/* Style controls */}
         <div className="grid sm:grid-cols-2 gap-4">
           <label className="block">
             Size: <span className="font-semibold">{size}px</span>
@@ -429,15 +362,14 @@ export default function QrCodeGeneratorClient() {
 
       {/* Preview & Actions */}
       {qrUrl && (
-        <div className="
-          mt-12 max-w-3xl mx-auto text-center space-y-6
-        ">
-          <canvas
-            ref={canvasRef}
+        <div className="mt-12 max-w-3xl mx-auto text-center space-y-6">
+          <Image
+            src={qrUrl}
+            alt="QR code preview"
             width={size}
             height={size}
+            unoptimized
             className="mx-auto border rounded"
-            aria-label="QR code preview"
           />
           <div className="flex justify-center gap-4">
             <button
