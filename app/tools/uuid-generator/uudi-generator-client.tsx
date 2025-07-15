@@ -115,10 +115,13 @@ export default function UuidGeneratorClient() {
 
   return (
     <section className="space-y-16 text-gray-900 antialiased">
-      <div className="text-center space-y-4">
-        <h1 className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
+      <div className="text-center space-y-6 sm:px-0">
+        <h1 className="bg-clip-text text-transparent
+                       bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+                       text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
           UUID Generator
         </h1>
+        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mx-auto max-w-3xl text-lg sm:text-xl text-gray-700">
           Create RFC4122-compliant UUIDs (v1, v4, v5) instantly, with optional
           namespace support.

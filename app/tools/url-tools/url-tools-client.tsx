@@ -102,7 +102,7 @@ export default function UrlToolsClient() {
       className="space-y-16 text-gray-900 antialiased px-4 sm:px-6 lg:px-8"
     >
       {/* Heading & Description */}
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-6 sm:px-0">
         <h1
           id="url-tools-heading"
           className="
@@ -113,7 +113,7 @@ export default function UrlToolsClient() {
         >
           URL Tools: Encode, Parse &amp; Slugify
         </h1>
-        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mx-auto max-w-2xl text-lg text-gray-700 leading-relaxed">
           Encode/decode URLs, parse components, manage query parameters,
           and generate SEO-friendly slugs—all in your browser.
@@ -121,7 +121,7 @@ export default function UrlToolsClient() {
       </div>
 
       {/* URL Input */}
-      <div className="max-w-3xl mx-auto space-y-4">
+      <div className="max-w-3xl mx-auto space-y-6">
         <label
           htmlFor="url-input"
           className="block text-sm font-medium text-gray-800 mb-1"

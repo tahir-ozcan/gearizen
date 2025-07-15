@@ -84,7 +84,7 @@ export default function RegexTesterClient() {
       className="space-y-16 text-gray-900 antialiased"
     >
       {/* Heading & Description */}
-      <div className="text-center sm:px-0 space-y-4">
+      <div className="text-center space-y-6 sm:px-0">
         <h1
           id="regex-tester-heading"
           className="

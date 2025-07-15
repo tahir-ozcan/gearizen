@@ -60,7 +60,7 @@ export default function TextCounterClient() {
       className="space-y-16 text-gray-900 antialiased"
     >
       {/* Heading & Description */}
-      <div className="text-center sm:px-0 space-y-4">
+      <div className="text-center space-y-6 sm:px-0">
         <h1
           id="text-counter-heading"
           className="
@@ -71,7 +71,7 @@ export default function TextCounterClient() {
         >
           Text Counter
         </h1>
-        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
           Get real-time counts of words, characters, sentences and lines for any text input with detailed analytics—all client-side, no signup required.
         </p>

@@ -91,7 +91,7 @@ export default function SitemapGeneratorClient() {
       className="space-y-16 text-gray-900 antialiased"
     >
       {/* Heading & Description */}
-      <div className="text-center space-y-4 sm:px-0">
+      <div className="text-center space-y-6 sm:px-0">
         <h1
           id="sitemap-generator-heading"
           className="
@@ -102,7 +102,7 @@ export default function SitemapGeneratorClient() {
         >
           Sitemap Generator
         </h1>
-        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mx-auto max-w-2xl text-lg sm:text-xl text-gray-700 leading-relaxed">
           Paste one URL per line to generate a standards-compliant XML sitemap with custom change frequency and priority—copy or download instantly, all client-side.
         </p>

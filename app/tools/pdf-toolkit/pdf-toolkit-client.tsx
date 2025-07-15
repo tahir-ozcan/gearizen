@@ -3,7 +3,6 @@
 
 import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { PDFDocument, type SaveOptions } from "pdf-lib";
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 
 export default function PdfToolkitClient() {
@@ -13,18 +12,27 @@ export default function PdfToolkitClient() {
   const [extractedText, setExtractedText] = useState("");
   const [compressedBlob, setCompressedBlob] = useState<Blob | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pdfjsLib, setPdfjsLib] = useState<typeof import("pdfjs-dist/legacy/build/pdf") | null>(null);
 
-  // PDF.js worker configuration
+  // PDF.js’i dinamik import et ve worker konfigürasyonunu yap
   useEffect(() => {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+    import("pdfjs-dist/legacy/build/pdf")
+      .then((mod) => {
+        mod.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+        setPdfjsLib(mod);
+      })
+      .catch((err) => {
+        console.error("PDF.js yüklenirken hata:", err);
+        setError("PDF işleme modülü yüklenemedi.");
+      });
   }, []);
 
-  // Open file picker
+  // Dosya seçme penceresini aç
   function handleBrowseClick() {
     fileInputRef.current?.click();
   }
 
-  // File input change
+  // Dosya yüklendiğinde çalışır
   function handleUploadChange(e: ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0] ?? null;
     setError(null);
@@ -42,7 +50,7 @@ export default function PdfToolkitClient() {
     setUploadFile(f);
   }
 
-  // Compress PDF
+  // PDF sıkıştırma işlemi
   async function handleCompressPdf() {
     if (!uploadFile) return;
     setLoading("compress");
@@ -61,7 +69,7 @@ export default function PdfToolkitClient() {
     }
   }
 
-  // Download compressed PDF
+  // Sıkıştırılmış PDF’i indir
   function handleDownloadCompressed() {
     if (!compressedBlob || !uploadFile) return;
     const url = URL.createObjectURL(compressedBlob);
@@ -74,9 +82,9 @@ export default function PdfToolkitClient() {
     URL.revokeObjectURL(url);
   }
 
-  // Extract text and convert to Word
+  // Metin çıkarma ve Word dökümanına dönüştürme
   async function handleExtractToWord() {
-    if (!uploadFile) return;
+    if (!uploadFile || !pdfjsLib) return;
     setLoading("extract");
     setError(null);
     setExtractedText("");
@@ -92,7 +100,7 @@ export default function PdfToolkitClient() {
         const content = await page.getTextContent();
         const pageText = content.items
           .filter((item): item is { str: string } => "str" in item)
-          .map(item => item.str)
+          .map((item) => item.str)
           .join(" ");
 
         previewText += pageText + "\n\n";
@@ -113,10 +121,7 @@ export default function PdfToolkitClient() {
 
       setExtractedText(previewText.trim());
 
-      const doc = new Document({
-        sections: [{ children: paragraphs }],
-      });
-
+      const doc = new Document({ sections: [{ children: paragraphs }] });
       const blob = await Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -139,7 +144,7 @@ export default function PdfToolkitClient() {
       aria-labelledby="pdf-toolkit-heading"
       className="space-y-16 text-gray-900 antialiased"
     >
-      {/* Heading & Description */}
+      {/* Başlık ve Açıklama */}
       <div className="text-center space-y-6 sm:px-0">
         <h1
           id="pdf-toolkit-heading"
@@ -148,16 +153,14 @@ export default function PdfToolkitClient() {
         >
           PDF Toolkit: Compress &amp; Convert
         </h1>
-        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-        <div className="mx-auto max-w-2xl space-y-4 text-base sm:text-lg leading-relaxed text-gray-700">
-          <p>
-            Shrink PDF file sizes without loss of quality, and produce Word documents that mirror your PDF’s original
-            typography and layout—entirely in-browser, offline, and with no signup required.
-          </p>
-        </div>
+        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <p className="mx-auto max-w-2xl space-y-4 text-base sm:text-lg leading-relaxed text-gray-700">
+          Shrink PDF file sizes without loss of quality, and produce Word documents that mirror your PDF’s original
+          typography and layout—entirely in-browser, offline, and with no signup required.
+        </p>
       </div>
 
-      {/* File Selection */}
+      {/* Dosya Seçimi */}
       <div className="max-w-md mx-auto flex flex-col items-center space-y-4">
         <input
           ref={fileInputRef}
@@ -180,14 +183,14 @@ export default function PdfToolkitClient() {
         )}
       </div>
 
-      {/* Error */}
+      {/* Hata Mesajı */}
       {error && (
         <div className="max-w-md mx-auto p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-center font-serif">
           {error}
         </div>
       )}
 
-      {/* Action Buttons */}
+      {/* İşlem Butonları */}
       {uploadFile && (
         <div className="max-w-md mx-auto flex flex-wrap justify-center gap-4">
           <button
@@ -209,7 +212,7 @@ export default function PdfToolkitClient() {
 
           <button
             onClick={handleExtractToWord}
-            disabled={loading !== "idle"}
+            disabled={loading !== "idle" || !pdfjsLib}
             className="px-5 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition font-medium"
           >
             {loading === "extract" ? "Converting to Word…" : "Extract Text to Word"}
@@ -217,11 +220,11 @@ export default function PdfToolkitClient() {
         </div>
       )}
 
-      {/* Extracted Text Preview */}
+      {/* Çıkarılan Metin Önizlemesi */}
       {extractedText && (
         <div className="max-w-2xl mx-auto space-y-6 sm:px-0">
           <h2 className="text-2xl font-semibold text-gray-800 tracking-tight">Extracted Text Preview</h2>
-          <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <div className="mt-1 h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
           <textarea
             rows={6}
             readOnly

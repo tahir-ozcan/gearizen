@@ -77,7 +77,7 @@ export default function SeoMetaTagGeneratorClient() {
       className="space-y-16 text-gray-900 antialiased"
     >
       {/* Heading & Description */}
-      <div className="text-center sm:px-0 space-y-4">
+      <div className="text-center space-y-6 sm:px-0">
         <h1
           id="seo-meta-tag-generator-heading"
           className="
@@ -88,7 +88,7 @@ export default function SeoMetaTagGeneratorClient() {
         >
           SEO Meta Tag Generator
         </h1>
-        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mx-auto max-w-3xl text-lg sm:text-xl text-gray-700 leading-relaxed">
           Generate optimized meta tags, Open Graph and Twitter card snippets to boost search visibility and social sharing—copy ready to paste in your{" "}
           {"<head>"} section.

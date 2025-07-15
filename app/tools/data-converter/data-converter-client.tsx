@@ -169,7 +169,7 @@ export default function DataConverterClient() {
       className="space-y-16 text-gray-900 antialiased"
     >
       {/* Heading & Description */}
-      <div className="text-center sm:px-0 space-y-4">
+      <div className="text-center space-y-6 sm:px-0">
         <h1
           id="data-converter-heading"
           className="
@@ -180,7 +180,7 @@ export default function DataConverterClient() {
         >
           Data Converter: CSV, JSON, YAML &amp; XML
         </h1>
-        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
           Transform data between CSV, JSON, YAML and XML formats in seconds—even large datasets—all client-side.
         </p>

@@ -25,7 +25,7 @@ export default function HomeClient() {
 
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
 
-        <p className="mx-auto max-w-2xl text-base sm:text-lg text-gray-700 leading-relaxed">
+        <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
           {hero.subHeadline}
         </p>
 

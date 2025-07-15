@@ -85,21 +85,29 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        {/* Favicon preload */}
-        <link rel="preload" href="/favicon.ico" as="image" type="image/png" />
+        {/* Favicon */}
+        <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
+        <link rel="alternate icon" href="/favicon.ico" type="image/x-icon" />
 
-        {/* Preconnects */}
+        {/* Preconnect to analytics and ads domains */}
         <link
           rel="preconnect"
           href="https://www.googletagmanager.com"
           crossOrigin="anonymous"
         />
+        <link
+          rel="preconnect"
+          href="https://pagead2.googlesyndication.com"
+          crossOrigin="anonymous"
+        />
+
+        {/* Google AdSense account metadata */}
         <meta
           name="google-adsense-account"
           content="ca-pub-2108375251131552"
         />
 
-        {/* Analytics Loader */}
+        {/* Analytics Loader (e.g. Google Analytics, GTM scripts) */}
         <AnalyticsLoader />
       </head>
       <body className="flex min-h-screen flex-col">
@@ -110,7 +118,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             We just launched our website; some tools may be buggy or missing but we’ll fix them shortly!
             <br />
             <span className="font-normal block mt-1">
-              Last updated: July 14, 2025 at 22:00 (GMT+3). For feedback, please <a href="/contact" className="underline">visit our Contact page</a>.
+              Last updated: July 14, 2025 at 22:00 (GMT+3). For feedback, please{" "}
+              <a href="/contact" className="underline">
+                visit our Contact page
+              </a>.
             </span>
           </div>
         </div>

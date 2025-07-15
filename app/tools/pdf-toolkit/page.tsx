@@ -1,9 +1,9 @@
 // app/tools/pdf-toolkit/page.tsx
-
+import { Metadata } from "next";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
-import PdfToolkitClient from "./pdf-toolkit-client";
+import PdfToolkitWrapper from "./pdf-toolkit-wrapper-client";
 
-export const metadata = {
+export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "PDF Toolkit | Gearizen",
   description:
@@ -55,7 +55,7 @@ export default function PdfToolkitPage() {
         pageTitle="PDF Toolkit"
         pageUrl="https://gearizen.com/tools/pdf-toolkit"
       />
-      <PdfToolkitClient />
+      <PdfToolkitWrapper />
     </>
   );
 }

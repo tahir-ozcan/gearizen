@@ -124,7 +124,7 @@ export default function TimeConverterClient() {
       className="space-y-16 text-gray-900 antialiased px-4 sm:px-6 lg:px-8"
     >
       {/* Heading */}
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-6 sm:px-0">
         <h1
           id="time-converter-heading"
           className="
@@ -135,7 +135,7 @@ export default function TimeConverterClient() {
         >
           Time Converter: UNIX &amp; Timezone
         </h1>
-        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mx-auto max-w-2xl text-lg text-gray-700 leading-relaxed">
           Convert UNIX timestamps to human-readable dates and adjust across world time zones seamlessly.
         </p>

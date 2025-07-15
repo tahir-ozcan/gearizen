@@ -123,7 +123,7 @@ export default function ImageToolkitClient() {
       className="space-y-16 text-gray-900 antialiased"
     >
       {/* Heading */}
-      <div className="text-center space-y-4 sm:px-0">
+      <div className="text-center space-y-6 sm:px-0">
         <h1
           id="image-toolkit-heading"
           className="
@@ -134,7 +134,7 @@ export default function ImageToolkitClient() {
         >
           Image Toolkit: Compress & Resize
         </h1>
-        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mx-auto max-w-2xl text-lg sm:text-xl text-gray-700 leading-relaxed">
           Optimize JPEG/PNG images and resize with optional aspect-ratio lock—fast,
           free and privacy-focused.

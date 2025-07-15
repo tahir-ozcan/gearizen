@@ -89,7 +89,7 @@ export default function TextCaseConverterClient() {
       className="space-y-16 text-gray-900 antialiased"
     >
       {/* Heading & Description */}
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-6 sm:px-0">
         <h1
           id="text-case-converter-heading"
           className="
@@ -100,7 +100,7 @@ export default function TextCaseConverterClient() {
         >
           Text Case Converter
         </h1>
-        <div className="mx-auto mt-2 h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mx-auto max-w-3xl text-lg sm:text-xl text-gray-700 leading-relaxed">
           Switch between UPPERCASE, lowercase, Title Case, snake_case, camelCase and more with one click. Paste or type any text, convert instantly, then copy or clear—all client-side.
         </p>
