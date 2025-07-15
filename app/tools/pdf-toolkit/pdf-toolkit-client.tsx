@@ -2,25 +2,38 @@
 "use client";
 
 import { useState, useRef, useEffect, ChangeEvent } from "react";
-import { PDFDocument, type SaveOptions } from "pdf-lib";
-import { Document, Packer, Paragraph, TextRun } from "docx";
-import { GlobalWorkerOptions, getDocument } from "pdfjs-dist/legacy/build/pdf";
+import { jsPDF } from "jspdf";
+// PDF.js runtime
+import {
+  getDocument,
+  GlobalWorkerOptions,
+  type PDFDocumentProxy,
+  type PDFPageProxy,
+} from "pdfjs-dist/legacy/build/pdf";
+// Docx
+import {
+  Document as DocxDocument,
+  Packer,
+  Paragraph,
+  ImageRun,
+} from "docx";
 
 export default function PdfToolkitClient() {
   // --- State ---
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<"idle" | "compress" | "extract">("idle");
   const [error, setError] = useState<string | null>(null);
-  const [extractedText, setExtractedText] = useState("");
   const [compressedBlob, setCompressedBlob] = useState<Blob | null>(null);
+  const [jpegQuality, setJpegQuality] = useState(0.8);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // --- PDF.js worker setup ---
+  // PDF.js worker
   useEffect(() => {
     GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
   }, []);
 
-  // --- Handlers ---
+  // — Handlers —
+
   function handleSelectClick() {
     inputRef.current?.click();
   }
@@ -29,82 +42,122 @@ export default function PdfToolkitClient() {
     const f = e.target.files?.[0] ?? null;
     setError(null);
     setCompressedBlob(null);
-    setExtractedText("");
     if (!f) {
       setFile(null);
       return;
     }
     if (f.type !== "application/pdf") {
-      setError("❌ Please select a valid PDF file.");
+      setError("❌ Lütfen geçerli bir PDF dosyası seçin.");
       setFile(null);
       return;
     }
     setFile(f);
   }
 
+  /** Compress by rasterizing pages to JPEG & rebuilding PDF */
   async function handleCompress() {
     if (!file) return;
     setLoading("compress");
     setError(null);
     setCompressedBlob(null);
+
     try {
-      const buf = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(buf, { ignoreEncryption: true });
-      const bytes = await pdfDoc.save({ useObjectStreams: true } as SaveOptions);
-      const blob = new Blob([bytes], { type: "application/pdf" });
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf: PDFDocumentProxy = await getDocument({ data: arrayBuffer }).promise;
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page: PDFPageProxy = await pdf.getPage(i);
+
+        // @ts-expect-error getViewport is a runtime method
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          // @ts-expect-error render is a runtime method
+          const renderTask = page.render({ canvasContext: ctx, viewport });
+          await renderTask.promise;
+        }
+
+        const imgData = canvas.toDataURL("image/jpeg", jpegQuality);
+        const props = doc.getImageProperties(imgData);
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = (props.height * pageWidth) / props.width;
+        if (i > 1) doc.addPage();
+        doc.addImage(imgData, "JPEG", 0, 0, pageWidth, pageHeight);
+      }
+
+      const blob = doc.output("blob");
       setCompressedBlob(blob);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "❌ Compression failed.");
+      console.error(err);
+      setError(err instanceof Error ? err.message : "❌ Sıkıştırma başarısız.");
     } finally {
       setLoading("idle");
     }
   }
 
+  /** Trigger download only, no new tab */
   function handleDownloadCompressed() {
     if (!compressedBlob || !file) return;
     const url = URL.createObjectURL(compressedBlob);
     const a = document.createElement("a");
     a.href = url;
     a.download = `compressed-${file.name}`;
-    a.rel = "noopener";
+    a.rel = "noopener"; // kesinlikle yeni sekme açmasın
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
 
+  /** Convert pages to images and embed in Word to preserve exact layout */
   async function handleExtractToWord() {
     if (!file) return;
     setLoading("extract");
     setError(null);
-    setExtractedText("");
+
     try {
-      const buf = await file.arrayBuffer();
-      const pdf = await getDocument({ data: buf }).promise;
-      const paragraphs: Paragraph[] = [];
-      let preview = "";
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf: PDFDocumentProxy = await getDocument({ data: arrayBuffer }).promise;
+      const children: Paragraph[] = [];
 
       for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        const textItems = content.items
-          .filter((item): item is { str: string } => "str" in item)
-          .map((item) => item.str);
-        const pageText = textItems.join(" ");
-        preview += pageText + "\n\n";
-        paragraphs.push(
+        const page: PDFPageProxy = await pdf.getPage(i);
+
+        // @ts-expect-error getViewport is runtime
+        const viewport = page.getViewport({ scale: 2 });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          // @ts-expect-error render is runtime
+          const renderTask = page.render({ canvasContext: ctx, viewport });
+          await renderTask.promise;
+        }
+
+        const dataUrl = canvas.toDataURL("image/png");
+        const base64 = dataUrl.split(",")[1];
+        const buffer = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+
+        children.push(
           new Paragraph({
             children: [
-              new TextRun({ text: pageText, font: "Times New Roman", size: 24 }),
+              new ImageRun({
+                data: buffer,
+                transformation: { width: viewport.width, height: viewport.height },
+                type: "png",
+              }),
             ],
             spacing: { after: 200 },
           })
         );
       }
 
-      setExtractedText(preview.trim());
-
-      const doc = new Document({ sections: [{ children: paragraphs }] });
+      const doc = new DocxDocument({ sections: [{ children }] });
       const blob = await Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -116,7 +169,8 @@ export default function PdfToolkitClient() {
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "❌ Text extraction failed.");
+      console.error(err);
+      setError(err instanceof Error ? err.message : "❌ Word’e çevirme hatası.");
     } finally {
       setLoading("idle");
     }
@@ -124,7 +178,7 @@ export default function PdfToolkitClient() {
 
   return (
     <section id="pdf-toolkit" aria-labelledby="pdf-toolkit-heading" className="space-y-16 text-gray-900 antialiased">
-      {/* Heading & Description */}
+      {/* Başlık */}
       <div className="text-center space-y-6 sm:px-0">
         <h1
           id="pdf-toolkit-heading"
@@ -134,23 +188,17 @@ export default function PdfToolkitClient() {
             text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
           "
         >
-          PDF Toolkit: Compress &amp; Convert
+          PDF Toolkit: Compress &amp; True-Layout Convert
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mx-auto max-w-2xl text-lg leading-relaxed text-gray-700">
-          Shrink PDF file sizes without quality loss, and extract text to Word documents—entirely in-browser, offline, 100% client-side, no signup.
+          Ayarlanabilir JPEG kalitesiyle PDF’leri küçültün ve sayfa düzenini bozmadan Word’e aktarın.
         </p>
       </div>
 
-      {/* File Selector */}
+      {/* Dosya Seçimi */}
       <div className="max-w-md mx-auto flex flex-col items-center space-y-4">
-        <input
-          ref={inputRef}
-          type="file"
-          accept="application/pdf"
-          onChange={handleFileChange}
-          className="hidden"
-        />
+        <input ref={inputRef} type="file" accept="application/pdf" onChange={handleFileChange} className="hidden" />
         <button
           onClick={handleSelectClick}
           disabled={loading !== "idle"}
@@ -162,7 +210,7 @@ export default function PdfToolkitClient() {
             transition transform hover:scale-105 disabled:opacity-50
           "
         >
-          {file ? "Change PDF…" : "Select PDF…"}
+          {file ? "PDF Değiştir…" : "PDF Seç…"}
         </button>
         {file && (
           <p className="text-sm text-gray-600 font-mono truncate w-full text-center">
@@ -171,14 +219,32 @@ export default function PdfToolkitClient() {
         )}
       </div>
 
-      {/* Error Message */}
+      {/* JPEG Kalite Slider */}
+      {file && (
+        <div className="max-w-md mx-auto px-4">
+          <label className="block text-gray-800">
+            JPEG Kalite: <span className="font-semibold">{Math.round(jpegQuality * 100)}%</span>
+          </label>
+          <input
+            type="range"
+            min={10}
+            max={100}
+            step={5}
+            value={jpegQuality * 100}
+            onChange={(e) => setJpegQuality(Number(e.target.value) / 100)}
+            className="w-full"
+          />
+        </div>
+      )}
+
+      {/* Hata */}
       {error && (
         <div className="max-w-md mx-auto p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-center">
           {error}
         </div>
       )}
 
-      {/* Action Buttons */}
+      {/* İşlem Butonları */}
       {file && (
         <div className="max-w-md mx-auto flex flex-wrap justify-center gap-4">
           <button
@@ -192,7 +258,7 @@ export default function PdfToolkitClient() {
               transition transform hover:scale-105 disabled:opacity-50
             "
           >
-            {loading === "compress" ? "Compressing…" : "Compress PDF"}
+            {loading === "compress" ? "Sıkıştırılıyor…" : "PDF Sıkıştır"}
           </button>
 
           {compressedBlob && (
@@ -205,7 +271,7 @@ export default function PdfToolkitClient() {
                 transition hover:bg-indigo-50
               "
             >
-              Download Compressed
+              İndir (Sıkıştırıldı)
             </button>
           )}
 
@@ -220,27 +286,8 @@ export default function PdfToolkitClient() {
               transition transform hover:scale-105 disabled:opacity-50
             "
           >
-            {loading === "extract" ? "Converting…" : "Extract Text to Word"}
+            {loading === "extract" ? "Dönüştürülüyor…" : "Word’e Aktar"}
           </button>
-        </div>
-      )}
-
-      {/* Extracted Text Preview */}
-      {extractedText && (
-        <div className="max-w-2xl mx-auto space-y-6 sm:px-0">
-          <h2 className="text-2xl font-semibold text-gray-800 tracking-tight">Extracted Text Preview</h2>
-          <div className="h-1 w-16 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-          <textarea
-            rows={6}
-            readOnly
-            value={extractedText}
-            className="
-              w-full p-3 border border-gray-300 rounded-md
-              bg-gray-50 font-mono text-sm resize-y
-              focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500
-              transition
-            "
-          />
         </div>
       )}
     </section>
