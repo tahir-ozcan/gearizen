@@ -4,7 +4,7 @@
   xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
   xmlns:xhtml="http://www.w3.org/1999/xhtml"
 >
-  <!-- Ana Sayfalar -->
+  <!-- Core Pages -->
   <url>
     <loc>https://gearizen.com/</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
@@ -15,46 +15,36 @@
       <image:caption>Gearizen – Free Client-Side Digital Tools</image:caption>
     </image:image>
   </url>
-
   <url>
     <loc>https://gearizen.com/tools</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.90</priority>
-    <image:image>
-      <image:loc>https://gearizen.com/og-placeholder.svg</image:loc>
-      <image:caption>Gearizen Suite of Client-Side Tools</image:caption>
-    </image:image>
   </url>
-
   <url>
     <loc>https://gearizen.com/about</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.50</priority>
   </url>
-
   <url>
     <loc>https://gearizen.com/contact</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.50</priority>
   </url>
-
   <url>
     <loc>https://gearizen.com/privacy</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.40</priority>
   </url>
-
   <url>
     <loc>https://gearizen.com/cookies</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.40</priority>
   </url>
-
   <url>
     <loc>https://gearizen.com/terms</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
@@ -62,33 +52,25 @@
     <priority>0.40</priority>
   </url>
 
-  <!-- Araç Sayfaları -->
-  <!-- Generators: priority 0.85 → 0.80 arası -->
+  <!-- Generators -->
   <url>
     <loc>https://gearizen.com/tools/password-generator</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
-    <image:image>
-      <image:loc>https://gearizen.com/og-placeholder.svg</image:loc>
-      <image:caption>Strong Password Generator | Gearizen</image:caption>
-    </image:image>
   </url>
-
   <url>
     <loc>https://gearizen.com/tools/uuid-generator</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
   </url>
-
   <url>
     <loc>https://gearizen.com/tools/lorem-ipsum-generator</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
   </url>
-
   <url>
     <loc>https://gearizen.com/tools/qr-code-generator</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
@@ -96,83 +78,87 @@
     <priority>0.85</priority>
   </url>
 
-  <!-- Converters & Transformers: priority 0.75 → 0.80 arası -->
+  <!-- Converters & Transformers -->
   <url>
     <loc>https://gearizen.com/tools/text-case-converter</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.78</priority>
   </url>
-
   <url>
     <loc>https://gearizen.com/tools/unit-converter</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.78</priority>
   </url>
-
+  <url>
+    <loc>https://gearizen.com/tools/markdown-converter</loc>
+    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
   <url>
     <loc>https://gearizen.com/tools/image-toolkit</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
-    <image:image>
-      <image:loc>https://gearizen.com/og/image-toolkit.png</image:loc>
-      <image:caption>Image Toolkit | Gearizen</image:caption>
-    </image:image>
   </url>
-
   <url>
     <loc>https://gearizen.com/tools/html-to-pdf</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
-    <image:image>
-      <image:loc>https://gearizen.com/og/html-to-pdf.png</image:loc>
-      <image:caption>HTML to PDF Converter | Gearizen</image:caption>
-    </image:image>
   </url>
-
+  <url>
+    <loc>https://gearizen.com/tools/pdf-toolkit</loc>
+    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
   <url>
     <loc>https://gearizen.com/tools/data-converter</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
-    <image:image>
-      <image:loc>https://gearizen.com/og/data-converter.png</image:loc>
-      <image:caption>Data Converter | Gearizen</image:caption>
-    </image:image>
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/url-tools</loc>
+    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.78</priority>
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/base64-encoder-decoder</loc>
+    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.78</priority>
   </url>
 
-  <!-- Analyzers & Formatters: priority 0.70 → 0.75 arası -->
+  <!-- Analyzers & Formatters -->
   <url>
     <loc>https://gearizen.com/tools/text-counter</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
-
   <url>
     <loc>https://gearizen.com/tools/text-diff</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
-
   <url>
     <loc>https://gearizen.com/tools/regex-tester</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
-
   <url>
     <loc>https://gearizen.com/tools/json-formatter</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
   </url>
-
   <url>
     <loc>https://gearizen.com/tools/code-formatter-minifier</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
@@ -180,13 +166,19 @@
     <priority>0.80</priority>
   </url>
 
+  <!-- Security & SEO -->
+  <url>
+    <loc>https://gearizen.com/tools/jwt-hash-generator</loc>
+    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
   <url>
     <loc>https://gearizen.com/tools/seo-meta-tag-generator</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
-
   <url>
     <loc>https://gearizen.com/tools/sitemap-generator</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
@@ -194,38 +186,13 @@
     <priority>0.75</priority>
   </url>
 
-  <url>
-    <loc>https://gearizen.com/tools/url-tools</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-
-  <url>
-    <loc>https://gearizen.com/tools/base64-encoder-decoder</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-
-  <url>
-    <loc>https://gearizen.com/tools/jwt-hash-generator</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-
+  <!-- Design & Misc -->
   <url>
     <loc>https://gearizen.com/tools/color-toolkit</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
-    <image:image>
-      <image:loc>https://gearizen.com/og/color-toolkit.png</image:loc>
-      <image:caption>Color Toolkit | Gearizen</image:caption>
-    </image:image>
   </url>
-
   <url>
     <loc>https://gearizen.com/tools/time-converter</loc>
     <lastmod>2025-07-15T00:00:00+00:00</lastmod>
