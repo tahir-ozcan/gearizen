@@ -248,19 +248,26 @@ export default function PdfToolkitClient() {
   }
 
   return (
-    <section id="pdf-toolkit" className="px-4 py-16 max-w-3xl mx-auto space-y-12">
-      {/* Başlık */}
-      <header className="text-center space-y-4">
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900">
+    <section id="pdf-toolkit" className="space-y-16 text-gray-900 antialiased">
+      {/* Heading & Description */}
+      <div className="text-center space-y-6 sm:px-0">
+        <h1
+          className="
+            bg-clip-text text-transparent
+            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
+            text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
+          "
+        >
           PDF Toolkit: Compress &amp; Convert
         </h1>
-        <p className="text-gray-600">
+        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+        <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
           Compress PDF files or convert them to Word—preserve layout as images or extract editable text, entirely in-browser.
         </p>
-      </header>
+      </div>
 
-      {/* Dosya Seçimi */}
-      <div className="flex flex-col items-center space-y-2">
+      {/* File Selection */}
+      <div className="max-w-md mx-auto flex flex-col items-center space-y-4">
         <input ref={inputRef} type="file" accept="application/pdf" onChange={handleFileChange} className="hidden" />
         <button
           onClick={handleSelectClick}
@@ -276,9 +283,9 @@ export default function PdfToolkitClient() {
         )}
       </div>
 
-      {/* Ayarlar */}
+      {/* Settings */}
       {file && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="max-w-md mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
           {extractMode === "image" && (
             <div>
               <label className="block text-gray-700 mb-1">
@@ -309,16 +316,16 @@ export default function PdfToolkitClient() {
         </div>
       )}
 
-      {/* Hata Mesajı */}
+      {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-center">
+        <div className="max-w-md mx-auto bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-center">
           {error}
         </div>
       )}
 
-      {/* Butonlar */}
+      {/* Action Buttons */}
       {file && (
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="max-w-md mx-auto flex flex-wrap justify-center gap-4">
           <button
             onClick={handleCompress}
             disabled={loading !== "idle"}
