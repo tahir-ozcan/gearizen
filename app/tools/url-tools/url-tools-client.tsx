@@ -1,87 +1,50 @@
 // app/tools/url-tools/url-tools-client.tsx
 "use client";
 
-import {
-  useState,
-  useEffect,
-  ChangeEvent,
-  useRef,
-} from "react";
-import {
-  ClipboardCopy,
-  ExternalLink,
-} from "lucide-react";
+import { useState, useEffect, ChangeEvent, useRef } from "react";
+import { ClipboardCopy, PlusCircle, Trash2 } from "lucide-react";
 
-/**
- * URL Tools: Encode, Parse & Slugify
- *
- * Encode/decode URLs, parse components, manage query parameters,
- * and generate SEO-friendly slugs—copy anything with one click.
- * 100% client-side, no back-end required.
- */
+type Mode = "encode" | "decode" | "parse" | "slug";
+
 export default function UrlToolsClient() {
-  // ─── URL Parsing & State ─────────────────────────────────────────────
-  const [inputUrl, setInputUrl] = useState("");
-  const [urlObj, setUrlObj] = useState<URL | null>(null);
+  const [mode, setMode] = useState<Mode>("parse");
+  const [input, setInput] = useState("");
+  const [parsedUrl, setParsedUrl] = useState<URL | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Whenever URL input changes, attempt to parse
-  useEffect(() => {
-    if (!inputUrl.trim()) {
-      setUrlObj(null);
-      setError(null);
-      return;
-    }
-    try {
-      const parsed = new URL(inputUrl.trim());
-      setUrlObj(parsed);
-      setError(null);
-    } catch {
-      setUrlObj(null);
-      setError("Invalid URL");
-    }
-  }, [inputUrl]);
-
-  // ─── Slugify State ────────────────────────────────────────────────────
   const [slugSource, setSlugSource] = useState("");
   const [slug, setSlug] = useState("");
 
-  // Whenever slugSource changes, generate a slug
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Parse URL on input change in parse mode
   useEffect(() => {
-    const s = slugSource
-      .trim()
-      .toLowerCase()
-      // Replace non-alphanumeric with hyphens
-      .replace(/[^a-z0-9]+/g, "-")
-      // Collapse multiple hyphens
-      .replace(/-+/g, "-")
-      // Trim hyphens
-      .replace(/^-|-$/g, "");
-    setSlug(s);
-  }, [slugSource]);
+    if (mode === "parse" && input.trim()) {
+      try {
+        const u = new URL(input.trim());
+        setParsedUrl(u);
+        setError(null);
+      } catch {
+        setParsedUrl(null);
+        setError("Invalid URL");
+      }
+    }
+  }, [input, mode]);
 
-  // ─── Handlers ────────────────────────────────────────────────────────
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) =>
-    setInputUrl(e.target.value);
+  // Generate slug on slugSource change
+  useEffect(() => {
+    if (mode === "slug") {
+      const s = slugSource
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+      setSlug(s);
+    }
+  }, [slugSource, mode]);
 
-  const handleAddParam = () => {
-    if (!urlObj) return;
-    const key = prompt("Parameter name:");
-    if (!key) return;
-    const value = prompt("Parameter value:") || "";
-    urlObj.searchParams.set(key.trim(), value);
-    setInputUrl(urlObj.toString());
-  };
-
-  const handleRemoveParam = (key: string) => {
-    if (!urlObj) return;
-    urlObj.searchParams.delete(key);
-    setInputUrl(urlObj.toString());
-  };
-
-  const copyToClipboard = async (text: string) => {
+  const copy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
       alert("✅ Copied!");
@@ -90,258 +53,250 @@ export default function UrlToolsClient() {
     }
   };
 
-  // Encode/Decode
-  const applyEncode = () => setInputUrl((u) => encodeURI(u));
-  const applyDecode = () => setInputUrl((u) => decodeURI(u));
+  const handleEncode = () => setInput(encodeURI(input));
+  const handleDecode = () => setInput(decodeURI(input));
 
-  // ─── Render ───────────────────────────────────────────────────────────
+  const addParam = () => {
+    if (!parsedUrl) return;
+    const key = prompt("Parameter name:");
+    if (!key) return;
+    const val = prompt("Parameter value:") ?? "";
+    parsedUrl.searchParams.set(key.trim(), val);
+    setInput(parsedUrl.toString());
+  };
+
+  const removeParam = (key: string) => {
+    if (!parsedUrl) return;
+    parsedUrl.searchParams.delete(key);
+    setInput(parsedUrl.toString());
+  };
+
+  const modes: [string, Mode][] = [
+    ["Parse URL", "parse"],
+    ["Encode URI", "encode"],
+    ["Decode URI", "decode"],
+    ["Slugify", "slug"],
+  ];
+
+  const components: [string, string][] = parsedUrl
+    ? [
+        ["Protocol", parsedUrl.protocol],
+        ["Host", parsedUrl.host],
+        ["Pathname", parsedUrl.pathname || "/"],
+        ["Hash", parsedUrl.hash || "(none)"],
+      ]
+    : [];
+
   return (
     <section
       id="url-tools"
       aria-labelledby="url-tools-heading"
-      className="space-y-16 text-gray-900 antialiased px-4 sm:px-6 lg:px-8"
+      className="space-y-12 text-gray-900 antialiased px-4 lg:px-0"
     >
-      {/* Heading & Description */}
-      <div className="text-center space-y-6 sm:px-0">
+      {/* Header */}
+      <div className="text-center space-y-4">
         <h1
           id="url-tools-heading"
           className="
             bg-clip-text text-transparent
             bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
-            text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
+            text-4xl sm:text-5xl font-extrabold tracking-tight
           "
         >
-          URL Tools: Encode, Parse &amp; Slugify
+          URL Tools: Encode, Decode, Parse &amp; Slugify
         </h1>
-        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-        <p className="mx-auto max-w-2xl text-lg text-gray-700 leading-relaxed">
-          Encode/decode URLs, parse components, manage query parameters,
-          and generate SEO-friendly slugs—all in your browser.
+        <p className="mx-auto max-w-2xl text-lg text-gray-700">
+          Choose a mode below to work with your URL or text—fully client-side,
+          no signup required.
         </p>
       </div>
 
-      {/* URL Input */}
-      <div className="max-w-3xl mx-auto space-y-6">
-        <label
-          htmlFor="url-input"
-          className="block text-sm font-medium text-gray-800 mb-1"
-        >
-          URL
-        </label>
-        <div className="relative">
-          <input
-            id="url-input"
-            ref={inputRef}
-            type="text"
-            value={inputUrl}
-            onChange={handleInputChange}
-            placeholder="https://example.com/path?foo=bar"
-            className="
-              w-full p-3 border border-gray-300 rounded-md
-              focus:ring-2 focus:ring-indigo-500 transition
-            "
-          />
+      {/* Mode Switch */}
+      <div className="flex justify-center gap-4 flex-wrap">
+        {modes.map(([label, m]) => (
           <button
-            onClick={() => copyToClipboard(inputUrl)}
-            aria-label="Copy URL"
-            className="absolute right-2 top-2 text-gray-500 hover:text-indigo-500 transition"
+            key={m}
+            onClick={() => {
+              setMode(m);
+              setInput("");
+              setParsedUrl(null);
+              setError(null);
+              setSlugSource("");
+              setSlug("");
+              inputRef.current?.focus();
+            }}
+            className={`
+              px-5 py-2 rounded-md font-medium transition
+              ${
+                mode === m
+                  ? "bg-indigo-600 text-white"
+                  : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+              }
+            `}
           >
-            <ClipboardCopy className="w-5 h-5" />
+            {label}
           </button>
-        </div>
+        ))}
       </div>
 
-      {/* Error */}
-      {error && (
-        <div className="max-w-3xl mx-auto text-center text-red-600">
-          {error}
-        </div>
-      )}
-
-      {/* Parsed Components */}
-      {urlObj && (
-        <div className="max-w-3xl mx-auto space-y-8">
-          {/* Components Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <ComponentCard label="Protocol" value={urlObj.protocol} />
-            <ComponentCard label="Host" value={urlObj.host} />
-            <ComponentCard label="Pathname" value={urlObj.pathname || "/"} />
-            <ComponentCard label="Hash" value={urlObj.hash || "(none)"} />
-          </div>
-
-          {/* Query Parameters */}
-          <div className="space-y-2">
-            <h2 className="text-lg font-medium">Query Parameters</h2>
-            {Array.from(urlObj.searchParams.entries()).map(
-              ([key, val]) => (
-                <div
-                  key={key}
-                  className="
-                    flex items-center justify-between
-                    p-3 bg-gray-50 rounded
-                  "
-                >
-                  <span className="font-mono text-gray-700">
-                    {key} = {val}
-                  </span>
-                  <button
-                    onClick={() => handleRemoveParam(key)}
-                    className="text-red-500 hover:underline text-sm"
-                  >
-                    Remove
-                  </button>
-                </div>
-              )
-            )}
-            {urlObj.searchParams.toString() === "" && (
-              <p className="text-sm text-gray-500">
-                No query parameters
-              </p>
-            )}
+      {/* Input Field */}
+      {mode !== "slug" && (
+        <div className="max-w-3xl mx-auto space-y-4">
+          <label
+            htmlFor="ut-input"
+            className="block text-sm font-medium text-gray-800"
+          >
+            {mode === "parse"
+              ? "Enter URL to parse"
+              : mode === "encode"
+              ? "Enter URI to encode"
+              : "Enter URI to decode"}
+          </label>
+          <div className="relative flex items-center">
+            <input
+              id="ut-input"
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setInput(e.target.value)
+              }
+              placeholder={
+                mode === "parse"
+                  ? "https://example.com/path?foo=bar"
+                  : mode === "encode"
+                  ? "Enter URI…"
+                  : "Enter encoded URI…"
+              }
+              className="flex-1 p-3 pr-12 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 transition"
+            />
             <button
-              onClick={handleAddParam}
-              className="
-                mt-2 inline-block px-6 py-2 bg-indigo-600 text-white
-                rounded-md hover:bg-indigo-700 focus:outline-none
-                focus:ring-2 focus:ring-indigo-500 transition font-medium
-              "
+              onClick={() => copy(input)}
+              aria-label="Copy input"
+              className="absolute right-2 text-gray-500 hover:text-indigo-600 transition"
             >
-              Add / Update Param
+              <ClipboardCopy className="w-5 h-5" />
             </button>
           </div>
-
-          {/* Encode / Decode */}
-          <div className="space-y-2">
-            <h2 className="text-lg font-medium">Encode / Decode</h2>
-            <div className="flex flex-wrap gap-4">
-              <button
-                onClick={applyEncode}
-                className="
-                  flex-1 px-6 py-3 bg-green-600 text-white
-                  rounded-md hover:bg-green-700 focus:outline-none
-                  focus:ring-2 focus:ring-green-500 transition font-medium
-                "
-              >
-                Encode URI
-              </button>
-              <button
-                onClick={applyDecode}
-                className="
-                  flex-1 px-6 py-3 bg-yellow-600 text-white
-                  rounded-md hover:bg-yellow-700 focus:outline-none
-                  focus:ring-2 focus:ring-yellow-500 transition font-medium
-                "
-              >
-                Decode URI
-              </button>
-            </div>
-          </div>
-
-          {/* Final URL */}
-          <div className="space-y-1">
-            <label
-              htmlFor="final-url"
-              className="block text-sm font-medium text-gray-800"
-            >
-              Resulting URL
-            </label>
-            <div className="relative">
-              <input
-                id="final-url"
-                readOnly
-                value={urlObj.toString()}
-                className="
-                  w-full p-3 border border-gray-300 rounded-md
-                  bg-gray-50 focus:ring-2 focus:ring-indigo-500
-                  transition font-mono
-                "
-              />
-              <button
-                onClick={() => copyToClipboard(urlObj.toString())}
-                aria-label="Copy Result URL"
-                className="absolute right-2 top-2 text-gray-500 hover:text-indigo-500 transition"
-              >
-                <ClipboardCopy className="w-5 h-5" />
-              </button>
-              <a
-                href={urlObj.toString()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute right-10 top-2 text-gray-500 hover:text-indigo-500 transition"
-              >
-                <ExternalLink className="w-5 h-5" />
-              </a>
-            </div>
-          </div>
+          {error && <p className="text-red-600 text-sm">{error}</p>}
         </div>
       )}
 
-      {/* Slugify Section */}
-      <div className="max-w-3xl mx-auto space-y-4">
-        <h2 className="text-center text-2xl font-semibold">
-          SEO-Friendly Slug Generator
-        </h2>
-        <textarea
-          rows={2}
-          value={slugSource}
-          onChange={(e) => setSlugSource(e.target.value)}
-          placeholder="Enter text to slugify…"
-          className="
-            w-full p-3 border border-gray-300 rounded-md
-            focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition
-          "
-        />
-        <div className="relative">
-          <input
-            readOnly
-            value={slug}
-            className="
-              w-full p-3 border border-gray-300 rounded-md
-              bg-gray-50 focus:ring-2 focus:ring-indigo-500
-              transition font-mono
-            "
-          />
+      {/* Mode Outputs */}
+      <div className="max-w-3xl mx-auto space-y-8">
+        {mode === "parse" && parsedUrl && (
+          <>
+            {/* Parsed Components */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {components.map(([label, value]) => (
+                <div
+                  key={label}
+                  className="p-4 bg-gray-50 rounded-lg text-center"
+                >
+                  <p className="text-sm text-gray-600 mb-1">{label}</p>
+                  <p className="font-mono text-indigo-600 break-all">
+                    {value}
+                  </p>
+                  <button
+                    onClick={() => copy(value)}
+                    className="mt-2 text-gray-500 hover:text-indigo-600 transition"
+                  >
+                    <ClipboardCopy className="w-5 h-5 inline-block" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Query Parameters */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-gray-800">
+                Query Parameters
+              </p>
+              {parsedUrl.searchParams.toString() ? (
+                Array.from(parsedUrl.searchParams.entries()).map(
+                  ([key, val]) => (
+                    <div
+                      key={key}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+                    >
+                      <span className="font-mono text-gray-700 break-all">
+                        {key} = {val}
+                      </span>
+                      <button
+                        onClick={() => removeParam(key)}
+                        className="text-red-500 hover:underline text-sm inline-flex items-center gap-1"
+                      >
+                        <Trash2 className="w-4 h-4" /> Remove
+                      </button>
+                    </div>
+                  )
+                )
+              ) : (
+                <p className="text-sm text-gray-500">No parameters</p>
+              )}
+              <button
+                onClick={addParam}
+                className="inline-flex items-center gap-2 px-5 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition font-medium"
+              >
+                <PlusCircle className="w-5 h-5" /> Add Parameter
+              </button>
+            </div>
+          </>
+        )}
+
+        {mode === "encode" && (
           <button
-            onClick={() => copyToClipboard(slug)}
-            aria-label="Copy Slug"
-            className="absolute right-2 top-2 text-gray-500 hover:text-indigo-500 transition"
+            onClick={handleEncode}
+            className="w-full px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition font-medium"
           >
-            <ClipboardCopy className="w-5 h-5" />
+            Encode URI →
           </button>
-        </div>
+        )}
+
+        {mode === "decode" && (
+          <button
+            onClick={handleDecode}
+            className="w-full px-6 py-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition font-medium"
+          >
+            Decode URI →
+          </button>
+        )}
+
+        {mode === "slug" && (
+          <>
+            <label
+              htmlFor="slug-input"
+              className="block text-sm font-medium text-gray-800"
+            >
+              Enter text to slugify
+            </label>
+            <textarea
+              id="slug-input"
+              rows={2}
+              value={slugSource}
+              onChange={(e) => setSlugSource(e.target.value)}
+              placeholder="My Awesome Blog Post Title!"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 transition font-mono resize-y"
+            />
+            {slug && (
+              <div className="relative">
+                <input
+                  readOnly
+                  value={slug}
+                  className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 focus:ring-2 focus:ring-indigo-500 transition font-mono"
+                />
+                <button
+                  onClick={() => copy(slug)}
+                  aria-label="Copy slug"
+                  className="absolute right-2 top-2 text-gray-500 hover:text-indigo-600 transition"
+                >
+                  <ClipboardCopy className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </section>
-  );
-}
-
-// Reusable component for parsed URL parts
-function ComponentCard({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(value);
-      alert("✅ Copied!");
-    } catch {
-      alert("❌ Copy failed");
-    }
-  };
-
-  return (
-    <div className="p-4 bg-gray-50 rounded-lg text-center">
-      <p className="text-sm text-gray-600 mb-2">{label}</p>
-      <p className="font-mono text-indigo-600 break-all">{value}</p>
-      <button
-        onClick={copy}
-        aria-label={`Copy ${label}`}
-        className="mt-3 text-gray-500 hover:text-indigo-600 transition"
-      >
-        <ClipboardCopy className="inline-block w-5 h-5" />
-      </button>
-    </div>
   );
 }

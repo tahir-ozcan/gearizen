@@ -144,7 +144,6 @@ export default function ToolsClient() {
       {/* Sonuçlar Grid’i */}
       <section className="space-y-6 sm:px-0">
         <div className="flex flex-col">
-          {/* Her durumda araç sayısını göster */}
           <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800">
             Showing {filtered.length} {filtered.length === 1 ? "tool" : "tools"}
           </h2>
