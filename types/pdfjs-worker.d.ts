@@ -1,8 +1,8 @@
 // types/pdfjs-dist-legacy.d.ts
 
 /**
- * Minimal types for the PDF.js “legacy” ESM build that
- * we only import & run in the browser at runtime.
+ * Minimal types for the PDF.js “legacy” ESM build
+ * (we import at runtime in the browser).
  */
 declare module "pdfjs-dist/legacy/build/pdf" {
   export interface GlobalWorkerOptions {
@@ -33,8 +33,8 @@ declare module "pdfjs-dist/legacy/build/pdf" {
 }
 
 /**
- * Tell TS what “import ...?url” returns so
- * our webpack rule can bundle the worker for us.
+ * `?url` sorgusuyla import edilen worker dosyasının
+ * bize URL string olarak geldiğini TypeScript’e bildiriyoruz.
  */
 declare module "pdfjs-dist/legacy/build/pdf.worker.min.js?url" {
   const workerUrl: string;
