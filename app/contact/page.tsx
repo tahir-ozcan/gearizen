@@ -56,12 +56,15 @@ export default function ContactPage() {
     "@type": "Organization",
     name: "Gearizen",
     url: "https://gearizen.com",
-    logo: "https://gearizen.com/logo.png",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://gearizen.com/logo.png",
+    },
     sameAs: [
       "https://twitter.com/gearizen",
       "https://github.com/gearizen",
-      "https://linkedin.com/company/gearizen"
-    ]
+      "https://linkedin.com/company/gearizen",
+    ],
   };
 
   const pageJsonLd = {
@@ -77,8 +80,8 @@ export default function ContactPage() {
       url: "https://gearizen.com",
       logo: {
         "@type": "ImageObject",
-        url: "https://gearizen.com/logo.png"
-      }
+        url: "https://gearizen.com/logo.png",
+      },
     },
     breadcrumb: {
       "@type": "BreadcrumbList",
@@ -87,16 +90,16 @@ export default function ContactPage() {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://gearizen.com"
+          item: "https://gearizen.com",
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Contact",
-          item: "https://gearizen.com/contact"
-        }
-      ]
-    }
+          item: "https://gearizen.com/contact",
+        },
+      ],
+    },
   };
 
   return (
@@ -105,14 +108,14 @@ export default function ContactPage() {
       <JsonLd data={orgJsonLd} />
 
       {/* WebPage structured data */}
-      <Script id="webpage-ld" type="application/ld+json" strategy="afterInteractive">
+      <Script id="contact-page-ld" type="application/ld+json" strategy="afterInteractive">
         {JSON.stringify(pageJsonLd)}
       </Script>
 
       {/* Breadcrumb */}
-      <BreadcrumbJsonLd pageTitle="Contact Us" pageUrl="https://gearizen.com/contact" />
+      <BreadcrumbJsonLd pageTitle="Contact" pageUrl="https://gearizen.com/contact" />
 
-      {/* Main content */}
+      {/* Main client component */}
       <ContactClient />
     </>
   );
