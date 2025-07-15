@@ -4,8 +4,8 @@
 import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { PDFDocument, type SaveOptions } from "pdf-lib";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
-// Bundler-friendly worker import (Next.js will emit a URL for us)
-import pdfWorker from "pdfjs-dist/legacy/build/pdf.worker.min.js?url";
+// webpack will emit this worker file as an asset per your next.config.ts rule:
+import pdfWorkerUrl from "pdfjs-dist/legacy/build/pdf.worker.min.js?url";
 
 type LoadingState = "idle" | "compress" | "extract";
 
@@ -13,54 +13,48 @@ export default function PdfToolkitClient() {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<LoadingState>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [extractedText, setExtractedText] = useState<string>("");
+  const [extractedText, setExtractedText] = useState("");
   const [compressedUrl, setCompressedUrl] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Configure PDF.js worker once on mount
+  // Wire up PDF.js's worker to the emitted URL
   useEffect(() => {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
   }, []);
 
-  /** Open file chooser */
   function handleBrowseClick() {
     fileInputRef.current?.click();
   }
 
-  /** Handle PDF selection */
   function handleUploadChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
+    setError(null);
     setCompressedUrl(null);
     setExtractedText("");
-    setError(null);
 
     if (!file) {
       setUploadFile(null);
-      return;
-    }
-    if (file.type !== "application/pdf") {
+    } else if (file.type !== "application/pdf") {
       setError("Please select a valid PDF file.");
       setUploadFile(null);
-      return;
+    } else {
+      setUploadFile(file);
     }
-    setUploadFile(file);
   }
 
-  /** Compress the PDF */
   async function handleCompressPdf() {
     if (!uploadFile) return;
     setLoading("compress");
     setError(null);
     setCompressedUrl(null);
+
     try {
       const buffer = await uploadFile.arrayBuffer();
       const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
-      const options: SaveOptions = { useObjectStreams: true };
-      const bytes = await pdfDoc.save(options);
+      const bytes = await pdfDoc.save({ useObjectStreams: true } as SaveOptions);
       const blob = new Blob([bytes], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      setCompressedUrl(url);
+      setCompressedUrl(URL.createObjectURL(blob));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Compression failed.");
     } finally {
@@ -68,7 +62,10 @@ export default function PdfToolkitClient() {
     }
   }
 
-  /** Download compressed PDF */
+  function handleViewCompressed() {
+    if (compressedUrl) window.open(compressedUrl, "_blank");
+  }
+
   function handleDownloadCompressed() {
     if (!compressedUrl || !uploadFile) return;
     const a = document.createElement("a");
@@ -77,22 +74,15 @@ export default function PdfToolkitClient() {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    // revoke after a slight delay to ensure download has started
     setTimeout(() => URL.revokeObjectURL(compressedUrl), 1000);
   }
 
-  /** View compressed PDF */
-  function handleViewCompressed() {
-    if (!compressedUrl) return;
-    window.open(compressedUrl, "_blank");
-  }
-
-  /** Extract text and download as .doc */
   async function handleExtractText() {
     if (!uploadFile) return;
     setLoading("extract");
     setError(null);
     setExtractedText("");
+
     try {
       const buffer = await uploadFile.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
@@ -101,15 +91,13 @@ export default function PdfToolkitClient() {
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
-        const strings = content.items
-          .filter((item): item is { str: string } => "str" in item)
-          .map((item) => item.str);
+        const strings = content.items.map((itm) => itm.str);
         fullText += strings.join(" ") + "\n\n";
       }
 
       setExtractedText(fullText.trim());
 
-      // Download as .doc
+      // download as Word doc
       const blob = new Blob([fullText], { type: "application/msword" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -127,29 +115,20 @@ export default function PdfToolkitClient() {
   }
 
   return (
-    <section
-      id="pdf-toolkit"
-      aria-labelledby="pdf-toolkit-heading"
-      className="space-y-16 text-gray-900 antialiased"
-    >
+    <section className="space-y-12 text-gray-900 antialiased px-4 md:px-0">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h1
-          id="pdf-toolkit-heading"
-          className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
-                     text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight"
-        >
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]">
           PDF Toolkit: Compress &amp; Convert
         </h1>
-        <div className="mx-auto mt-2 h-1 w-32 rounded-full
-                        bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-        <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Shrink PDF file sizes without quality loss and extract text to Word documents—all in-browser and offline, no signup required.
+        <p className="text-gray-700 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
+          Shrink PDF file sizes without quality loss and extract text to Word documents—all in-browser
+          and offline, no signup required.
         </p>
       </div>
 
-      {/* File Input */}
-      <div className="max-w-3xl mx-auto space-y-4">
+      {/* File chooser */}
+      <div className="max-w-md mx-auto flex flex-col items-center gap-4">
         <input
           ref={fileInputRef}
           type="file"
@@ -159,33 +138,31 @@ export default function PdfToolkitClient() {
         />
         <button
           onClick={handleBrowseClick}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700
-                     focus:ring-2 focus:ring-blue-500 transition"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition"
         >
           {uploadFile ? "Change PDF…" : "Browse PDF…"}
         </button>
         {uploadFile && (
-          <div className="text-sm text-gray-600">
-            Selected: {uploadFile.name} ({(uploadFile.size / 1024).toFixed(1)} KB)
+          <div className="text-sm text-gray-600 truncate w-full text-center">
+            {uploadFile.name} — {(uploadFile.size / 1024).toFixed(1)} KB
           </div>
         )}
       </div>
 
       {/* Error */}
       {error && (
-        <div className="max-w-3xl mx-auto p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+        <div className="max-w-md mx-auto p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-center">
           {error}
         </div>
       )}
 
       {/* Actions */}
       {uploadFile && (
-        <div className="max-w-3xl mx-auto flex flex-wrap gap-4">
+        <div className="max-w-md mx-auto flex flex-wrap justify-center gap-3">
           <button
             onClick={handleCompressPdf}
             disabled={loading !== "idle"}
-            className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700
-                       focus:ring-2 focus:ring-green-500 transition disabled:opacity-50"
+            className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 transition disabled:opacity-50"
           >
             {loading === "compress" ? "Compressing…" : "Compress PDF"}
           </button>
@@ -194,15 +171,13 @@ export default function PdfToolkitClient() {
             <>
               <button
                 onClick={handleViewCompressed}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700
-                           focus:ring-2 focus:ring-indigo-500 transition"
+                className="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 transition"
               >
                 View Compressed
               </button>
               <button
                 onClick={handleDownloadCompressed}
-                className="px-6 py-2 bg-green-800 text-white rounded-md hover:bg-green-900
-                           focus:ring-2 focus:ring-green-700 transition"
+                className="px-5 py-2 bg-green-800 text-white rounded-lg hover:bg-green-900 focus:ring-2 focus:ring-green-700 transition"
               >
                 Download Compressed
               </button>
@@ -212,26 +187,22 @@ export default function PdfToolkitClient() {
           <button
             onClick={handleExtractText}
             disabled={loading !== "idle"}
-            className="px-6 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700
-                       focus:ring-2 focus:ring-yellow-500 transition disabled:opacity-50"
+            className="px-5 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500 transition disabled:opacity-50"
           >
             {loading === "extract" ? "Extracting…" : "Extract Text to Word"}
           </button>
         </div>
       )}
 
-      {/* Extracted Text Preview */}
+      {/* Preview */}
       {extractedText && (
-        <div className="max-w-3xl mx-auto space-y-2">
-          <span className="block text-sm font-medium text-gray-800">
-            Extracted Text Preview
-          </span>
+        <div className="max-w-md mx-auto space-y-2">
+          <h2 className="text-lg font-medium text-gray-800">Extracted Text Preview</h2>
           <textarea
             rows={6}
             readOnly
             value={extractedText}
-            className="w-full p-3 border border-gray-300 rounded-md bg-gray-50
-                       font-mono text-sm resize-y focus:ring-2 focus:ring-indigo-500 transition"
+            className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm resize-y focus:ring-2 focus:ring-indigo-500 transition"
           />
         </div>
       )}

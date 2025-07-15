@@ -1,14 +1,23 @@
 # Gearizen
 
-> Client-side Next.js tools platform — free, no signup, SEO-optimized.
+> Instant, privacy-first web tools for developers and creators — 100% client-side, free, no signup required, SEO-optimized.
 
 ## Table of Contents
 
+- [Overview](#overview)
 - [Installation](#installation)
-- [Usage](#usage)
+- [Development](#development)
 - [Project Structure](#project-structure)
+- [Testing](#testing)
+- [Configuration & Metadata](#configuration-metadata)
+- [Analytics & Ads](#analytics-ads)
+- [Build & Deploy](#build-deploy)
 - [License](#license)
 - [Contact](#contact)
+
+## Overview
+
+Gearizen is a collection of lightweight, privacy-focused utilities built with Next.js and Tailwind CSS. All tools run entirely in the browser—no server calls, no user tracking, and no accounts. Perfect for rapid prototyping or embedding in static sites.
 
 ## Installation
 
@@ -16,107 +25,116 @@
 git clone https://github.com/tahir-ozcan/gearizen.git
 cd gearizen
 npm install
+```
+
+## Development
+
+```bash
 npm run dev
 ```
 
-## Usage
+Then open http://localhost:3000 in your browser. Hot-reload is enabled for instant feedback.
 
-After installation run `npm run dev` and open <http://localhost:3000> in your browser. All tools run entirely client-side with no external APIs.
+### Project Structure
 
-### Metadata Guidelines
-
-Each page exports a `metadata` object to define `<title>`, description and social tags. Use semantic headings (H1 → H2…) and keep URLs canonical via the `alternates` field.
+```bash
+gearizen/
+├─ app/  
+│  ├─ layout.tsx          # Global layout & providers  
+│  ├─ page.tsx            # Home page  
+│  └─ tools/              # Each subfolder is a standalone tool  
+│     ├─ pdf-toolkit/  
+│     │  ├─ page.tsx      # Tool page wrapper & metadata  
+│     │  └─ pdf-toolkit-client.tsx  
+│     └─ …  
+├─ components/            # Shared UI components  
+├─ public/                # Static assets (icons, fonts, sitemap.xml)  
+├─ types/                 # Custom TypeScript declaration files  
+├─ styles/                # Global CSS (Tailwind config, globals.css)  
+├─ tests/                 # Jest & Playwright tests  
+├─ next.config.js         # Next.js configuration & custom webpack rules  
+├─ tsconfig.json          # TypeScript configuration  
+├─ package.json  
+└─ README.md  
+```
 
 ### Testing
 
-Unit tests are written with [Jest](https://jestjs.io/). Execute all tests with:
+## Unit Tests
+
+Written with Jest:
 
 ```bash
 npm test
 ```
 
-Run the production build to ensure pages compile correctly:
+## End-to-End Tests
 
-```bash
-npm run build
-```
-
-### Design System
-
-All pages share a light theme with Tailwind CSS utility classes. Buttons, inputs and layout containers use the custom classes `.btn-primary`, `.input-base`, and `.container-responsive` defined in `globals.css`.
-
-### Ads & Analytics
-
-Google AdSense and Google Analytics are injected into the `<head>` of every
-page through `app/components/AnalyticsLoader.tsx`.  Replace the IDs below with
-your own if deploying a fork. The loader renders the following snippets exactly
-as provided by Google using Next.js `Script` components:
-
-```html
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-V74SWZ9H8B"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-V74SWZ9H8B');
-</script>
-
-<script async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2108375251131552"
-        crossorigin="anonymous"></script>
-```
-
-To disable analytics or ads, remove `AnalyticsLoader` from `app/layout.tsx`.
-
-### Build & Deploy
-
-Create a production build and start the server:
-
-```bash
-npm run build
-npm start
-```
-
-### Running Tests
-
-Unit tests use [Jest](https://jestjs.io/):
-
-```bash
-npm test
-```
-
-End-to-end tests are written with [Playwright](https://playwright.dev/):
+Written with Playwright:
 
 ```bash
 npm run test:e2e
 ```
 
-Install browsers once with `npx playwright install`. The tests run offline using the locally installed browsers; the npm script sets `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` to prevent any downloads. The Contact page now links directly to an email address via `mailto:` so no form submission leaves the browser.
+Note: Browsers must be installed once via
+`npx playwright install`
+We skip automatic downloads in CI with `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1`.
 
+### Configuration & Metadata
 
-## Project Structure
+Each tool page under `app/tools/.../page.tsx` exports a `metadata` object:
 
-```bash
-gearizen/
-├─ app/
-│  ├─ layout.tsx
-│  ├─ page.tsx
-│  ├─ tools/
-│  │  ├─ password-generator/
-│  │  └─ …
-│  └─ …
-├─ components/
-├─ public/
-├─ types/
-├─ README.md
-├─ LICENSE
-└─ package.json
+- **title** & **description** control the `<head>` tags
+- **openGraph** & **twitter** fields define social previews
+- **alternates** ensure canonical URLs
+
+Follow semantic heading order (H1 → H2 → H3).
+
+### Analytics & Ads
+
+We inject Google Analytics and AdSense via `<AnalyticsLoader />` in app/layout.tsx. The loader uses Next.js `<Script>` components to include:
+
+```html
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=YOUR_ID"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'YOUR_ID');
+</script>
+
+<!-- Google AdSense -->
+<script async
+  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=CA-PUB-XXXX"
+  crossorigin="anonymous"></script>
 ```
 
-## License
+To disable analytics or ads, simply remove the `<AnalyticsLoader />` import from `app/layout.tsx.`
 
-MIT — see LICENSE
+### Build & Deploy
 
-## Contact
-For any questions or feedback, email [gearizen.tahir.ozcan@gmail.com](mailto:gearizen.tahir.ozcan@gmail.com).
+1. Create a production build:
+
+```bash
+npm run build
+```
+
+2. Preview locally:
+
+```bash
+npm start
+```
+
+3. Deploy on Vercel (recommended):
+
+```bash
+vercel
+```
+
+### License
+
+MIT License. See LICENSE for full text.
+
+### Contact
+For questions or feedback, email [gearizen.tahir.ozcan@gmail.com](mailto:gearizen.tahir.ozcan@gmail.com) or open an issue on [GitHub](https://github.com/tahir-ozcan/gearizen).
