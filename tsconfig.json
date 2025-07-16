@@ -1,48 +1,50 @@
+// tsconfig.json
 {
   "compilerOptions": {
-    /* Hedeflenen JS sürümü ve global/types */
+    /* Hedeflenen JS sürümü ve DOM / ESNext API’leri */
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
 
-    /* Modül çözümü ve çıktı ayarları */
+    /* Modül sistemi ve çözümleme */
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* Çıktı üretme: Next.js kendisi derleyecek */
     "noEmit": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "resolveJsonModule": true,
 
     /* Katı tip denetimi */
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "allowJs": true,
-    "esModuleInterop": true,
 
-    /* Proje içi import kısayolları */
+    /* Proje içi alias’lar */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      /* PDF.js bildirimlerimizi bu .d.ts dosyasına yönlendiriyoruz */
+      "pdfjs-dist/legacy/build/pdf": ["types/pdfjs-worker.d.ts"],
+      "pdfjs-dist/legacy/build/pdf.worker.min.js?url": ["types/pdfjs-worker.d.ts"]
     },
 
-    /* Hızlı yeniden derleme */
+    /* Yeniden derleme hızlandırma */
     "incremental": true,
 
-    /* Global tip deklarasyonlarını arayacağımız klasörler */
-    "typeRoots": ["./node_modules/@types", "./types"],
-
-    /* Next.js için önerilen plugin */
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    /* Özel tip köklerimiz */
+    "typeRoots": ["./types", "./node_modules/@types"]
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "./types/**/*.d.ts",
+
+    /* .d.ts’lerimizi mutlaka derlemeye dahil ediyoruz */
+    "types/**/*.d.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]

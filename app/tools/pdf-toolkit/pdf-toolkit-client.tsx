@@ -3,13 +3,18 @@
 
 import { useState, useRef, useEffect, ChangeEvent, FormEvent } from "react";
 import { jsPDF } from "jspdf";
+// Core PDF.js API (legacy build)
 import {
   getDocument,
   GlobalWorkerOptions,
   type PDFDocumentProxy,
   type PDFPageProxy,
+  type TextItem,
+  type TextContent,
 } from "pdfjs-dist/legacy/build/pdf";
-import type { TextContent, TextItem, TextMarkedContent } from "pdfjs-dist/types/src/display/api";
+// Worker bundle (URL)
+import workerSrc from "pdfjs-dist/legacy/build/pdf.worker.min.js?url";
+// Official DOCX types
 import {
   Document as DocxDocument,
   Packer,
@@ -19,130 +24,123 @@ import {
   HeadingLevel,
 } from "docx";
 
-type ExtractMode = "image" | "text";
+type ExtractionMode = "image" | "text";
 
 interface PDFTextItem {
-  str: string;
+  text: string;
   transform: number[];
   fontName?: string;
 }
 
 export default function PdfToolkitClient() {
-  const [file, setFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState<"idle" | "compress" | "extract">("idle");
-  const [error, setError] = useState<string | null>(null);
-  const [compressedBlob, setCompressedBlob] = useState<Blob | null>(null);
-  const [jpegQuality, setJpegQuality] = useState(0.8);
-  const [extractMode, setExtractMode] = useState<ExtractMode>("image");
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [currentAction, setCurrentAction] = useState<"idle" | "compress" | "extract">("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [jpegQuality, setJpegQuality] = useState<number>(0.8);
+  const [extractionMode, setExtractionMode] = useState<ExtractionMode>("image");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Point PDF.js at its worker
   useEffect(() => {
-    GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+    GlobalWorkerOptions.workerSrc = workerSrc;
   }, []);
 
   function handleSelectClick() {
-    inputRef.current?.click();
+    fileInputRef.current?.click();
   }
 
-  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0] ?? null;
-    setError(null);
-    setCompressedBlob(null);
-    if (!f) {
-      setFile(null);
+  function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+    setErrorMessage(null);
+    const file = event.target.files?.[0] ?? null;
+    if (!file) {
+      setSelectedFile(null);
       return;
     }
-    if (f.type !== "application/pdf") {
-      setError("❌ Please select a valid PDF file.");
-      setFile(null);
-    } else {
-      setFile(f);
+    if (file.type !== "application/pdf") {
+      setErrorMessage("❌ Please select a valid PDF file.");
+      setSelectedFile(null);
+      return;
     }
+    setSelectedFile(file);
   }
 
-  async function handleCompress() {
-    if (!file) return;
-    setLoading("compress");
-    setError(null);
-    setCompressedBlob(null);
+  async function compressPdfAndDownload() {
+    if (!selectedFile) return;
+    setCurrentAction("compress");
+    setErrorMessage(null);
 
     try {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf: PDFDocumentProxy = await getDocument({ data: arrayBuffer }).promise;
-      const doc = new jsPDF({ unit: "pt", format: "a4" });
+      const arrayBuffer = await selectedFile.arrayBuffer();
+      const pdfDoc: PDFDocumentProxy = await getDocument({ data: arrayBuffer }).promise;
+      const pdfWriter = new jsPDF({ unit: "pt", format: "a4" });
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Canvas 2D context not available.");
 
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page: PDFPageProxy = await pdf.getPage(i);
-        // @ts-expect-error viewport runtime
-        const viewport = page.getViewport({ scale: 1.5 });
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+        const page: PDFPageProxy = await pdfDoc.getPage(i);
+        const viewport = page.getViewport({ scale: 2 });
         canvas.width = viewport.width;
         canvas.height = viewport.height;
-        if (ctx) {
-          // @ts-expect-error render runtime
-          await page.render({ canvasContext: ctx, viewport }).promise;
-        }
-        const dataUrl = canvas.toDataURL("image/jpeg", jpegQuality);
-        const props = doc.getImageProperties(dataUrl);
-        const pw = doc.internal.pageSize.getWidth();
-        const ph = (props.height * pw) / props.width;
-        if (i > 1) doc.addPage();
-        doc.addImage(dataUrl, "JPEG", 0, 0, pw, ph);
+        await page.render({ canvasContext: ctx, viewport }).promise;
+
+        const jpeg = canvas.toDataURL("image/jpeg", jpegQuality);
+        const props = pdfWriter.getImageProperties(jpeg);
+        const pdfWidth = pdfWriter.internal.pageSize.getWidth();
+        const pdfHeight = (props.height * pdfWidth) / props.width;
+
+        if (i > 1) pdfWriter.addPage();
+        pdfWriter.addImage(jpeg, "JPEG", 0, 0, pdfWidth, pdfHeight);
       }
 
-      setCompressedBlob(doc.output("blob"));
+      const blob = pdfWriter.output("blob");
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `compressed-${selectedFile.name}`;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (err: unknown) {
       console.error(err);
-      setError(err instanceof Error ? err.message : "❌ Compression failed.");
+      setErrorMessage(
+        err instanceof Error ? `❌ Compression error: ${err.message}` : "❌ Compression failed."
+      );
     } finally {
-      setLoading("idle");
+      setCurrentAction("idle");
     }
   }
 
-  function handleDownloadCompressed() {
-    if (!compressedBlob || !file) return;
-    const url = URL.createObjectURL(compressedBlob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `compressed-${file.name}`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  async function handleExtractToWord() {
-    if (!file) return;
-    setLoading("extract");
-    setError(null);
+  async function extractPdfToWordAndDownload() {
+    if (!selectedFile) return;
+    setCurrentAction("extract");
+    setErrorMessage(null);
 
     try {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf: PDFDocumentProxy = await getDocument({ data: arrayBuffer }).promise;
-      const children: Paragraph[] = [];
+      const arrayBuffer = await selectedFile.arrayBuffer();
+      const pdfDoc: PDFDocumentProxy = await getDocument({ data: arrayBuffer }).promise;
+      const paragraphs: Paragraph[] = [];
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Canvas 2D context not available.");
 
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page: PDFPageProxy = await pdf.getPage(i);
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+        const page: PDFPageProxy = await pdfDoc.getPage(i);
 
-        if (extractMode === "image") {
-          // Görsel mod
-          // @ts-expect-error viewport runtime
+        if (extractionMode === "image") {
           const viewport = page.getViewport({ scale: 2 });
           canvas.width = viewport.width;
           canvas.height = viewport.height;
-          if (ctx) {
-            // @ts-expect-error render runtime
-            await page.render({ canvasContext: ctx, viewport }).promise;
-          }
-          const dataUrl = canvas.toDataURL("image/png");
-          const base64 = dataUrl.split(",")[1];
-          const buffer = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-          children.push(
+          await page.render({ canvasContext: ctx, viewport }).promise;
+
+          const png = canvas.toDataURL("image/png");
+          const base64 = png.split(",")[1];
+          const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+
+          paragraphs.push(
             new Paragraph({
               children: [
                 new ImageRun({
-                  data: buffer,
+                  data: bytes,
                   transformation: { width: viewport.width, height: viewport.height },
                   type: "png",
                 }),
@@ -151,45 +149,47 @@ export default function PdfToolkitClient() {
             })
           );
         } else {
-          // Metin modu
-          const textContent = (await page.getTextContent()) as TextContent;
-          const raw = textContent.items as (TextItem | TextMarkedContent)[];
-          const textItems: TextItem[] = raw.filter((it): it is TextItem => Boolean((it as TextItem).str));
-          const items: PDFTextItem[] = textItems.map(it => ({
-            str: it.str,
-            transform: it.transform,
-            fontName: it.fontName,
+          const textContent: TextContent = await page.getTextContent();
+          const rawItems = textContent.items as TextItem[];
+          const pdfTextItems: PDFTextItem[] = rawItems.map((item) => ({
+            text: item.str,
+            transform: item.transform ?? [],
+            fontName: item.fontName,
           }));
 
+          // Group by vertical position to form lines
           const lines: string[] = [];
-          let acc = "", lastY: number | null = null;
-          for (const itm of items) {
-            const y = Math.round(itm.transform[5]);
+          let lastY: number | null = null;
+          let buffer = "";
+
+          for (const itm of pdfTextItems) {
+            const y = Math.round(itm.transform[5] || 0);
             if (lastY === null || Math.abs(y - lastY) > 5) {
-              if (acc) lines.push(acc);
-              acc = itm.str;
+              if (buffer) lines.push(buffer);
+              buffer = itm.text;
               lastY = y;
             } else {
-              acc += itm.str;
+              buffer += itm.text;
             }
           }
-          if (acc) lines.push(acc);
+          if (buffer) lines.push(buffer);
 
-          const sample = items.find(it => it.str.trim());
+          // Heading detection (basic)
+          const sample = pdfTextItems.find((t) => t.text.trim());
           const baseFont = sample?.fontName ?? "Times New Roman";
-          const halfPt = Math.round((sample?.transform[0] ?? 1) * 24);
-          const headingThreshold = Math.max(32, halfPt + 4);
+          const fontSizePt = Math.round((sample?.transform[0] ?? 1) * 24);
+          const headingThreshold = Math.max(32, fontSizePt + 4);
 
-          for (const txt of lines) {
-            const isHeading = halfPt >= headingThreshold;
-            children.push(
+          for (const line of lines) {
+            const isHeading = fontSizePt >= headingThreshold;
+            paragraphs.push(
               new Paragraph({
                 heading: isHeading ? HeadingLevel.HEADING_1 : undefined,
                 children: [
                   new TextRun({
-                    text: txt,
+                    text: line,
                     font: baseFont.replace(/[^a-zA-Z ]/g, ""),
-                    size: halfPt,
+                    size: fontSizePt,
                     bold: baseFont.toLowerCase().includes("bold"),
                     italics: baseFont.toLowerCase().includes("italic"),
                   }),
@@ -201,77 +201,101 @@ export default function PdfToolkitClient() {
         }
       }
 
-      const docx = new DocxDocument({ sections: [{ children }] });
-      const blob = await Packer.toBlob(docx);
+      const wordDoc = new DocxDocument({ sections: [{ children: paragraphs }] });
+      const blob = await Packer.toBlob(wordDoc);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = file.name.replace(/\.pdf$/i, ".docx");
+      a.download = selectedFile.name.replace(/\.pdf$/i, ".docx");
       a.click();
       URL.revokeObjectURL(url);
     } catch (err: unknown) {
       console.error(err);
-      setError(err instanceof Error ? err.message : "❌ Conversion to Word failed.");
+      setErrorMessage(
+        err instanceof Error ? `❌ Conversion error: ${err.message}` : "❌ Conversion failed."
+      );
     } finally {
-      setLoading("idle");
+      setCurrentAction("idle");
     }
   }
 
-  function handleModeChange(e: ChangeEvent<HTMLSelectElement>) {
-    setExtractMode(e.target.value as ExtractMode);
+  function handleModeChange(event: ChangeEvent<HTMLSelectElement>) {
+    setExtractionMode(event.target.value as ExtractionMode);
   }
 
   return (
     <section id="pdf-toolkit" className="space-y-16 text-gray-900 antialiased">
+      {/* Header */}
       <div className="text-center space-y-6 sm:px-0">
-        <h1
-          className="
-            bg-clip-text text-transparent
-            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
-            text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
-          "
-        >
+        <h1 className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
           PDF Toolkit: Compress &amp; Convert
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Compress PDF or convert to Word—preserve layout as images or extract editable text, entirely client-side.
+          Compress your PDF or convert it to Word—preserve layout as images or extract editable text,
+          entirely client-side.
         </p>
       </div>
 
-      <form onSubmit={(e: FormEvent) => e.preventDefault()} className="max-w-3xl mx-auto space-y-8 sm:px-0">
+      <form
+        onSubmit={(e: FormEvent) => e.preventDefault()}
+        className="max-w-3xl mx-auto space-y-8 sm:px-0"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Sol sütun */}
+          {/* Left column */}
           <div className="flex flex-col space-y-6">
             <div className="flex flex-col items-center">
-              <input ref={inputRef} type="file" accept="application/pdf" onChange={handleFileChange} className="hidden" />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/pdf"
+                onChange={handleFileChange}
+                className="hidden"
+              />
               <button
                 type="button"
                 onClick={handleSelectClick}
-                disabled={loading !== "idle"}
+                disabled={currentAction !== "idle"}
                 className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
               >
-                {file ? "Change PDF…" : "Select PDF…"}
+                {selectedFile ? "Change PDF…" : "Select PDF…"}
               </button>
-              {file && (
+              {selectedFile && (
                 <p className="mt-2 text-sm text-gray-500 font-mono truncate">
-                  {file.name} ({(file.size / 1024).toFixed(1)} KB)
+                  {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
                 </p>
               )}
             </div>
 
-            {file && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {extractMode === "image" && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-800 mb-1">JPEG Quality</label>
-                    <input type="range" min={10} max={100} step={5} value={jpegQuality * 100} onChange={e => setJpegQuality(Number(e.target.value) / 100)} className="w-full" />
-                    <p className="mt-1 text-xs text-gray-500">{Math.round(jpegQuality * 100)}%</p>
+            {selectedFile && (
+              <div className="p-6 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+                {extractionMode === "image" && (
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-800">
+                      JPEG Quality ({Math.round(jpegQuality * 100)}%)
+                    </label>
+                    <input
+                      type="range"
+                      min={10}
+                      max={100}
+                      step={5}
+                      value={jpegQuality * 100}
+                      onChange={(e) => setJpegQuality(Number(e.target.value) / 100)}
+                      disabled={currentAction === "extract"}
+                      className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
                   </div>
                 )}
-                <div>
-                  <label className="block text-sm font-medium text-gray-800 mb-1">Extraction Mode</label>
-                  <select value={extractMode} onChange={handleModeChange} className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 transition">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-800">
+                    Extraction Mode
+                  </label>
+                  <select
+                    value={extractionMode}
+                    onChange={handleModeChange}
+                    disabled={currentAction === "extract"}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
                     <option value="image">Embed pages as images</option>
                     <option value="text">Extract editable text</option>
                   </select>
@@ -280,35 +304,31 @@ export default function PdfToolkitClient() {
             )}
           </div>
 
-          {/* Sağ sütun */}
+          {/* Right column */}
           <div className="flex flex-col justify-between">
-            {error && <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">{error}</div>}
-            {file && (
+            {errorMessage && (
+              <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+                {errorMessage}
+              </div>
+            )}
+            {selectedFile && (
               <div className="flex flex-wrap items-center gap-4">
                 <button
                   type="button"
-                  onClick={handleCompress}
-                  disabled={loading !== "idle"}
-                  className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition font-medium"
+                  onClick={compressPdfAndDownload}
+                  disabled={currentAction !== "idle"}
+                  className="flex items-center px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition font-medium"
                 >
-                  {loading === "compress" ? "Compressing…" : "Compress PDF"}
+                  {currentAction === "compress" ? "Compressing…" : "Download Compressed"}
                 </button>
-                {compressedBlob && (
-                  <button
-                    type="button"
-                    onClick={handleDownloadCompressed}
-                    className="px-6 py-2 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 transition font-medium"
-                  >
-                    Download Compressed
-                  </button>
-                )}
+
                 <button
                   type="button"
-                  onClick={handleExtractToWord}
-                  disabled={loading !== "idle"}
-                  className="px-6 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition font-medium"
+                  onClick={extractPdfToWordAndDownload}
+                  disabled={currentAction !== "idle"}
+                  className="flex items-center px-6 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition font-medium"
                 >
-                  {loading === "extract" ? "Converting…" : "Download as Word"}
+                  {currentAction === "extract" ? "Converting…" : "Download as Word"}
                 </button>
               </div>
             )}

@@ -1,41 +1,32 @@
-// types/pdfjs-dist-legacy.d.ts
+// types/pdfjs-worker.d.ts
+import type { PageViewport } from "pdfjs-dist/types/src/display/api";
 
-/**
- * Minimal types for the PDF.js “legacy” ESM build
- * (we import at runtime in the browser).
- */
 declare module "pdfjs-dist/legacy/build/pdf" {
-  export interface GlobalWorkerOptions {
-    workerSrc: string;
-  }
-  export namespace GlobalWorkerOptions {}
-
+  export interface GlobalWorkerOptions { workerSrc: string }
   export interface PDFDocumentProxy {
     numPages: number;
-    getPage(pageIndex: number): Promise<PDFPageProxy>;
+    getPage(index: number): Promise<PDFPageProxy>;
   }
-
   export interface PDFPageProxy {
+    getViewport(params: { scale: number }): PageViewport;
     getTextContent(): Promise<TextContent>;
+    render(params: {
+      canvasContext: CanvasRenderingContext2D;
+      viewport: PageViewport;
+    }): { promise: Promise<void> };
   }
-
-  export interface TextContent {
-    items: Array<{ str: string }>;
+  export interface TextItem {
+    str: string;
+    transform?: number[];
+    fontName?: string;
   }
-
+  export interface TextContent { items: TextItem[] }
   export function getDocument(
     source: string | Uint8Array | { data: ArrayBuffer }
-  ): {
-    promise: Promise<PDFDocumentProxy>;
-  };
-
+  ): { promise: Promise<PDFDocumentProxy> };
   export const GlobalWorkerOptions: GlobalWorkerOptions;
 }
 
-/**
- * `?url` sorgusuyla import edilen worker dosyasının
- * bize URL string olarak geldiğini TypeScript’e bildiriyoruz.
- */
 declare module "pdfjs-dist/legacy/build/pdf.worker.min.js?url" {
   const workerUrl: string;
   export default workerUrl;
