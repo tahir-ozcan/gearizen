@@ -8,11 +8,7 @@ import React, {
   useEffect,
   ChangeEvent,
 } from "react";
-import {
-  Trash2,
-  ClipboardCopy,
-  Check,
-} from "lucide-react";
+import { Trash2, ClipboardCopy, Check } from "lucide-react";
 import {
   html as beautifyHTML,
   css as beautifyCSS,
@@ -20,15 +16,10 @@ import {
 } from "js-beautify";
 
 export interface CodeFormatterMinifierProps {
-  /** Main heading text */
   heading?: string;
-  /** Subtitle/description text */
   description?: string;
-  /** Gradient classes for headings and accents */
   gradientClasses?: string;
-  /** Focus-ring Tailwind class */
   focusRingClass?: string;
-  /** Labels & placeholders */
   inputLabel?: string;
   languageLabel?: string;
   outputLabel?: string;
@@ -36,7 +27,6 @@ export interface CodeFormatterMinifierProps {
   placeholderOutput?: string;
   clearButtonLabel?: string;
   copyButtonLabel?: string;
-  /** Extra classes for overrides */
   rootClassName?: string;
   inputClassName?: string;
   outputClassName?: string;
@@ -115,18 +105,29 @@ export default function CodeFormatterMinifierClient({
         return;
       }
 
-      // Format & minify
+      // Formatting & minifying
       try {
         let fmt: string, min: string;
+
         if (language === "css") {
-          fmt = beautifyCSS(code, { indent_size: 2 });
+          fmt = beautifyCSS(code, {
+            indent_size: 2,
+            preserve_newlines: true,
+            max_preserve_newlines: 1,
+            wrap_line_length: 80,
+          });
           min = beautifyCSS(code, {
             indent_size: 0,
             max_preserve_newlines: 0,
             wrap_line_length: 0,
           });
         } else if (language === "js") {
-          fmt = beautifyJS(code, { indent_size: 2 });
+          fmt = beautifyJS(code, {
+            indent_size: 2,
+            preserve_newlines: true,
+            max_preserve_newlines: 1,
+            wrap_line_length: 80,
+          });
           min = beautifyJS(code, {
             indent_size: 0,
             max_preserve_newlines: 0,
@@ -135,7 +136,10 @@ export default function CodeFormatterMinifierClient({
         } else {
           fmt = beautifyHTML(code, {
             indent_size: 2,
-            wrap_line_length: 0,
+            indent_inner_html: true,
+            preserve_newlines: true,
+            max_preserve_newlines: 1,
+            wrap_line_length: 80,
           });
           min = beautifyHTML(code, {
             indent_size: 0,
@@ -143,6 +147,7 @@ export default function CodeFormatterMinifierClient({
             wrap_line_length: 0,
           });
         }
+
         setFormattedCode(fmt);
         setMinifiedCode(min);
         setError(null);
@@ -168,11 +173,12 @@ export default function CodeFormatterMinifierClient({
   }, []);
 
   const handleCopy = useCallback(async () => {
-    const output = error
-      ? ""
-      : minify
-      ? minifiedCode
-      : formattedCode;
+    const output =
+      error || (!formattedCode && !minifiedCode)
+        ? ""
+        : minify
+        ? minifiedCode
+        : formattedCode;
     if (!output) return;
     try {
       await navigator.clipboard.writeText(output);
@@ -186,6 +192,13 @@ export default function CodeFormatterMinifierClient({
   const handleLangChange = useCallback(
     (e: ChangeEvent<HTMLSelectElement>) => {
       setLanguage(e.target.value as "html" | "css" | "js");
+    },
+    []
+  );
+
+  const handleMinifyChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setMinify(e.target.checked);
     },
     []
   );
@@ -237,24 +250,67 @@ export default function CodeFormatterMinifierClient({
             />
           </div>
 
-          {/* Language Select */}
-          <div>
-            <label
-              htmlFor="language-select"
-              className="block text-sm font-medium text-gray-800 mb-1"
-            >
-              {languageLabel}
+          {/* Controls */}
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Language */}
+            <div>
+              <label
+                htmlFor="language-select"
+                className="block text-sm font-medium text-gray-800 mb-1"
+              >
+                {languageLabel}
+              </label>
+              <select
+                id="language-select"
+                value={language}
+                onChange={handleLangChange}
+                className={`w-32 p-2 bg-gray-50 border border-gray-300 rounded-md focus:outline-none ${focusRingClass}`}
+              >
+                <option value="html">HTML</option>
+                <option value="css">CSS</option>
+                <option value="js">JavaScript</option>
+              </select>
+            </div>
+
+            {/* Minify */}
+            <label className="flex items-center gap-2 mt-6">
+              <input
+                type="checkbox"
+                checked={minify}
+                onChange={handleMinifyChange}
+                className="h-4 w-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <span className="text-sm text-gray-800 select-none">
+                Minify
+              </span>
             </label>
-            <select
-              id="language-select"
-              value={language}
-              onChange={handleLangChange}
-              className={`w-full max-w-xs p-2 bg-gray-50 border border-gray-300 rounded-md focus:outline-none ${focusRingClass}`}
+
+            {/* Copy */}
+            <button
+              type="button"
+              onClick={handleCopy}
+              disabled={!outputValue}
+              aria-label={copyButtonLabel}
+              className={secondaryBtnClasses}
             >
-              <option value="html">HTML</option>
-              <option value="css">CSS</option>
-              <option value="js">JavaScript</option>
-            </select>
+              {copied ? (
+                <Check className="w-5 h-5" aria-hidden="true" />
+              ) : (
+                <ClipboardCopy className="w-5 h-5" aria-hidden="true" />
+              )}
+              {copyButtonLabel}
+            </button>
+
+            {/* Clear */}
+            <button
+              type="button"
+              onClick={clearAll}
+              aria-label={clearButtonLabel}
+              className={secondaryBtnClasses}
+            >
+              <Trash2 className="w-5 h-5" aria-hidden="true" />
+              {clearButtonLabel}
+            </button>
           </div>
 
           {/* Output */}
@@ -275,44 +331,6 @@ export default function CodeFormatterMinifierClient({
               }
               aria-readonly
             />
-          </div>
-
-          {/* Controls (below output) */}
-          <div className="flex flex-wrap items-center gap-4">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={minify}
-                onChange={(e) => setMinify(e.target.checked)}
-                className="h-4 w-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              <span className="text-sm text-gray-800 select-none">
-                Minify
-              </span>
-            </label>
-            <button
-              type="button"
-              onClick={handleCopy}
-              disabled={!outputValue || !!error}
-              aria-label={copyButtonLabel}
-              className={secondaryBtnClasses}
-            >
-              {copied ? (
-                <Check className="w-5 h-5" aria-hidden="true" />
-              ) : (
-                <ClipboardCopy className="w-5 h-5" aria-hidden="true" />
-              )}
-              {copyButtonLabel}
-            </button>
-            <button
-              type="button"
-              onClick={clearAll}
-              aria-label={clearButtonLabel}
-              className={secondaryBtnClasses}
-            >
-              <Trash2 className="w-5 h-5" aria-hidden="true" />
-              {clearButtonLabel}
-            </button>
           </div>
         </div>
       </div>
