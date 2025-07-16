@@ -1,11 +1,9 @@
+// app/tools/base64-encoder-decoder/page.tsx
+import { Metadata } from "next";
+import Script from "next/script";
 import Base64EncoderDecoderClient from "./base64-encoder-decoder-client";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
-import Script from "next/script";
-import { Metadata } from "next";
 
-/**
- * Page metadata for SEO, Open Graph, and Twitter cards.
- */
 export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "Base64 Encoder & Decoder | Gearizen",
@@ -14,9 +12,14 @@ export const metadata: Metadata = {
   keywords: [
     "Base64 encoder",
     "Base64 decoder",
-    "online Base64 converter",
-    "drag-and-drop Base64",
-    "privacy-first tool",
+    "Base64 converter",
+    "online Base64 encoder decoder",
+    "drag and drop Base64",
+    "file to Base64",
+    "text to Base64",
+    "offline Base64 tool",
+    "privacy-first Base64",
+    "Gearizen Base64 tool",
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
   robots: { index: true, follow: true },
@@ -36,7 +39,7 @@ export const metadata: Metadata = {
         url: "https://gearizen.com/og/base64-encoder-decoder.png",
         width: 1200,
         height: 630,
-        alt: "Preview of the Base64 Encoder & Decoder tool",
+        alt: "Gearizen Base64 Encoder & Decoder Preview",
       },
     ],
   },
@@ -49,26 +52,22 @@ export const metadata: Metadata = {
     images: [
       {
         url: "https://gearizen.com/og/base64-encoder-decoder.png",
-        alt: "Base64 Encoder & Decoder Preview",
+        alt: "Preview of Gearizen Base64 Encoder & Decoder",
       },
     ],
   },
 };
 
-/**
- * Base64 Encoder & Decoder Page
- *
- * Embeds the client-side tool and injects JSON-LD for structured data.
- */
 export default function Base64EncoderDecoderPage() {
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "WebPage",
-        name: metadata.title,
-        url: metadata.alternates?.canonical,
-        description: metadata.description,
+        name: "Base64 Encoder & Decoder | Gearizen",
+        url: "https://gearizen.com/tools/base64-encoder-decoder",
+        description:
+          "Convert text and files to and from Base64 with drag-and-drop support—fully client-side, privacy-first, zero signup, instant results.",
         publisher: {
           "@type": "Organization",
           name: "Gearizen",
@@ -126,7 +125,7 @@ export default function Base64EncoderDecoderPage() {
   return (
     <>
       <Script
-        id="structured-data"
+        id="ld-json"
         type="application/ld+json"
         strategy="afterInteractive"
       >
@@ -138,11 +137,12 @@ export default function Base64EncoderDecoderPage() {
         pageUrl="https://gearizen.com/tools/base64-encoder-decoder"
       />
 
-      <main className="container mx-auto px-4 py-8">
-        <Base64EncoderDecoderClient
-          initialMode="encode"
-          // Pass custom translations, theme, or layout props here if needed
-        />
+      <main
+        id="base64-encoder-decoder-page"
+        aria-labelledby="base64-heading"
+        className="container mx-auto px-4 sm:px-6 lg:px-8 py-16"
+      >
+        <Base64EncoderDecoderClient />
       </main>
     </>
   );

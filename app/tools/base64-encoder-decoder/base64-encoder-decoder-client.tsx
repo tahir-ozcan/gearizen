@@ -1,300 +1,224 @@
+// app/tools/base64-encoder-decoder/base64-encoder-decoder-client.tsx
 "use client";
 
 import React, {
   useState,
   useRef,
+  useCallback,
   ChangeEvent,
   FormEvent,
   DragEvent,
   KeyboardEvent,
 } from "react";
-import dynamic from "next/dynamic";
+import { Trash2, ClipboardCopy, Paperclip } from "lucide-react";
 
-/** Dynamic imports for icons to reduce initial bundle size */
-const Trash2Icon = dynamic(() =>
-  import("lucide-react").then((mod) => mod.Trash2)
-);
-const ClipboardCopyIcon = dynamic(() =>
-  import("lucide-react").then((mod) => mod.ClipboardCopy)
-);
-const PaperclipIcon = dynamic(() =>
-  import("lucide-react").then((mod) => mod.Paperclip)
-);
-
-/**
- * Translations for all UI strings in the Base64 tool.
- */
-export interface Translations {
-  toolTitle: string;
-  inputLabelEncode: string;
-  inputLabelDecode: string;
-  inputPlaceholderEncode: string;
-  inputPlaceholderDecode: string;
-  outputLabelEncode: string;
-  outputLabelDecode: string;
-  outputPlaceholder: string;
-  encodeButtonLabel: string;
-  decodeButtonLabel: string;
-  clearButtonLabel: string;
-  switchToEncodeLabel: string;
-  switchToDecodeLabel: string;
-  copiedNotification: string;
-  copyErrorNotification: string;
-  encodingErrorMessage: string;
-  decodingErrorMessage: string;
-  dragDropHint: string;
-}
-
-/**
- * Theme tokens to allow overriding colors, fonts, etc.
- */
-export interface ThemeTokens {
-  primaryColor?: string;    /** e.g. "indigo-600" or CSS variable */
-  textColor?: string;
-  borderColor?: string;
-  backgroundColor?: string;
-  fontFamily?: string;      /** e.g. "font-mono" or "font-sans" */
-}
-
-/**
- * Layout options to show or hide specific UI features.
- */
-export interface LayoutOptions {
-  showDragDropArea?: boolean;
-  showIcons?: boolean;
-}
-
-/**
- * Props for Base64EncoderDecoderClient component.
- */
 export interface Base64EncoderDecoderProps {
-  /** Initial mode: 'encode' or 'decode'. Default 'encode'. */
+  /** Initial mode (“encode” or “decode”) */
   initialMode?: "encode" | "decode";
-  /** Override any of the default translations. */
-  translations?: Partial<Translations>;
-  /** Override default theme tokens. */
-  theme?: ThemeTokens;
-  /** Control visibility of extra UI features. */
-  layout?: LayoutOptions;
+  /** Main heading text */
+  heading?: string;
+  /** Subtitle/description text */
+  description?: string;
+  /** Gradient classes for headings and accents */
+  gradientClasses?: string;
+  /** Focus-ring Tailwind class */
+  focusRingClass?: string;
+  /** Labels & placeholders */
+  inputLabelEncode?: string;
+  inputLabelDecode?: string;
+  outputLabelEncode?: string;
+  outputLabelDecode?: string;
+  placeholderEncode?: string;
+  placeholderDecode?: string;
+  resultPlaceholder?: string;
+  encodeButtonLabel?: string;
+  decodeButtonLabel?: string;
+  clearButtonLabel?: string;
+  switchToEncodeLabel?: string;
+  switchToDecodeLabel?: string;
+  copyButtonAriaLabel?: string;
+  fileUploadButtonLabel?: string;
+  /** ARIA label for drop zone */
+  dropZoneLabel?: string;
+  /** Extra classes for the root container */
+  rootClassName?: string;
 }
 
-/** Default English translations. */
-const defaultTranslations: Translations = {
-  toolTitle: "Base64 Encoder/Decoder",
-  inputLabelEncode: "Text to Encode",
-  inputLabelDecode: "Base64 to Decode",
-  inputPlaceholderEncode: "Enter text or drop a file…",
-  inputPlaceholderDecode: "Enter Base64 string to decode…",
-  outputLabelEncode: "Base64 Output",
-  outputLabelDecode: "Decoded Text",
-  outputPlaceholder: "Result appears here…",
-  encodeButtonLabel: "Encode →",
-  decodeButtonLabel: "Decode →",
-  clearButtonLabel: "Clear All",
-  switchToEncodeLabel: "Switch to Encode",
-  switchToDecodeLabel: "Switch to Decode",
-  copiedNotification: "✅ Copied to clipboard!",
-  copyErrorNotification: "❌ Copy failed.",
-  encodingErrorMessage: "❌ Encoding failed.",
-  decodingErrorMessage: "❌ Decoding failed.",
-  dragDropHint: "Drag and drop a file here or click to select.",
-};
-
-/** Default theme settings. */
-const defaultTheme: Required<ThemeTokens> = {
-  primaryColor: "indigo-600",
-  textColor: "gray-900",
-  borderColor: "gray-300",
-  backgroundColor: "white",
-  fontFamily: "font-mono",
-};
-
-/** Default layout settings. */
-const defaultLayout: Required<LayoutOptions> = {
-  showDragDropArea: true,
-  showIcons: true,
-};
-
-/**
- * Base64 Encoder/Decoder Client Component
- *
- * Convert text and files to and from Base64, fully client-side and customizable.
- *
- * @example
- * ```tsx
- * <Base64EncoderDecoderClient
- *   initialMode="decode"
- *   translations={{ encodeButtonLabel: "Encode Base64" }}
- *   theme={{ primaryColor: "purple-500", fontFamily: "font-sans" }}
- *   layout={{ showIcons: false }}
- * />
- * ```
- */
 export default function Base64EncoderDecoderClient({
   initialMode = "encode",
-  translations = {},
-  theme = {},
-  layout = {},
+  heading = "Base64 Encoder/Decoder",
+  description =
+    "Convert text and files to and from Base64 with drag-and-drop support—no server, fully client-side.",
+  gradientClasses = "from-[#7c3aed] via-[#ec4899] to-[#fbbf24]",
+  focusRingClass = "focus:ring-[#7c3aed]",
+  inputLabelEncode = "Text to Encode",
+  inputLabelDecode = "Base64 to Decode",
+  outputLabelEncode = "Base64 Output",
+  outputLabelDecode = "Decoded Text",
+  placeholderEncode = "Enter text here…",
+  placeholderDecode = "Enter Base64 string…",
+  resultPlaceholder = "Result appears here…",
+  encodeButtonLabel = "Encode →",
+  decodeButtonLabel = "Decode →",
+  clearButtonLabel = "Clear All",
+  switchToEncodeLabel = "Switch to Encode",
+  switchToDecodeLabel = "Switch to Decode",
+  copyButtonAriaLabel = "Copy output",
+  fileUploadButtonLabel = "Upload File",
+  dropZoneLabel = "Drag & drop file here, or click to upload",
+  rootClassName = "",
 }: Base64EncoderDecoderProps) {
-  const t: Translations = { ...defaultTranslations, ...translations };
-  const th = { ...defaultTheme, ...theme };
-  const lo = { ...defaultLayout, ...layout };
-
   const [mode, setMode] = useState<"encode" | "decode">(initialMode);
-  const [input, setInput] = useState<string>("");
-  const [output, setOutput] = useState<string>("");
+  const [input, setInput] = useState("");
+  const [output, setOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
+
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  /** Focus the text input */
-  const focusInput = () => inputRef.current?.focus();
-
-  /**
-   * Clear all fields and reset focus.
-   */
-  function clearAll() {
+  const clearAll = useCallback(() => {
     setInput("");
     setOutput("");
     setError(null);
-    focusInput();
-  }
+    inputRef.current?.focus();
+  }, []);
 
-  /**
-   * Encode a UTF-8 string to Base64.
-   * @param text UTF-8 input
-   */
-  function encodeText(text: string): string {
-    if (!text) return "";
-    const utf8Bytes = new TextEncoder().encode(text);
-    return btoa(String.fromCharCode(...utf8Bytes));
-  }
+  const encodeText = useCallback((text: string) => {
+    const utf8 = unescape(encodeURIComponent(text));
+    return btoa(utf8);
+  }, []);
 
-  /**
-   * Decode a Base64 string to UTF-8.
-   * Throws if invalid input.
-   * @param base64 Base64 input
-   */
-  function decodeText(base64: string): string {
-    if (!base64) return "";
-    const binary = atob(base64);
-    const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
-    return new TextDecoder().decode(bytes);
-  }
+  const decodeText = useCallback((text: string) => {
+    const binary = atob(text);
+    return decodeURIComponent(escape(binary));
+  }, []);
 
-  /** Handle file drops for encoding */
-  function handleDrop(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    setError(null);
-    const file = e.dataTransfer.files[0];
-    if (!file) return;
+  const handleFile = useCallback((file: File) => {
     const reader = new FileReader();
     reader.onload = () => {
-      if (reader.result instanceof ArrayBuffer) {
-        const bytes = new Uint8Array(reader.result);
-        const str = String.fromCharCode(...bytes);
+      const result = reader.result;
+      if (result instanceof ArrayBuffer) {
+        const bytes = new Uint8Array(result);
+        let str = "";
+        for (const b of bytes) str += String.fromCharCode(b);
         setMode("encode");
         setInput("");
         setOutput(btoa(str));
       }
     };
     reader.readAsArrayBuffer(file);
-  }
+  }, []);
 
-  /** Prevent default dragover behavior */
-  function handleDragOver(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-  }
-
-  /** Trigger hidden file input on keyboard activation */
-  function handleDropZoneKeyDown(e: KeyboardEvent<HTMLDivElement>) {
-    if (e.key === "Enter" || e.key === " ") {
+  const handleDrop = useCallback(
+    (e: DragEvent<HTMLDivElement>) => {
       e.preventDefault();
-      fileInputRef.current?.click();
-    }
-  }
+      const file = e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    },
+    [handleFile]
+  );
 
-  /** Handle manual file selection */
-  function handleFileSelect(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.result instanceof ArrayBuffer) {
-        const bytes = new Uint8Array(reader.result);
-        setMode("encode");
-        setInput("");
-        setOutput(btoa(String.fromCharCode(...bytes)));
-      }
-    };
-    reader.readAsArrayBuffer(file);
-  }
-
-  /** Update input text */
-  function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    setInput(e.target.value);
-    setError(null);
-    setOutput("");
-  }
-
-  /** Process encode/decode on submit */
-  function handleSubmit(e: FormEvent) {
+  const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setError(null);
-    setOutput("");
-    try {
-      const result = mode === "encode" ? encodeText(input) : decodeText(input);
-      setOutput(result);
-    } catch {
-      setError(
-        mode === "encode" ? t.encodingErrorMessage : t.decodingErrorMessage
-      );
-    }
-  }
+  }, []);
 
-  /** Copy output to clipboard with user feedback */
-  async function copyOutput() {
+  const handleDropZoneKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        fileInputRef.current?.click();
+      }
+    },
+    []
+  );
+
+  const handleInputChange = useCallback(
+    (e: ChangeEvent<HTMLTextAreaElement>) => {
+      setInput(e.target.value);
+      setError(null);
+      setOutput("");
+    },
+    []
+  );
+
+  const handleSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault();
+      setError(null);
+      setOutput("");
+      try {
+        const result =
+          mode === "encode" ? encodeText(input) : decodeText(input);
+        setOutput(result);
+      } catch {
+        setError(
+          mode === "encode"
+            ? "❌ Encoding failed."
+            : "❌ Decoding failed."
+        );
+      }
+    },
+    [mode, input, encodeText, decodeText]
+  );
+
+  const handleCopy = useCallback(async () => {
     if (!output) return;
     try {
       await navigator.clipboard.writeText(output);
-      alert(t.copiedNotification);
+      alert("✅ Copied to clipboard!");
     } catch {
-      alert(t.copyErrorNotification);
+      alert("❌ Copy failed.");
     }
-  }
+  }, [output]);
+
+  const handleFileSelect = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) handleFile(file);
+    },
+    [handleFile]
+  );
 
   const inputCount = input.length.toLocaleString();
   const outputCount = output.length.toLocaleString();
 
   return (
     <section
-      id="base64-tool"
-      aria-labelledby="base64-tool-heading"
-      role="region"
-      className={`space-y-8 ${th.textColor}`}
+      id="base64-encoder-decoder"
+      aria-labelledby="base64-heading"
+      className={`space-y-12 text-gray-900 antialiased ${rootClassName}`}
     >
-      {/* Title & Hint */}
-      <div className="text-center">
-        <h1 id="base64-tool-heading" className="text-3xl font-bold">
-          {t.toolTitle}
+      {/* Heading & Subtitle */}
+      <div className="text-center space-y-4">
+        <h1
+          id="base64-heading"
+          className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight`}
+        >
+          {heading}
         </h1>
-        {lo.showDragDropArea && (
-          <p className="text-sm text-gray-600 mt-1">{t.dragDropHint}</p>
-        )}
+        <div
+          className={`mx-auto h-1 w-20 rounded-full bg-gradient-to-r ${gradientClasses}`}
+        />
+        <p className="mt-2 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          {description}
+        </p>
       </div>
 
+      {/* Tool Form */}
       <form
         onSubmit={handleSubmit}
-        className="max-w-3xl mx-auto space-y-6"
-        noValidate
+        className="max-w-3xl mx-auto space-y-8"
       >
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Input */}
-          <div className="flex flex-col">
-            <label htmlFor="base64-input" className="font-medium mb-1">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Textarea + File Upload */}
+          <div className="flex flex-col space-y-2">
+            <label
+              htmlFor="base64-input"
+              className="block text-sm font-medium text-gray-800"
+            >
               {mode === "encode"
-                ? t.inputLabelEncode
-                : t.inputLabelDecode}
+                ? inputLabelEncode
+                : inputLabelDecode}
             </label>
             <textarea
               id="base64-input"
@@ -303,67 +227,69 @@ export default function Base64EncoderDecoderClient({
               onChange={handleInputChange}
               placeholder={
                 mode === "encode"
-                  ? t.inputPlaceholderEncode
-                  : t.inputPlaceholderDecode
+                  ? placeholderEncode
+                  : placeholderDecode
               }
-              className={`
-                w-full min-h-[200px] p-3 border ${th.borderColor}
-                rounded focus:outline-none focus:ring-2 focus:ring-${th.primaryColor}
-                ${th.fontFamily}
-              `}
+              className={`w-full h-48 p-4 border border-gray-300 rounded-md bg-white ${focusRingClass} font-mono resize-y transition focus:outline-none`}
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="text-xs text-gray-500">
               {inputCount} characters
             </p>
+            <div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 transition text-sm"
+              >
+                <Paperclip className="w-5 h-5" />
+                {fileUploadButtonLabel}
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="sr-only"
+                onChange={handleFileSelect}
+              />
+            </div>
           </div>
 
-          {/* Output / Drag-Drop */}
+          {/* Drop-zone & Output */}
           <div
+            role="button"
+            tabIndex={0}
+            aria-label={dropZoneLabel}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onKeyDown={handleDropZoneKeyDown}
-            role={lo.showDragDropArea ? "button" : undefined}
-            tabIndex={lo.showDragDropArea ? 0 : undefined}
-            aria-label="File drop zone"
-            className={`
-              relative flex flex-col p-3 border ${th.borderColor}
-              rounded bg-gray-50 focus:outline-none focus:ring-2 focus:ring-${th.primaryColor}
-              ${!lo.showDragDropArea ? "pointer-events-none opacity-50" : ""}
-            `}
+            className="flex flex-col p-4 border-2 border-dashed border-gray-300 rounded-md hover:border-indigo-500 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500 transition cursor-pointer"
           >
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileSelect}
-              className="sr-only"
-            />
-            <label htmlFor="base64-output" className="font-medium mb-1">
+            <label
+              htmlFor="base64-output"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
               {mode === "encode"
-                ? t.outputLabelEncode
-                : t.outputLabelDecode}
+                ? outputLabelEncode
+                : outputLabelDecode}
             </label>
-            <textarea
-              id="base64-output"
-              value={output}
-              readOnly
-              placeholder={t.outputPlaceholder}
-              className={`
-                w-full min-h-[200px] p-3 pr-10 border ${th.borderColor}
-                rounded bg-gray-50 focus:outline-none focus:ring-2 focus:ring-${th.primaryColor}
-                ${th.fontFamily}
-              `}
-            />
-            {lo.showIcons && (
+            <div className="relative flex-1">
+              <textarea
+                id="base64-output"
+                value={output}
+                readOnly
+                placeholder={resultPlaceholder}
+                aria-live="polite"
+                className="w-full h-48 p-4 bg-transparent resize-none font-mono outline-none"
+              />
               <button
                 type="button"
-                onClick={copyOutput}
+                onClick={handleCopy}
                 disabled={!output}
-                aria-label="Copy output"
-                className="absolute top-2 right-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="absolute top-2 right-2 p-2 text-gray-500 hover:text-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition"
+                aria-label={copyButtonAriaLabel}
               >
-                <ClipboardCopyIcon />
+                <ClipboardCopy className="w-6 h-6" />
               </button>
-            )}
+            </div>
             <p className="mt-1 text-xs text-gray-500">
               {outputCount} characters
             </p>
@@ -371,45 +297,42 @@ export default function Base64EncoderDecoderClient({
         </div>
 
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded">
+          <div
+            role="alert"
+            className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md"
+          >
             {error}
           </div>
         )}
 
         {/* Actions */}
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap items-center gap-4">
           <button
             type="submit"
-            className={`
-              px-5 py-2 bg-${th.primaryColor} text-white rounded
-              focus:outline-none focus:ring-2 focus:ring-${th.primaryColor}
-            `}
+            className={`px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium`}
           >
             {mode === "encode"
-              ? t.encodeButtonLabel
-              : t.decodeButtonLabel}
+              ? encodeButtonLabel
+              : decodeButtonLabel}
           </button>
-
           <button
             type="button"
             onClick={clearAll}
-            className="inline-flex items-center gap-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-gray-300"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 transition text-sm"
           >
-            {lo.showIcons && <Trash2Icon />}
-            {t.clearButtonLabel}
+            <Trash2 className="w-5 h-5" />
+            {clearButtonLabel}
           </button>
-
           <button
             type="button"
             onClick={() =>
               setMode((m) => (m === "encode" ? "decode" : "encode"))
             }
-            className="inline-flex items-center gap-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition text-sm font-medium text-gray-700"
           >
-            {lo.showIcons && <PaperclipIcon />}
             {mode === "encode"
-              ? t.switchToDecodeLabel
-              : t.switchToEncodeLabel}
+              ? switchToDecodeLabel
+              : switchToEncodeLabel}
           </button>
         </div>
       </form>
