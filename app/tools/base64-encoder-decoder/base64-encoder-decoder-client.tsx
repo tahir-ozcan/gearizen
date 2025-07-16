@@ -255,7 +255,7 @@ export default function Base64EncoderDecoderClient({
       aria-labelledby="base64-heading"
       className={`text-gray-900 antialiased ${rootClassName}`}
     >
-      <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
         {/* Heading */}
         <header className="text-center space-y-6 mb-10">
           <h1
