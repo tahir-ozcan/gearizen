@@ -1,76 +1,69 @@
 // app/tools/color-toolkit/color-toolkit-client.tsx
 "use client";
 
-import React, { FC, useState, useEffect, ChangeEvent, useRef } from "react";
+import React, {
+  FC,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 
-/**
- * Props to override classes and labels at will.
- * Any prop you don’t set will fall back to a polished default.
- */
-export interface ColorToolkitClientProps {
-  // Class‐name overrides
-  containerClassName?: string;
-  headingWrapperClassName?: string;
-  headingClassName?: string;
-  dividerClassName?: string;
-  descriptionClassName?: string;
-  inputContainerClassName?: string;
-  colorPickerClassName?: string;
-  textInputClassName?: string;
-  formatGridClassName?: string;
-  paletteGridClassName?: string;
-  formatCardClassName?: string;
-  paletteCardClassName?: string;
-  copyButtonClassName?: string;
-  clearButtonClassName?: string;
-
-  // Label overrides
-  labels?: {
-    mainHeading?: string;
-    subHeading?: string;
-    colorLabel?: string;
-    placeholder?: string;
-    clearButton?: string;
-    copySuccess?: string;
-    copyFailure?: string;
-  };
-}
-
-// ─── Utility Functions ─────────────────────────────────────────────────────────
+// ─── Color Utility Functions ─────────────────────────────────────────────────
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
+
 function hexToRgb(hex: string) {
   const h = hex.replace(/^#/, "").trim();
   if (!/^[0-9A-Fa-f]{6}$/.test(h)) return null;
   const n = parseInt(h, 16);
   return { r: (n >> 16) & 0xff, g: (n >> 8) & 0xff, b: n & 0xff };
 }
+
 function rgbToHex(r: number, g: number, b: number): string {
-  const to2 = (n: number) => clamp(n, 0, 255).toString(16).padStart(2, "0");
+  const to2 = (n: number) =>
+    clamp(n, 0, 255).toString(16).padStart(2, "0");
   return `#${to2(r)}${to2(g)}${to2(b)}`;
 }
+
 function rgbToHsl(r: number, g: number, b: number) {
-  r /= 255; g /= 255; b /= 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b);
-  let h = 0, s = 0;
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
+  let h = 0,
+    s = 0;
   const l = (max + min) / 2;
   if (max !== min) {
     const d = max - min;
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
     switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
     }
     h *= 60;
   }
-  return { h: Math.round(h), s: Math.round(s * 100), l: Math.round(l * 100) };
+  return {
+    h: Math.round(h),
+    s: Math.round(s * 100),
+    l: Math.round(l * 100),
+  };
 }
+
 function hslToRgb(h: number, s: number, l: number) {
   h = ((h % 360) + 360) % 360;
-  s /= 100; l /= 100;
+  s /= 100;
+  l /= 100;
   const c = (1 - Math.abs(2 * l - 1)) * s;
   const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
   const m = l - c / 2;
@@ -80,15 +73,18 @@ function hslToRgb(h: number, s: number, l: number) {
   else if (h < 180) [r1, g1, b1] = [0, c, x];
   else if (h < 240) [r1, g1, b1] = [0, x, c];
   else if (h < 300) [r1, g1, b1] = [x, 0, c];
-  else [r1, g1, b1] = [c, 0, x];
+  else [r1, g1, b1] = [c, 0, 0];
   return {
     r: Math.round((r1 + m) * 255),
     g: Math.round((g1 + m) * 255),
     b: Math.round((b1 + m) * 255),
   };
 }
+
 function rgbToCmyk(r: number, g: number, b: number) {
-  const rr = r / 255, gg = g / 255, bb = b / 255;
+  const rr = r / 255,
+    gg = g / 255,
+    bb = b / 255;
   const k = 1 - Math.max(rr, gg, bb);
   const c = k === 1 ? 0 : (1 - rr - k) / (1 - k);
   const m = k === 1 ? 0 : (1 - gg - k) / (1 - k);
@@ -100,12 +96,20 @@ function rgbToCmyk(r: number, g: number, b: number) {
     k: Math.round(k * 100),
   };
 }
-function shiftLightness(h: number, s: number, l: number, delta: number) {
+
+function shiftLightness(
+  h: number,
+  s: number,
+  l: number,
+  delta: number
+) {
   return { h, s, l: clamp(l + delta, 0, 100) };
 }
+
 function complementary(h: number) {
   return (h + 180) % 360;
 }
+
 function luminance(r: number, g: number, b: number) {
   const toLin = (v: number) => {
     v /= 255;
@@ -113,132 +117,101 @@ function luminance(r: number, g: number, b: number) {
       ? v / 12.92
       : Math.pow((v + 0.055) / 1.055, 2.4);
   };
-  return 0.2126 * toLin(r) + 0.7152 * toLin(g) + 0.0722 * toLin(b);
+  return (
+    0.2126 * toLin(r) +
+    0.7152 * toLin(g) +
+    0.0722 * toLin(b)
+  );
 }
+
 function contrastRatio(
   c1: { r: number; g: number; b: number },
   c2: { r: number; g: number; b: number }
 ) {
   const L1 = luminance(c1.r, c1.g, c1.b);
   const L2 = luminance(c2.r, c2.g, c2.b);
-  return ((Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05)).toFixed(2);
+  return ((Math.max(L1, L2) + 0.05) /
+    (Math.min(L1, L2) + 0.05)
+  ).toFixed(2);
 }
 
-// ─── Subcomponents ────────────────────────────────────────────────────────────
+// ─── Reusable UI Subcomponents ────────────────────────────────────────────────
+
+const defaultButtonClasses =
+  "inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
 
 type FormatCardProps = {
   label: string;
   value: string;
   onCopy: () => void;
-  className?: string;
-  copyButtonClassName?: string;
 };
-const FormatCard: FC<FormatCardProps> = ({
-  label,
-  value,
-  onCopy,
-  className = "",
-  copyButtonClassName = "",
-}) => (
-  <div className={`p-4 bg-gray-50 rounded-lg text-center ${className}`}>
-    <p className="text-sm text-gray-600 mb-1">{label}</p>
-    <p className="font-mono text-indigo-600 break-all">{value}</p>
-    <button
-      onClick={onCopy}
-      aria-label={`Copy ${label}`}
-      className={`mt-2 ${copyButtonClassName} focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-    >
-      Copy
-    </button>
-  </div>
+const FormatCard: FC<FormatCardProps> = React.memo(
+  ({ label, value, onCopy }) => (
+    <div className="p-4 bg-gray-50 rounded-lg text-center">
+      <p className="text-sm text-gray-600 mb-1">{label}</p>
+      <p className="font-mono text-indigo-600 break-all">{value}</p>
+      <button
+        type="button"
+        onClick={onCopy}
+        aria-label={`Copy ${label}`}
+        className={`${defaultButtonClasses} mt-2 text-sm`}
+      >
+        Copy
+      </button>
+    </div>
+  )
 );
+FormatCard.displayName = "FormatCard";
 
 type PaletteCardProps = {
   label: string;
   color: string;
   onCopy: () => void;
-  className?: string;
-  copyButtonClassName?: string;
 };
-const PaletteCard: FC<PaletteCardProps> = ({
-  label,
-  color,
-  onCopy,
-  className = "",
-  copyButtonClassName = "",
-}) => (
-  <div
-    className={`p-4 rounded-lg text-center ${className}`}
-    style={{ backgroundColor: color }}
-  >
-    <p className="text-sm text-white mb-1">{label}</p>
-    <p className="font-mono text-white break-all">{color}</p>
-    <button
-      onClick={onCopy}
-      aria-label={`Copy ${label} color`}
-      className={`mt-2 ${copyButtonClassName} focus:outline-none focus:ring-2 focus:ring-white`}
+const PaletteCard: FC<PaletteCardProps> = React.memo(
+  ({ label, color, onCopy }) => (
+    <div
+      className="p-4 rounded-lg text-center"
+      style={{ backgroundColor: color }}
     >
-      Copy
-    </button>
-  </div>
+      <p className="text-sm text-white mb-1">{label}</p>
+      <p className="font-mono text-white break-all">{color}</p>
+      <button
+        type="button"
+        onClick={onCopy}
+        aria-label={`Copy ${label} color`}
+        className={`${defaultButtonClasses} mt-2 text-sm bg-white bg-opacity-20 hover:bg-opacity-30 focus:ring-white`}
+      >
+        Copy
+      </button>
+    </div>
+  )
 );
+PaletteCard.displayName = "PaletteCard";
 
-const defaultClasses = {
-  button: [
-    "inline-flex",
-    "items-center",
-    "gap-2",
-    "px-6",
-    "py-2",
-    "bg-gray-100",
-    "text-gray-700",
-    "rounded-md",
-    "hover:bg-gray-200",
-    "focus:outline-none",
-    "focus:ring-2",
-    "focus:ring-gray-300",
-    "transition",
-  ].join(" "),
-};
+// ─── Main Client Component ───────────────────────────────────────────────────
 
-// ─── Main Component ────────────────────────────────────────────────────────────
-
-export const ColorToolkitClient: FC<ColorToolkitClientProps> = ({
-  containerClassName = "",
-  headingWrapperClassName = "",
-  headingClassName = "",
-  dividerClassName = "",
-  descriptionClassName = "",
-  inputContainerClassName = "",
-  colorPickerClassName = "",
-  textInputClassName = "",
-  formatGridClassName = "",
-  paletteGridClassName = "",
-  formatCardClassName = "",
-  paletteCardClassName = "",
-  copyButtonClassName = "",
-  clearButtonClassName = "",
-  labels = {},
-}) => {
-  // State
+export const ColorToolkitClient: FC = () => {
   const [inputValue, setInputValue] = useState<string>("#4f46e5");
   const [hex, setHex] = useState<string>("");
   const [rgb, setRgb] = useState<{ r: number; g: number; b: number } | null>(
     null
   );
-  const [hsl, setHsl] = useState<{ h: number; s: number; l: number } | null>(
+  const [
+    hsl,
+    setHsl,
+  ] = useState<{ h: number; s: number; l: number } | null>(null);
+  const [
+    cmyk,
+    setCmyk,
+  ] = useState<{ c: number; m: number; y: number; k: number } | null>(
     null
   );
-  const [cmyk, setCmyk] = useState<{
-    c: number;
-    m: number;
-    y: number;
-    k: number;
-  } | null>(null);
   const [copyStatus, setCopyStatus] = useState<string>("");
+  const [isCopying, setIsCopying] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Parse on input change
+  // Parse color on input changes
   useEffect(() => {
     const v = inputValue.trim();
     let newHex: string | null = null;
@@ -265,13 +238,11 @@ export const ColorToolkitClient: FC<ColorToolkitClientProps> = ({
     }
 
     if (newHex) {
-      const cRgb = hexToRgb(newHex)!;
-      const cHsl = rgbToHsl(cRgb.r, cRgb.g, cRgb.b);
-      const cCmyk = rgbToCmyk(cRgb.r, cRgb.g, cRgb.b);
+      const rgbObj = hexToRgb(newHex)!;
       setHex(newHex);
-      setRgb(cRgb);
-      setHsl(cHsl);
-      setCmyk(cCmyk);
+      setRgb(rgbObj);
+      setHsl(rgbToHsl(rgbObj.r, rgbObj.g, rgbObj.b));
+      setCmyk(rgbToCmyk(rgbObj.r, rgbObj.g, rgbObj.b));
     } else {
       setHex("");
       setRgb(null);
@@ -280,100 +251,92 @@ export const ColorToolkitClient: FC<ColorToolkitClientProps> = ({
     }
   }, [inputValue]);
 
-  // Copy helper with ARIA‐live status
-  const copyToClipboard = async (text: string) => {
+  // Copy helper
+  const copyToClipboard = useCallback(async (text: string) => {
+    setIsCopying(true);
     try {
       await navigator.clipboard.writeText(text);
-      setCopyStatus(labels.copySuccess || "Copied!");
+      setCopyStatus("Copied!");
     } catch {
-      setCopyStatus(labels.copyFailure || "Copy failed");
+      setCopyStatus("Copy failed");
+    } finally {
+      setIsCopying(false);
+      setTimeout(() => setCopyStatus(""), 2000);
     }
-    setTimeout(() => setCopyStatus(""), 2000);
-  };
+  }, []);
+
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      setInputValue(e.target.value),
+    []
+  );
+
+  const handleColorPicker = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      setInputValue(e.target.value),
+    []
+  );
+
+  const handleClear = useCallback(() => {
+    setInputValue("");
+    inputRef.current?.focus();
+  }, []);
 
   return (
     <section
       id="color-toolkit"
       aria-labelledby="color-toolkit-heading"
-      className={`space-y-16 antialiased mx-auto ${containerClassName}`}
+      className="space-y-8"
     >
-      {/* Hidden live region for copy status */}
+      {/* Live region for copy feedback */}
       <div aria-live="polite" className="sr-only">
-        {copyStatus}
+        {isCopying ? "Copying..." : copyStatus}
       </div>
 
-      {/* Heading */}
-      <div
-        className={`text-center space-y-6 ${headingWrapperClassName}`}
-      >
-        <h1
-          id="color-toolkit-heading"
-          className={`${
-            labels.mainHeading
-              ? ""
-              : "bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]"
-          } text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight ${
-            headingClassName
-          }`}
-        >
-          {labels.mainHeading ||
-            "Color Toolkit: Converter & Contrast Checker"}
-        </h1>
-        <div
-          className={`mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] ${dividerClassName}`}
-        />
-        <p
-          className={`mx-auto max-w-2xl text-lg sm:text-xl text-gray-700 leading-relaxed ${descriptionClassName}`}
-        >
-          {labels.subHeading ||
-            "Translate colors between HEX, RGB, HSL & CMYK and verify WCAG-compliant contrast ratios—copy any code or ratio with one click."}
-        </p>
-      </div>
-
-      {/* Input */}
-      <div
-        className={`max-w-lg mx-auto space-y-4 ${inputContainerClassName}`}
-      >
+      {/* Input controls */}
+      <div className="max-w-md mx-auto space-y-4">
         <label
           htmlFor="color-input"
           className="block text-sm font-medium text-gray-800"
         >
-          {labels.colorLabel || "Color"}
+          Color
         </label>
         <div className="flex items-center gap-3">
           <input
             id="color-input"
             type="color"
             value={hex || "#000000"}
-            onChange={(e) => setInputValue(e.target.value)}
-            className={`rounded ${colorPickerClassName}`}
+            onChange={handleColorPicker}
+            className="h-10 w-10 p-0 border-none rounded focus:outline-none"
           />
           <input
             ref={inputRef}
             type="text"
             value={inputValue}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setInputValue(e.target.value)
-            }
-            placeholder={
-              labels.placeholder || "#rrggbb or rgb(...) or hsl(...)"
-            }
-            className={`flex-1 ${textInputClassName}`}
+            onChange={handleInputChange}
+            placeholder="#rrggbb or rgb(...) or hsl(...)"
+            className="flex-1 border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            aria-invalid={!!inputValue && !hex}
           />
         </div>
       </div>
 
-      {/* Formats & Palette */}
+      {/* Validation/Error */}
+      {!!inputValue && !hex && (
+        <p className="text-center text-red-600">
+          Invalid format. Use #rrggbb, rgb(...), or hsl(...).
+        </p>
+      )}
+
+      {/* Results */}
       {rgb && hsl && cmyk && (
         <div className="space-y-8">
-          {/* Format Cards */}
-          <div className={`grid grid-cols-1 sm:grid-cols-4 gap-4 ${formatGridClassName}`}>
+          {/* Format outputs */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <FormatCard
               label="HEX"
               value={hex}
               onCopy={() => copyToClipboard(hex)}
-              className={formatCardClassName}
-              copyButtonClassName={copyButtonClassName}
             />
             <FormatCard
               label="RGB"
@@ -381,17 +344,15 @@ export const ColorToolkitClient: FC<ColorToolkitClientProps> = ({
               onCopy={() =>
                 copyToClipboard(`rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`)
               }
-              className={formatCardClassName}
-              copyButtonClassName={copyButtonClassName}
             />
             <FormatCard
               label="HSL"
               value={`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`}
               onCopy={() =>
-                copyToClipboard(`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`)
+                copyToClipboard(
+                  `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`
+                )
               }
-              className={formatCardClassName}
-              copyButtonClassName={copyButtonClassName}
             />
             <FormatCard
               label="CMYK"
@@ -401,71 +362,92 @@ export const ColorToolkitClient: FC<ColorToolkitClientProps> = ({
                   `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`
                 )
               }
-              className={formatCardClassName}
-              copyButtonClassName={copyButtonClassName}
             />
           </div>
 
-          {/* Palette: Complement, Tints, Shades */}
-          <div
-            className={`grid grid-cols-1 sm:grid-cols-4 gap-4 ${paletteGridClassName}`}
-          >
+          {/* Palette: complement, tints, shade */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Complement */}
             {(() => {
               const compH = complementary(hsl.h);
-              const { r, g, b } = hslToRgb(compH, hsl.s, hsl.l);
-              const compHex = rgbToHex(r, g, b);
+              const compRgb = hslToRgb(compH, hsl.s, hsl.l);
+              const compHex = rgbToHex(
+                compRgb.r,
+                compRgb.g,
+                compRgb.b
+              );
               return (
                 <PaletteCard
                   key="complement"
                   label="Complement"
                   color={compHex}
                   onCopy={() => copyToClipboard(compHex)}
-                  className={paletteCardClassName}
-                  copyButtonClassName={copyButtonClassName}
                 />
               );
             })()}
 
             {/* Tints */}
             {[20, 40].map((d) => {
-              const tintHsl = shiftLightness(hsl.h, hsl.s, hsl.l, d);
-              const { r, g, b } = hslToRgb(tintHsl.h, tintHsl.s, tintHsl.l);
-              const tintHex = rgbToHex(r, g, b);
-
+              const tintHsl = shiftLightness(
+                hsl.h,
+                hsl.s,
+                hsl.l,
+                d
+              );
+              const tintRgb = hslToRgb(
+                tintHsl.h,
+                tintHsl.s,
+                tintHsl.l
+              );
+              const tintHex = rgbToHex(
+                tintRgb.r,
+                tintRgb.g,
+                tintRgb.b
+              );
               return (
                 <PaletteCard
                   key={`tint-${d}`}
                   label={`Tint +${d}%`}
                   color={tintHex}
                   onCopy={() => copyToClipboard(tintHex)}
-                  className={paletteCardClassName}
-                  copyButtonClassName={copyButtonClassName}
                 />
               );
             })}
 
             {/* Shade */}
             {(() => {
-              const shadeHsl = shiftLightness(hsl.h, hsl.s, hsl.l, -20);
-              const { r, g, b } = hslToRgb(shadeHsl.h, shadeHsl.s, shadeHsl.l);
-              const shadeHex = rgbToHex(r, g, b);
-
+              const shadeHsl = shiftLightness(
+                hsl.h,
+                hsl.s,
+                hsl.l,
+                -20
+              );
+              const shadeRgb = hslToRgb(
+                shadeHsl.h,
+                shadeHsl.s,
+                shadeHsl.l
+              );
+              const shadeHex = rgbToHex(
+                shadeRgb.r,
+                shadeRgb.g,
+                shadeRgb.b
+              );
               return (
                 <PaletteCard
                   key="shade-20"
                   label="Shade -20%"
                   color={shadeHex}
                   onCopy={() => copyToClipboard(shadeHex)}
-                  className={paletteCardClassName}
-                  copyButtonClassName={copyButtonClassName}
                 />
               );
             })()}
           </div>
 
-          {/* Contrast Ratio */}
+          {/* Contrast ratio */}
           <div className="p-4 bg-gray-50 rounded-lg text-center">
-            <p className="text-sm text-gray-600 mb-1">Contrast vs White</p>
+            <p className="text-sm text-gray-600 mb-1">
+              Contrast vs White
+            </p>
             <p className="font-mono text-indigo-600">
               {contrastRatio(rgb, { r: 255, g: 255, b: 255 })}:1
             </p>
@@ -476,16 +458,28 @@ export const ColorToolkitClient: FC<ColorToolkitClientProps> = ({
         </div>
       )}
 
-      {/* Clear */}
+      {/* Copy status visible */}
+      {copyStatus && (
+        <p
+          className={`text-center mt-2 text-sm ${
+            copyStatus.toLowerCase().includes("fail")
+              ? "text-red-600"
+              : "text-green-600"
+          }`}
+        >
+          {copyStatus}
+        </p>
+      )}
+
+      {/* Clear button */}
       <div className="text-center">
         <button
-          onClick={() => {
-            setInputValue("");
-            inputRef.current?.focus();
-          }}
-          className={`${defaultClasses.button} ${clearButtonClassName}`}
+          type="button"
+          onClick={handleClear}
+          disabled={!inputValue}
+          className={`${defaultButtonClasses} disabled:opacity-50`}
         >
-          {labels.clearButton || "Clear All"}
+          Clear All
         </button>
       </div>
     </section>
