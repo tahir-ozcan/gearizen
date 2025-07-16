@@ -85,7 +85,7 @@ export default function Base64EncoderDecoderClient({
     inputClassName ??
     [
       "w-full",
-      "min-h-[8rem]",
+      "min-h-[12rem]",
       "p-4",
       "bg-transparent",
       "rounded-md",
@@ -100,7 +100,7 @@ export default function Base64EncoderDecoderClient({
     outputClassName ??
     [
       "w-full",
-      "min-h-[8rem]",
+      "min-h-[12rem]",
       "p-4",
       "bg-gray-50",
       "border",
@@ -274,7 +274,7 @@ export default function Base64EncoderDecoderClient({
       className={`text-gray-900 antialiased m-0 p-0 ${rootClassName}`}
     >
       {/* Heading */}
-      <div className="text-center space-y-4 mb-10">
+      <div className="text-center space-y-6 mb-10">
         <h1
           id="base64-heading"
           className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight`}
@@ -289,7 +289,7 @@ export default function Base64EncoderDecoderClient({
         </p>
       </div>
 
-      <div className="max-w-2xl mx-auto space-y-8">
+      <div className="max-w-2xl mx-auto space-y-6">
         {/* Input Block */}
         <div>
           <label
