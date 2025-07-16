@@ -132,7 +132,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             We just launched our site! Some tools may be incomplete or buggy
             — we’re fixing them now.
             <p className="mt-1 font-normal">
-              Last updated: July 15, 2025 at 17:49 (GMT+3). Feedback?{" "}
+              Last updated: July 16, 2025 at 21:00 (GMT+3). Feedback?{" "}
               <a
                 href="/contact"
                 className="underline hover:text-indigo-800"
