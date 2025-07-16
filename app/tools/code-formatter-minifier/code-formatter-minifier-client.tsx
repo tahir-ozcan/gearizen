@@ -29,8 +29,7 @@ export interface CodeFormatterMinifierProps {
   focusRingClass?: string;
   /** Labels & placeholders */
   inputLabel?: string;
-  outputLabelFormat?: string;
-  outputLabelMinify?: string;
+  outputLabel?: string;
   placeholderInput?: string;
   placeholderOutput?: string;
   clearButtonLabel?: string;
@@ -49,8 +48,7 @@ export default function CodeFormatterMinifierClient({
   gradientClasses = "from-purple-500 via-pink-500 to-yellow-400",
   focusRingClass = "focus:ring-purple-500",
   inputLabel = "Your Code",
-  outputLabelFormat = "Beautified Code",
-  outputLabelMinify = "Minified Code",
+  outputLabel = "Output",
   placeholderInput = "Enter HTML, CSS, or JS code here…",
   placeholderOutput = "Result appears here…",
   clearButtonLabel = "Clear All",
@@ -63,8 +61,9 @@ export default function CodeFormatterMinifierClient({
   const [inputCode, setInputCode] = useState("");
   const [formattedCode, setFormattedCode] = useState("");
   const [minifiedCode, setMinifiedCode] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [minify, setMinify] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -80,70 +79,102 @@ export default function CodeFormatterMinifierClient({
 
   const detectLanguage = useCallback(
     (code: string): "html" | "css" | "js" => {
-      const trimmed = code.trim();
-      if (trimmed.startsWith("<")) return "html";
+      const t = code.trim();
+      if (t.startsWith("<")) return "html";
       if (/^\s*[.#]?[A-Za-z0-9_-]+\s*\{/.test(code)) return "css";
       return "js";
     },
     []
   );
 
-  const processCode = useCallback(
-    (code: string) => {
-      if (!code.trim()) {
-        setFormattedCode("");
-        setMinifiedCode("");
-        setError(null);
-        return;
-      }
-      try {
-        const lang = detectLanguage(code);
-        let fmt: string;
-        let min: string;
-        switch (lang) {
-          case "css":
-            fmt = beautifyCSS(code, { indent_size: 2 });
-            min = beautifyCSS(code, {
-              indent_size: 0,
-              max_preserve_newlines: 0,
-              wrap_line_length: 0,
-            });
-            break;
-          case "js":
-            fmt = beautifyJS(code, { indent_size: 2 });
-            min = beautifyJS(code, {
-              indent_size: 0,
-              max_preserve_newlines: 0,
-              wrap_line_length: 0,
-            });
-            break;
-          default:
-            fmt = beautifyHTML(code, {
-              indent_size: 2,
-              wrap_line_length: 0,
-            });
-            min = beautifyHTML(code, {
-              indent_size: 0,
-              max_preserve_newlines: 0,
-              wrap_line_length: 0,
-            });
-        }
-        setFormattedCode(fmt);
-        setMinifiedCode(min);
-        setError(null);
-      } catch {
-        setError("❌ Processing failed");
-        setFormattedCode("");
-        setMinifiedCode("");
-      }
-    },
-    [detectLanguage]
-  );
+const validateAndProcess = useCallback(
+  (code: string) => {
+    if (!code.trim()) {
+      setFormattedCode("");
+      setMinifiedCode("");
+      setError(null);
+      return;
+    }
 
-  // Run on every input change
+    const lang = detectLanguage(code);
+
+    // Syntax validation
+    try {
+      if (lang === "js") {
+        // JS syntax check
+        new Function(code);
+      } else if (lang === "html") {
+        // HTML syntax check
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(code, "text/html");
+        if (doc.querySelector("parsererror")) {
+          throw new Error("HTML syntax error");
+        }
+      } else {
+        // CSS basic braces check
+        const open = (code.match(/{/g) || []).length;
+        const close = (code.match(/}/g) || []).length;
+        if (open !== close) {
+          throw new Error("CSS syntax error: unmatched braces");
+        }
+      }
+    } catch (e: unknown) {
+      // e’yi güvenli şekilde Error’a daraltıyoruz
+      const message = e instanceof Error ? e.message : String(e);
+      setError(message);
+      setFormattedCode("");
+      setMinifiedCode("");
+      return;
+    }
+
+    // Formatting & minifying
+    try {
+      let fmt: string;
+      let min: string;
+      switch (lang) {
+        case "css":
+          fmt = beautifyCSS(code, { indent_size: 2 });
+          min = beautifyCSS(code, {
+            indent_size: 0,
+            max_preserve_newlines: 0,
+            wrap_line_length: 0,
+          });
+          break;
+        case "js":
+          fmt = beautifyJS(code, { indent_size: 2 });
+          min = beautifyJS(code, {
+            indent_size: 0,
+            max_preserve_newlines: 0,
+            wrap_line_length: 0,
+          });
+          break;
+        default:
+          fmt = beautifyHTML(code, {
+            indent_size: 2,
+            wrap_line_length: 0,
+          });
+          min = beautifyHTML(code, {
+            indent_size: 0,
+            max_preserve_newlines: 0,
+            wrap_line_length: 0,
+          });
+      }
+      setFormattedCode(fmt);
+      setMinifiedCode(min);
+      setError(null);
+    } catch {
+      setError("❌ Processing failed");
+      setFormattedCode("");
+      setMinifiedCode("");
+    }
+  },
+  [detectLanguage]
+);
+
+  // Re-run when input or toggle changes
   useEffect(() => {
-    processCode(inputCode);
-  }, [inputCode, processCode]);
+    validateAndProcess(inputCode);
+  }, [inputCode, validateAndProcess]);
 
   const clearAll = useCallback(() => {
     setInputCode("");
@@ -154,15 +185,26 @@ export default function CodeFormatterMinifierClient({
   }, []);
 
   const handleCopy = useCallback(async () => {
-    if (!formattedCode) return;
+    const outputValue = error
+      ? ""
+      : minify
+      ? minifiedCode
+      : formattedCode;
+    if (!outputValue) return;
     try {
-      await navigator.clipboard.writeText(formattedCode);
+      await navigator.clipboard.writeText(outputValue);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
       /* silent */
     }
-  }, [formattedCode]);
+  }, [formattedCode, minifiedCode, minify, error]);
+
+  const outputValue = error
+    ? error
+    : minify
+    ? minifiedCode
+    : formattedCode;
 
   return (
     <section
@@ -205,48 +247,40 @@ export default function CodeFormatterMinifierClient({
             />
           </div>
 
-          {/* Error */}
-          {error && (
-            <div
-              role="alert"
-              className="text-red-700 bg-red-50 border border-red-200 p-4 rounded-md"
-            >
-              {error}
-            </div>
-          )}
-
-          {/* Beautified Output */}
-          <div>
-            <label
-              htmlFor="formatted-output"
-              className="block text-sm font-medium text-gray-800 mb-1"
-            >
-              {outputLabelFormat}
-            </label>
-            <textarea
-              id="formatted-output"
-              value={formattedCode}
-              readOnly
-              placeholder={placeholderOutput}
-              className={baseOutputClasses}
-              aria-readonly
+          {/* Minify Toggle */}
+          <div className="flex items-center gap-2">
+            <input
+              id="minify-toggle"
+              type="checkbox"
+              checked={minify}
+              onChange={(e) => setMinify(e.target.checked)}
+              className="h-4 w-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
+            <label
+              htmlFor="minify-toggle"
+              className="text-sm text-gray-800 select-none"
+            >
+              Minify
+            </label>
           </div>
 
-          {/* Minified Output */}
+          {/* Single Output */}
           <div>
             <label
-              htmlFor="minified-output"
+              htmlFor="code-output"
               className="block text-sm font-medium text-gray-800 mb-1"
             >
-              {outputLabelMinify}
+              {outputLabel}
             </label>
             <textarea
-              id="minified-output"
-              value={minifiedCode}
+              id="code-output"
+              value={outputValue}
               readOnly
               placeholder={placeholderOutput}
-              className={baseOutputClasses}
+              className={
+                baseOutputClasses +
+                (error ? " text-red-700" : "")
+              }
               aria-readonly
             />
           </div>
@@ -256,7 +290,7 @@ export default function CodeFormatterMinifierClient({
             <button
               type="button"
               onClick={handleCopy}
-              disabled={!formattedCode}
+              disabled={!outputValue || !!error}
               aria-label={copyButtonLabel}
               className={secondaryBtnClasses}
             >
@@ -270,7 +304,6 @@ export default function CodeFormatterMinifierClient({
               )}
               {copyButtonLabel}
             </button>
-
             <button
               type="button"
               onClick={clearAll}
