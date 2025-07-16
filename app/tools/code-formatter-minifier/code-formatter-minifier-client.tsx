@@ -87,7 +87,7 @@ export default function CodeFormatterMinifierClient({
 
   const baseInputClasses =
     inputClassName ??
-    `w-full min-h-[14rem] p-4 bg-transparent rounded-md font-mono resize-y placeholder-gray-400 focus:outline-none ${focusRingClass}`;
+    `w-full min-h-[14rem] p-4 bg-gray-50 border border-gray-300 rounded-md font-mono resize-y placeholder-gray-400 focus:outline-none ${focusRingClass}`;
   const baseOutputClasses =
     outputClassName ??
     `w-full min-h-[14rem] p-4 bg-gray-50 border border-gray-300 rounded-md font-mono resize-none placeholder-gray-400 focus:outline-none ${focusRingClass}`;
@@ -190,15 +190,16 @@ export default function CodeFormatterMinifierClient({
       aria-labelledby="formatter-heading"
       className={`text-gray-900 antialiased ${rootClassName}`}
     >
-      <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
         {/* Heading */}
-        <header className="text-center space-y-4 mb-10">
+        <header className="text-center space-y-6 mb-10">
           <h1
             id="formatter-heading"
-            className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight`}
+            className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight`}
           >
             {heading}
           </h1>
+          <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
           <p className="text-lg sm:text-xl text-gray-600">
             {description}
           </p>
