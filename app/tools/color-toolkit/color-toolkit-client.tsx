@@ -1,13 +1,40 @@
 // app/tools/color-toolkit/color-toolkit-client.tsx
 "use client";
 
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { FC, useState, useEffect, ChangeEvent, useRef } from "react";
+
+/**
+ * Props to override classes and labels at will.
+ * Any prop you don’t set will fall back to a polished default.
+ */
+export interface ColorToolkitClientProps {
+  // Class‐name overrides
+  containerClassName?: string;
+  headingWrapperClassName?: string;
+  headingClassName?: string;
+  dividerClassName?: string;
+  descriptionClassName?: string;
+  inputContainerClassName?: string;
+  colorPickerClassName?: string;
+  textInputClassName?: string;
+  formatGridClassName?: string;
+  paletteGridClassName?: string;
+  formatCardClassName?: string;
+  paletteCardClassName?: string;
+  copyButtonClassName?: string;
+  clearButtonClassName?: string;
+
+  // Label overrides
+  labels?: {
+    mainHeading?: string;
+    subHeading?: string;
+    colorLabel?: string;
+    placeholder?: string;
+    clearButton?: string;
+    copySuccess?: string;
+    copyFailure?: string;
+  };
+}
 
 // ─── Utility Functions ─────────────────────────────────────────────────────────
 
@@ -73,12 +100,7 @@ function rgbToCmyk(r: number, g: number, b: number) {
     k: Math.round(k * 100),
   };
 }
-function shiftLightness(
-  h: number,
-  s: number,
-  l: number,
-  delta: number
-) {
+function shiftLightness(h: number, s: number, l: number, delta: number) {
   return { h, s, l: clamp(l + delta, 0, 100) };
 }
 function complementary(h: number) {
@@ -102,28 +124,29 @@ function contrastRatio(
   return ((Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05)).toFixed(2);
 }
 
-// ─── Reusable UI Components ─────────────────────────────────────────────────
-
-const defaultButtonClasses =
-  "inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition";
+// ─── Subcomponents ────────────────────────────────────────────────────────────
 
 type FormatCardProps = {
   label: string;
   value: string;
   onCopy: () => void;
+  className?: string;
+  copyButtonClassName?: string;
 };
-const FormatCard: React.FC<FormatCardProps> = ({
+const FormatCard: FC<FormatCardProps> = ({
   label,
   value,
   onCopy,
+  className = "",
+  copyButtonClassName = "",
 }) => (
-  <div className="p-4 bg-gray-50 rounded-lg text-center">
+  <div className={`p-4 bg-gray-50 rounded-lg text-center ${className}`}>
     <p className="text-sm text-gray-600 mb-1">{label}</p>
     <p className="font-mono text-indigo-600 break-all">{value}</p>
     <button
       onClick={onCopy}
       aria-label={`Copy ${label}`}
-      className={defaultButtonClasses}
+      className={`mt-2 ${copyButtonClassName} focus:outline-none focus:ring-2 focus:ring-indigo-500`}
     >
       Copy
     </button>
@@ -134,34 +157,70 @@ type PaletteCardProps = {
   label: string;
   color: string;
   onCopy: () => void;
+  className?: string;
+  copyButtonClassName?: string;
 };
-const PaletteCard: React.FC<PaletteCardProps> = ({
+const PaletteCard: FC<PaletteCardProps> = ({
   label,
   color,
   onCopy,
+  className = "",
+  copyButtonClassName = "",
 }) => (
   <div
-    className="p-4 rounded-lg text-center"
+    className={`p-4 rounded-lg text-center ${className}`}
     style={{ backgroundColor: color }}
   >
     <p className="text-sm text-white mb-1">{label}</p>
     <p className="font-mono text-white break-all">{color}</p>
     <button
       onClick={onCopy}
-      aria-label={`Copy ${label}`}
-      className={defaultButtonClasses.replace(
-        /bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500/,
-        "bg-white text-gray-800 hover:bg-gray-100 focus:ring-white"
-      )}
+      aria-label={`Copy ${label} color`}
+      className={`mt-2 ${copyButtonClassName} focus:outline-none focus:ring-2 focus:ring-white`}
     >
       Copy
     </button>
   </div>
 );
 
-// ─── Main Client Component ───────────────────────────────────────────────────
+const defaultClasses = {
+  button: [
+    "inline-flex",
+    "items-center",
+    "gap-2",
+    "px-6",
+    "py-2",
+    "bg-gray-100",
+    "text-gray-700",
+    "rounded-md",
+    "hover:bg-gray-200",
+    "focus:outline-none",
+    "focus:ring-2",
+    "focus:ring-gray-300",
+    "transition",
+  ].join(" "),
+};
 
-export default function ColorToolkitClient() {
+// ─── Main Component ────────────────────────────────────────────────────────────
+
+export const ColorToolkitClient: FC<ColorToolkitClientProps> = ({
+  containerClassName = "",
+  headingWrapperClassName = "",
+  headingClassName = "",
+  dividerClassName = "",
+  descriptionClassName = "",
+  inputContainerClassName = "",
+  colorPickerClassName = "",
+  textInputClassName = "",
+  formatGridClassName = "",
+  paletteGridClassName = "",
+  formatCardClassName = "",
+  paletteCardClassName = "",
+  copyButtonClassName = "",
+  clearButtonClassName = "",
+  labels = {},
+}) => {
+  // State
   const [inputValue, setInputValue] = useState<string>("#4f46e5");
   const [hex, setHex] = useState<string>("");
   const [rgb, setRgb] = useState<{ r: number; g: number; b: number } | null>(
@@ -221,75 +280,65 @@ export default function ColorToolkitClient() {
     }
   }, [inputValue]);
 
-  // Copy helper
-  const copyToClipboard = useCallback(async (text: string) => {
+  // Copy helper with ARIA‐live status
+  const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      setCopyStatus("Copied!");
+      setCopyStatus(labels.copySuccess || "Copied!");
     } catch {
-      setCopyStatus("Copy failed");
+      setCopyStatus(labels.copyFailure || "Copy failed");
     }
     setTimeout(() => setCopyStatus(""), 2000);
-  }, []);
-
-  // Build palette items
-  const palette = useMemo(() => {
-    if (!hsl) return [];
-    const list: { label: string; color: string }[] = [];
-
-    // Complement
-    const compH = complementary(hsl.h);
-    const compRgb = hslToRgb(compH, hsl.s, hsl.l);
-    list.push({
-      label: "Complement",
-      color: rgbToHex(compRgb.r, compRgb.g, compRgb.b),
-    });
-
-    // Tints
-    [20, 40].forEach((d) => {
-      const t = shiftLightness(hsl.h, hsl.s, hsl.l, d);
-      const trgb = hslToRgb(t.h, t.s, t.l);
-      list.push({
-        label: `Tint +${d}%`,
-        color: rgbToHex(trgb.r, trgb.g, trgb.b),
-      });
-    });
-
-    // Shade
-    const s = shiftLightness(hsl.h, hsl.s, hsl.l, -20);
-    const srgb = hslToRgb(s.h, s.s, s.l);
-    list.push({
-      label: "Shade -20%",
-      color: rgbToHex(srgb.r, srgb.g, srgb.b),
-    });
-
-    return list;
-  }, [hsl]);
-
-  // Validation
-  const isInvalid = useMemo(
-    () => inputValue.trim() !== "" && hex === "",
-    [inputValue, hex]
-  );
+  };
 
   return (
     <section
       id="color-toolkit"
       aria-labelledby="color-toolkit-heading"
-      className="space-y-12 antialiased"
+      className={`space-y-16 antialiased mx-auto ${containerClassName}`}
     >
-      {/* Live region for screen readers */}
+      {/* Hidden live region for copy status */}
       <div aria-live="polite" className="sr-only">
         {copyStatus}
       </div>
 
+      {/* Heading */}
+      <div
+        className={`text-center space-y-6 ${headingWrapperClassName}`}
+      >
+        <h1
+          id="color-toolkit-heading"
+          className={`${
+            labels.mainHeading
+              ? ""
+              : "bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]"
+          } text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight ${
+            headingClassName
+          }`}
+        >
+          {labels.mainHeading ||
+            "Color Toolkit: Converter & Contrast Checker"}
+        </h1>
+        <div
+          className={`mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] ${dividerClassName}`}
+        />
+        <p
+          className={`mx-auto max-w-2xl text-lg sm:text-xl text-gray-700 leading-relaxed ${descriptionClassName}`}
+        >
+          {labels.subHeading ||
+            "Translate colors between HEX, RGB, HSL & CMYK and verify WCAG-compliant contrast ratios—copy any code or ratio with one click."}
+        </p>
+      </div>
+
       {/* Input */}
-      <div className="max-w-lg mx-auto space-y-4">
+      <div
+        className={`max-w-lg mx-auto space-y-4 ${inputContainerClassName}`}
+      >
         <label
           htmlFor="color-input"
           className="block text-sm font-medium text-gray-800"
         >
-          Color
+          {labels.colorLabel || "Color"}
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -297,33 +346,34 @@ export default function ColorToolkitClient() {
             type="color"
             value={hex || "#000000"}
             onChange={(e) => setInputValue(e.target.value)}
-            className="w-12 h-12 p-0 border-none"
+            className={`rounded ${colorPickerClassName}`}
           />
           <input
             ref={inputRef}
             type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="#rrggbb or rgb(...) or hsl(...)"
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setInputValue(e.target.value)
+            }
+            placeholder={
+              labels.placeholder || "#rrggbb or rgb(...) or hsl(...)"
+            }
+            className={`flex-1 ${textInputClassName}`}
           />
         </div>
-        {isInvalid && (
-          <p role="alert" className="text-center text-red-600">
-            Invalid color format. Please enter a valid HEX, RGB, or HSL value.
-          </p>
-        )}
       </div>
 
-      {/* Results */}
+      {/* Formats & Palette */}
       {rgb && hsl && cmyk && (
         <div className="space-y-8">
-          {/* Formats */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          {/* Format Cards */}
+          <div className={`grid grid-cols-1 sm:grid-cols-4 gap-4 ${formatGridClassName}`}>
             <FormatCard
               label="HEX"
               value={hex}
               onCopy={() => copyToClipboard(hex)}
+              className={formatCardClassName}
+              copyButtonClassName={copyButtonClassName}
             />
             <FormatCard
               label="RGB"
@@ -331,6 +381,8 @@ export default function ColorToolkitClient() {
               onCopy={() =>
                 copyToClipboard(`rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`)
               }
+              className={formatCardClassName}
+              copyButtonClassName={copyButtonClassName}
             />
             <FormatCard
               label="HSL"
@@ -338,6 +390,8 @@ export default function ColorToolkitClient() {
               onCopy={() =>
                 copyToClipboard(`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`)
               }
+              className={formatCardClassName}
+              copyButtonClassName={copyButtonClassName}
             />
             <FormatCard
               label="CMYK"
@@ -347,22 +401,69 @@ export default function ColorToolkitClient() {
                   `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`
                 )
               }
+              className={formatCardClassName}
+              copyButtonClassName={copyButtonClassName}
             />
           </div>
 
-          {/* Palette */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            {palette.map(({ label, color }) => (
-              <PaletteCard
-                key={label}
-                label={label}
-                color={color}
-                onCopy={() => copyToClipboard(color)}
-              />
-            ))}
+          {/* Palette: Complement, Tints, Shades */}
+          <div
+            className={`grid grid-cols-1 sm:grid-cols-4 gap-4 ${paletteGridClassName}`}
+          >
+            {(() => {
+              const compH = complementary(hsl.h);
+              const { r, g, b } = hslToRgb(compH, hsl.s, hsl.l);
+              const compHex = rgbToHex(r, g, b);
+              return (
+                <PaletteCard
+                  key="complement"
+                  label="Complement"
+                  color={compHex}
+                  onCopy={() => copyToClipboard(compHex)}
+                  className={paletteCardClassName}
+                  copyButtonClassName={copyButtonClassName}
+                />
+              );
+            })()}
+
+            {/* Tints */}
+            {[20, 40].map((d) => {
+              const tintHsl = shiftLightness(hsl.h, hsl.s, hsl.l, d);
+              const { r, g, b } = hslToRgb(tintHsl.h, tintHsl.s, tintHsl.l);
+              const tintHex = rgbToHex(r, g, b);
+
+              return (
+                <PaletteCard
+                  key={`tint-${d}`}
+                  label={`Tint +${d}%`}
+                  color={tintHex}
+                  onCopy={() => copyToClipboard(tintHex)}
+                  className={paletteCardClassName}
+                  copyButtonClassName={copyButtonClassName}
+                />
+              );
+            })}
+
+            {/* Shade */}
+            {(() => {
+              const shadeHsl = shiftLightness(hsl.h, hsl.s, hsl.l, -20);
+              const { r, g, b } = hslToRgb(shadeHsl.h, shadeHsl.s, shadeHsl.l);
+              const shadeHex = rgbToHex(r, g, b);
+
+              return (
+                <PaletteCard
+                  key="shade-20"
+                  label="Shade -20%"
+                  color={shadeHex}
+                  onCopy={() => copyToClipboard(shadeHex)}
+                  className={paletteCardClassName}
+                  copyButtonClassName={copyButtonClassName}
+                />
+              );
+            })()}
           </div>
 
-          {/* Contrast */}
+          {/* Contrast Ratio */}
           <div className="p-4 bg-gray-50 rounded-lg text-center">
             <p className="text-sm text-gray-600 mb-1">Contrast vs White</p>
             <p className="font-mono text-indigo-600">
@@ -382,11 +483,11 @@ export default function ColorToolkitClient() {
             setInputValue("");
             inputRef.current?.focus();
           }}
-          className={defaultButtonClasses}
+          className={`${defaultClasses.button} ${clearButtonClassName}`}
         >
-          Clear All
+          {labels.clearButton || "Clear All"}
         </button>
       </div>
     </section>
   );
-}
+};
