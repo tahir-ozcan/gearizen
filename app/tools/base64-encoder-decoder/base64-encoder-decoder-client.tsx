@@ -2,7 +2,13 @@
 "use client";
 
 import React, { useState, useRef, useCallback } from "react";
-import { Trash2, ClipboardCopy, Check } from "lucide-react";
+import {
+  Trash2,
+  ClipboardCopy,
+  Check,
+  RotateCcw,
+  UploadCloud,
+} from "lucide-react";
 
 export interface Base64EncoderDecoderProps {
   /** Initial mode (“encode” or “decode”) */
@@ -39,8 +45,8 @@ export interface Base64EncoderDecoderProps {
   /** Override CSS class for drop zone wrapper */
   dropZoneClassName?: string;
   /** Override CSS class for primary action buttons */
-  buttonClassName?: string;
-  /** Override CSS class for secondary buttons */
+  primaryButtonClassName?: string;
+  /** Override CSS class for secondary action buttons */
   secondaryButtonClassName?: string;
 }
 
@@ -49,8 +55,8 @@ export default function Base64EncoderDecoderClient({
   heading = "Base64 Encoder/Decoder",
   description =
     "Convert text and files to/from Base64 with drag-and-drop—fully client-side.",
-  gradientClasses = "from-[#7c3aed] via-[#ec4899] to-[#fbbf24]",
-  focusRingClass = "focus:ring-[#7c3aed]",
+  gradientClasses = "from-purple-500 via-pink-500 to-yellow-400",
+  focusRingClass = "focus:ring-purple-500",
   inputLabelEncode = "Text to Encode",
   inputLabelDecode = "Base64 to Decode",
   outputLabelEncode = "Base64 Output",
@@ -68,7 +74,7 @@ export default function Base64EncoderDecoderClient({
   inputClassName,
   outputClassName,
   dropZoneClassName,
-  buttonClassName,
+  primaryButtonClassName,
   secondaryButtonClassName,
 }: Base64EncoderDecoderProps) {
   const [mode, setMode] = useState<"encode" | "decode">(initialMode);
@@ -83,63 +89,29 @@ export default function Base64EncoderDecoderClient({
 
   const baseInputClasses =
     inputClassName ??
-    [
-      "w-full",
-      "min-h-[12rem]",
-      "p-4",
-      "bg-transparent",
-      "rounded-md",
-      "font-mono",
-      "resize-y",
-      "placeholder-gray-400",
-      "focus:outline-none",
-      focusRingClass,
-    ].join(" ");
+    "w-full min-h-[12rem] p-4 bg-transparent rounded-md font-mono resize-y placeholder-gray-400 focus:outline-none " +
+      focusRingClass;
 
   const baseOutputClasses =
     outputClassName ??
-    [
-      "w-full",
-      "min-h-[12rem]",
-      "p-4",
-      "bg-gray-50",
-      "border",
-      "border-gray-300",
-      "rounded-md",
-      "font-mono",
-      "resize-none",
-      "placeholder-gray-400",
-      "focus:outline-none",
-      focusRingClass,
-    ].join(" ");
+    "w-full min-h-[12rem] p-4 bg-gray-50 border border-gray-300 rounded-md font-mono resize-none placeholder-gray-400 focus:outline-none " +
+      focusRingClass;
 
-  const dropZoneBase = dropZoneClassName ?? "w-full";
+  const dropZoneClasses =
+    dropZoneClassName ??
+    `w-full p-2 border-2 border-dashed rounded-md transition ${
+      isDragging
+        ? "border-blue-500 bg-blue-50"
+        : "border-gray-300 bg-white"
+    }`;
 
-  const primaryButtonClasses =
-    buttonClassName ??
-    [
-      "px-6",
-      "py-2",
-      "rounded-md",
-      "font-medium",
-      "focus-visible:outline-none",
-      "focus-visible:ring-2",
-      "focus-visible:ring-indigo-500",
-      "transition",
-    ].join(" ");
+  const primaryBtnClasses =
+    primaryButtonClassName ??
+    "inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed";
 
-  const secondaryButtonClasses =
+  const secondaryBtnClasses =
     secondaryButtonClassName ??
-    [
-      "px-4",
-      "py-2",
-      "rounded-md",
-      "text-sm",
-      "focus-visible:outline-none",
-      "focus-visible:ring-2",
-      "focus-visible:ring-gray-300",
-      "transition",
-    ].join(" ");
+    "inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-md transition hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300";
 
   const encodeText = useCallback((text: string) => {
     const encoder = new TextEncoder();
@@ -166,7 +138,8 @@ export default function Base64EncoderDecoderClient({
         return;
       }
       try {
-        const result = mode === "encode" ? encodeText(text) : decodeText(text);
+        const result =
+          mode === "encode" ? encodeText(text) : decodeText(text);
         setOutputText(result);
         setError(null);
       } catch {
@@ -267,153 +240,173 @@ export default function Base64EncoderDecoderClient({
     inputRef.current?.focus();
   }, []);
 
+  const toggleMode = useCallback(() => {
+    const newMode = mode === "encode" ? "decode" : "encode";
+    setMode(newMode);
+    setInputText(outputText);
+    setOutputText(inputText);
+    setError(null);
+    inputRef.current?.focus();
+  }, [mode, inputText, outputText]);
+
   return (
     <section
       id="base64-encoder-decoder"
       aria-labelledby="base64-heading"
-      className={`text-gray-900 antialiased m-0 p-0 ${rootClassName}`}
+      className={`text-gray-900 antialiased ${rootClassName}`}
     >
-      {/* Heading */}
-      <div className="text-center space-y-6 mb-10">
-        <h1
-          id="base64-heading"
-          className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight`}
-        >
-          {heading}
-        </h1>
-        <div
-          className={`mx-auto h-1 w-32 rounded-full bg-gradient-to-r ${gradientClasses}`}
-        />
-        <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-          {description}
-        </p>
-      </div>
+      <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        {/* Heading */}
+        <header className="text-center space-y-4 mb-10">
+          <h1
+            id="base64-heading"
+            className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight`}
+          >
+            {heading}
+          </h1>
+          <p className="text-lg sm:text-xl text-gray-600">
+            {description}
+          </p>
+        </header>
 
-      <div className="max-w-2xl mx-auto space-y-6">
-        {/* Input Block */}
-        <div>
-          <label
-            htmlFor="base64-input"
-            className="block text-sm font-medium text-gray-800 mb-1"
-          >
-            {mode === "encode" ? inputLabelEncode : inputLabelDecode}
-          </label>
-          <div
-            role="textbox"
-            aria-label={dropZoneLabel}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragEnter={handleDragEnter}
-            onDragLeave={handleDragLeave}
-            className={`${dropZoneBase} border-2 border-dashed ${
-              isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
-            } rounded-md transition`}
-          >
+        <div className="space-y-6">
+          {/* Input Block */}
+          <div>
+            <label
+              htmlFor="base64-input"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
+              {mode === "encode"
+                ? inputLabelEncode
+                : inputLabelDecode}
+            </label>
+            <div
+              role="region"
+              aria-labelledby="dropzone-label"
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              tabIndex={0}
+              className={dropZoneClasses}
+            >
+              <label id="dropzone-label" className="sr-only">
+                {dropZoneLabel}
+              </label>
+              <textarea
+                id="base64-input"
+                ref={inputRef}
+                value={inputText}
+                placeholder={
+                  mode === "encode"
+                    ? placeholderEncode
+                    : placeholderDecode
+                }
+                onChange={handleInputChange}
+                className={baseInputClasses}
+                aria-multiline
+              />
+            </div>
+          </div>
+
+          {/* Output Block */}
+          <div>
+            <label
+              htmlFor="base64-output"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
+              {mode === "encode"
+                ? outputLabelEncode
+                : outputLabelDecode}
+            </label>
             <textarea
-              id="base64-input"
-              ref={inputRef}
-              value={inputText}
-              placeholder={
-                mode === "encode" ? placeholderEncode : placeholderDecode
+              id="base64-output"
+              value={outputText}
+              readOnly
+              placeholder={resultPlaceholder}
+              className={baseOutputClasses}
+              aria-readonly
+            />
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div
+              role="alert"
+              className="text-red-700 bg-red-50 border border-red-200 p-4 rounded-md"
+            >
+              {error}
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex flex-wrap items-center gap-4">
+            <button
+              type="button"
+              onClick={handleCopy}
+              disabled={!outputText}
+              aria-label={copyButtonLabel}
+              className={primaryBtnClasses}
+            >
+              {copied ? (
+                <Check className="w-5 h-5" aria-hidden="true" />
+              ) : (
+                <ClipboardCopy
+                  className="w-5 h-5"
+                  aria-hidden="true"
+                />
+              )}
+              {copyButtonLabel}
+            </button>
+
+            <button
+              type="button"
+              onClick={clearAll}
+              aria-label={clearButtonLabel}
+              className={secondaryBtnClasses}
+            >
+              <Trash2 className="w-5 h-5" aria-hidden="true" />
+              {clearButtonLabel}
+            </button>
+
+            <button
+              type="button"
+              onClick={toggleMode}
+              aria-label={
+                mode === "encode"
+                  ? switchToDecodeLabel
+                  : switchToEncodeLabel
               }
-              onChange={handleInputChange}
-              className={baseInputClasses}
-            />
-          </div>
-        </div>
-
-        {/* Output Block */}
-        <div>
-          <label
-            htmlFor="base64-output"
-            className="block text-sm font-medium text-gray-800 mb-1"
-          >
-            {mode === "encode" ? outputLabelEncode : outputLabelDecode}
-          </label>
-          <textarea
-            id="base64-output"
-            value={outputText}
-            readOnly
-            placeholder={resultPlaceholder}
-            className={baseOutputClasses}
-          />
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div
-            role="alert"
-            className="text-red-700 bg-red-50 border border-red-200 p-4 rounded-md"
-          >
-            {error}
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="flex flex-wrap items-center gap-4">
-          <button
-            type="button"
-            onClick={handleCopy}
-            disabled={!outputText}
-            aria-label={copyButtonLabel}
-            className={`${primaryButtonClasses} bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            {copied ? (
-              <Check
-                className="w-5 h-5 inline mr-2"
+              className={secondaryBtnClasses}
+            >
+              <RotateCcw
+                className="w-5 h-5"
                 aria-hidden="true"
               />
-            ) : (
-              <ClipboardCopy
-                className="w-5 h-5 inline mr-2"
+              {mode === "encode"
+                ? switchToDecodeLabel
+                : switchToEncodeLabel}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              aria-label={fileUploadButtonLabel}
+              className={secondaryBtnClasses}
+            >
+              <UploadCloud
+                className="w-5 h-5"
                 aria-hidden="true"
               />
-            )}
-            {copyButtonLabel}
-          </button>
-
-          <button
-            type="button"
-            onClick={clearAll}
-            className={`${secondaryButtonClasses} bg-gray-100 text-gray-700 hover:bg-gray-200`}
-          >
-            <Trash2
-              className="w-5 h-5 inline mr-2"
-              aria-hidden="true"
+              {fileUploadButtonLabel}
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="sr-only"
+              onChange={handleFileSelect}
             />
-            {clearButtonLabel}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              const newMode = mode === "encode" ? "decode" : "encode";
-              const swappedInput = outputText;
-              const swappedOutput = inputText;
-              setInputText(swappedInput);
-              setOutputText(swappedOutput);
-              setMode(newMode);
-            }}
-            className={`${secondaryButtonClasses} bg-gray-100 text-gray-700 hover:bg-gray-200`}
-          >
-            {mode === "encode"
-              ? switchToDecodeLabel
-              : switchToEncodeLabel}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className={`${secondaryButtonClasses} bg-gray-100 text-gray-700 hover:bg-gray-200`}
-          >
-            {fileUploadButtonLabel}
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            className="sr-only"
-            onChange={handleFileSelect}
-          />
+          </div>
         </div>
       </div>
     </section>

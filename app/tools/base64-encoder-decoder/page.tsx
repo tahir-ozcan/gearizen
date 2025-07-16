@@ -23,7 +23,8 @@ export const metadata: Metadata = {
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
   robots: { index: true, follow: true },
   alternates: {
-    canonical: "https://gearizen.com/tools/base64-encoder-decoder",
+    canonical:
+      "https://gearizen.com/tools/base64-encoder-decoder",
   },
   openGraph: {
     title: "Base64 Encoder & Decoder | Gearizen",
@@ -35,7 +36,8 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://gearizen.com/og/base64-encoder-decoder.png",
+        url:
+          "https://gearizen.com/og/base64-encoder-decoder.png",
         width: 1200,
         height: 630,
         alt: "Gearizen Base64 Encoder & Decoder Preview",
@@ -50,7 +52,8 @@ export const metadata: Metadata = {
     creator: "@gearizen",
     images: [
       {
-        url: "https://gearizen.com/og/base64-encoder-decoder.png",
+        url:
+          "https://gearizen.com/og/base64-encoder-decoder.png",
         alt: "Preview of Gearizen Base64 Encoder & Decoder",
       },
     ],
@@ -63,7 +66,8 @@ const structuredData = {
     {
       "@type": "WebPage",
       name: "Base64 Encoder & Decoder | Gearizen",
-      url: "https://gearizen.com/tools/base64-encoder-decoder",
+      url:
+        "https://gearizen.com/tools/base64-encoder-decoder",
       description:
         "Convert text and files to/from Base64 with drag-and-drop support—fully client-side, privacy-first, zero signup, instant results.",
       publisher: {
@@ -79,7 +83,8 @@ const structuredData = {
     {
       "@type": "SoftwareApplication",
       name: "Base64 Encoder & Decoder",
-      url: "https://gearizen.com/tools/base64-encoder-decoder",
+      url:
+        "https://gearizen.com/tools/base64-encoder-decoder",
       applicationCategory: "Utilities",
       operatingSystem: "All",
       offers: {
@@ -96,7 +101,7 @@ const structuredData = {
   ],
 };
 
-export default function Base64EncoderDecoderPage() {
+export default function Page() {
   return (
     <>
       <Script
