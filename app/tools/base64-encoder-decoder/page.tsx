@@ -137,13 +137,7 @@ export default function Base64EncoderDecoderPage() {
         pageUrl="https://gearizen.com/tools/base64-encoder-decoder"
       />
 
-      <main
-        id="base64-encoder-decoder-page"
-        aria-labelledby="base64-heading"
-        className="container mx-auto px-4 sm:px-6 lg:px-8 py-16"
-      >
-        <Base64EncoderDecoderClient />
-      </main>
+      <Base64EncoderDecoderClient />
     </>
   );
 }

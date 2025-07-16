@@ -246,7 +246,7 @@ export default function Base64EncoderDecoderClient({
       <div className="text-center space-y-4 px-4">
         <h1
           id="base64-heading"
-          className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight`}
+          className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight`}
         >
           {heading}
         </h1>
