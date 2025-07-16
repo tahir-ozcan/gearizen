@@ -12,8 +12,8 @@ import {
   type TextItem,
   type TextContent,
 } from "pdfjs-dist/legacy/build/pdf";
-// Worker bundle (URL)
-import workerSrc from "pdfjs-dist/legacy/build/pdf.worker.min.js?url";
+// Worker bundle (URL) — artık .mjs uzantılı
+import workerSrc from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
 // Official DOCX types
 import {
   Document as DocxDocument,

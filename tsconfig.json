@@ -1,4 +1,3 @@
-// tsconfig.json
 {
   "compilerOptions": {
     /* Hedeflenen JS sürümü ve DOM / ESNext API’leri */
@@ -26,26 +25,20 @@
     /* Proje içi alias’lar */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      /* PDF.js bildirimlerimizi bu .d.ts dosyasına yönlendiriyoruz */
-      "pdfjs-dist/legacy/build/pdf": ["types/pdfjs-worker.d.ts"],
-      "pdfjs-dist/legacy/build/pdf.worker.min.js?url": ["types/pdfjs-worker.d.ts"]
+      "@/*": ["./*"]
     },
 
     /* Yeniden derleme hızlandırma */
     "incremental": true,
 
-    /* Özel tip köklerimiz */
+    /* Özel tip kökleri (ambient .d.ts dosyalarınız burada aranacak) */
     "typeRoots": ["./types", "./node_modules/@types"]
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-
-    /* .d.ts’lerimizi mutlaka derlemeye dahil ediyoruz */
-    "types/**/*.d.ts",
-    ".next/types/**/*.ts"
+    "types/**/*.d.ts"
   ],
   "exclude": ["node_modules"]
 }

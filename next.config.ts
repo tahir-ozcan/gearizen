@@ -3,19 +3,24 @@ import type { NextConfig } from "next";
 
 const ContentSecurityPolicy = [
   "default-src 'self';",
+  // Inline scripts are needed for Next.js hydration & Google Tag Manager
   "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://pagead2.googlesyndication.com;",
+  // Allow analytics & ads images + data URIs for our canvas exports
   "img-src 'self' data: https://www.google-analytics.com https://pagead2.googlesyndication.com;",
+  // Allow in-page styles for our Tailwind utility CSS
   "style-src 'self' 'unsafe-inline';",
+  // Allow fetch/beacon calls to analytics & ad endpoints
   "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://pagead2.googlesyndication.com;",
+  // Allow ad frames
   "frame-src https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com;"
 ].join(" ");
 
 const nextConfig: NextConfig = {
-  // PDF.js worker'ı public klasöründen sunuyoruz:
-  // - node_modules/pdfjs-dist/legacy/build/pdf.worker.min.js dosyasını
-  //   projenizin kökünde `public/pdf.worker.min.js` olarak kopyalamayı unutmayın.
+  // Eğer PDF.js worker'ı public/pdf.worker.min.js olarak kopyaladıysanız,
+  // webpack tarafında ekstra ayar yapmaya gerek kalmaz. workerSrc = '/pdf.worker.min.js'
+  // kodunuzda bu yolu kullanabilirsiniz.
 
-  // Tüm sayfalara Content-Security-Policy başlığı ekleniyor
+  // Global olarak tüm yanıt başlıklarına CSP ekleyelim
   async headers() {
     return [
       {
@@ -23,14 +28,16 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: ContentSecurityPolicy
-          }
-        ]
-      }
+            value: ContentSecurityPolicy,
+          },
+        ],
+      },
     ];
   },
 
-  // Diğer isterseniz ek ayarlarınızı da buraya ekleyebilirsiniz
+  // Geliştirme / üretim modu için ek ayarlar
+  reactStrictMode: true,
+  swcMinify: true,
 };
 
 export default nextConfig;
