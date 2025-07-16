@@ -1,8 +1,8 @@
 // app/tools/color-toolkit/page.tsx
 import { Metadata } from "next";
 import Script from "next/script";
-import { ColorToolkitClient } from "./color-toolkit-client";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
+import ColorToolkitClient from "./color-toolkit-client";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
@@ -56,10 +56,12 @@ export const metadata: Metadata = {
     description:
       "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Privacy-first, zero signup, instant results.",
     creator: "@gearizen",
-    images: [{
-      url: "https://gearizen.com/og/color-toolkit.png",
-      alt: "Gearizen Color Toolkit Preview",
-    }],
+    images: [
+      {
+        url: "https://gearizen.com/og/color-toolkit.png",
+        alt: "Gearizen Color Toolkit Preview",
+      },
+    ],
   },
 };
 
@@ -141,7 +143,21 @@ export default function ColorToolkitPage() {
         pageUrl="https://gearizen.com/tools/color-toolkit"
       />
 
-      <ColorToolkitClient />
+      <div className="container mx-auto px-4 py-8">
+        <h1
+          id="color-toolkit-heading"
+          className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight"
+        >
+          Color Toolkit: Converter & Contrast Checker
+        </h1>
+
+        <p className="mx-auto max-w-2xl text-lg sm:text-xl text-gray-700 leading-relaxed">
+          Translate colors between HEX, RGB, HSL & CMYK and verify
+          WCAG-compliant contrast ratios—copy any code or ratio with one click.
+        </p>
+
+        <ColorToolkitClient />
+      </div>
     </>
   );
 }
