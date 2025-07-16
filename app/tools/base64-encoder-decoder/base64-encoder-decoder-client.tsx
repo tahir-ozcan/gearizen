@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback } from "react";
-import { Trash2, ClipboardCopy } from "lucide-react";
+import { Trash2, ClipboardCopy, Check } from "lucide-react";
 
 export interface Base64EncoderDecoderProps {
   /** Initial mode (“encode” or “decode”) */
@@ -76,33 +76,70 @@ export default function Base64EncoderDecoderClient({
   const [outputText, setOutputText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [copied, setCopied] = useState(false);
+
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const baseInputClasses = inputClassName ?? [
-    "w-full", "min-h-[8rem]", "bg-transparent", "rounded-md",
-    "font-mono", "resize-y", "placeholder-gray-400",
-    "focus:outline-none", focusRingClass
-  ].join(" ");
+  const baseInputClasses =
+    inputClassName ??
+    [
+      "w-full",
+      "min-h-[8rem]",
+      "p-4",
+      "bg-transparent",
+      "rounded-md",
+      "font-mono",
+      "resize-y",
+      "placeholder-gray-400",
+      "focus:outline-none",
+      focusRingClass,
+    ].join(" ");
 
-  const baseOutputClasses = outputClassName ?? [
-    "w-full", "min-h-[8rem]", "p-4", "bg-gray-50",
-    "border", "border-gray-300", "rounded-md",
-    "font-mono", "resize-none", "placeholder-gray-400",
-    "focus:outline-none", focusRingClass
-  ].join(" ");
+  const baseOutputClasses =
+    outputClassName ??
+    [
+      "w-full",
+      "min-h-[8rem]",
+      "p-4",
+      "bg-gray-50",
+      "border",
+      "border-gray-300",
+      "rounded-md",
+      "font-mono",
+      "resize-none",
+      "placeholder-gray-400",
+      "focus:outline-none",
+      focusRingClass,
+    ].join(" ");
 
   const dropZoneBase = dropZoneClassName ?? "w-full";
-  const primaryButtonClasses = buttonClassName ?? [
-    "px-6", "py-2", "rounded-md", "font-medium",
-    "focus-visible:outline-none", "focus-visible:ring-2",
-    "focus-visible:ring-indigo-500", "transition"
-  ].join(" ");
-  const secondaryButtonClasses = secondaryButtonClassName ?? [
-    "px-4", "py-2", "rounded-md", "text-sm",
-    "focus-visible:outline-none", "focus-visible:ring-2",
-    "focus-visible:ring-gray-300", "transition"
-  ].join(" ");
+
+  const primaryButtonClasses =
+    buttonClassName ??
+    [
+      "px-6",
+      "py-2",
+      "rounded-md",
+      "font-medium",
+      "focus-visible:outline-none",
+      "focus-visible:ring-2",
+      "focus-visible:ring-indigo-500",
+      "transition",
+    ].join(" ");
+
+  const secondaryButtonClasses =
+    secondaryButtonClassName ??
+    [
+      "px-4",
+      "py-2",
+      "rounded-md",
+      "text-sm",
+      "focus-visible:outline-none",
+      "focus-visible:ring-2",
+      "focus-visible:ring-gray-300",
+      "transition",
+    ].join(" ");
 
   const encodeText = useCallback((text: string) => {
     const encoder = new TextEncoder();
@@ -111,6 +148,7 @@ export default function Base64EncoderDecoderClient({
     data.forEach((b) => (binary += String.fromCharCode(b)));
     return btoa(binary);
   }, []);
+
   const decodeText = useCallback((text: string) => {
     const binary = atob(text);
     const bytes = Uint8Array.from(
@@ -132,7 +170,9 @@ export default function Base64EncoderDecoderClient({
         setOutputText(result);
         setError(null);
       } catch {
-        setError(mode === "encode" ? "❌ Encoding failed" : "❌ Decoding failed");
+        setError(
+          mode === "encode" ? "❌ Encoding failed" : "❌ Decoding failed"
+        );
         setOutputText("");
       }
     },
@@ -177,32 +217,49 @@ export default function Base64EncoderDecoderClient({
     e.preventDefault();
     setIsDragging(true);
   }, []);
+
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
   }, []);
+
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
   }, []);
+
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
       const file = e.dataTransfer.files[0];
-      if (file) handleFile(file);
+      if (file) {
+        file
+          .text()
+          .then((content) => {
+            setInputText(content);
+            handleConversion(content);
+            setError(null);
+          })
+          .catch(() => {
+            setError("❌ Failed to read file");
+          });
+      }
     },
-    [handleFile]
+    [handleConversion]
   );
 
   const handleCopy = useCallback(async () => {
     if (!outputText) return;
     try {
       await navigator.clipboard.writeText(outputText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch {
       /* silent */
     }
   }, [outputText]);
+
   const clearAll = useCallback(() => {
     setInputText("");
     setOutputText("");
@@ -214,7 +271,7 @@ export default function Base64EncoderDecoderClient({
     <section
       id="base64-encoder-decoder"
       aria-labelledby="base64-heading"
-      className={`text-gray-900 antialiased ${rootClassName}`}
+      className={`text-gray-900 antialiased m-0 p-0 ${rootClassName}`}
     >
       {/* Heading */}
       <div className="text-center space-y-4 mb-10">
@@ -301,7 +358,17 @@ export default function Base64EncoderDecoderClient({
             aria-label={copyButtonLabel}
             className={`${primaryButtonClasses} bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            <ClipboardCopy className="w-5 h-5 inline mr-2" aria-hidden="true" />
+            {copied ? (
+              <Check
+                className="w-5 h-5 inline mr-2"
+                aria-hidden="true"
+              />
+            ) : (
+              <ClipboardCopy
+                className="w-5 h-5 inline mr-2"
+                aria-hidden="true"
+              />
+            )}
             {copyButtonLabel}
           </button>
 
@@ -310,18 +377,28 @@ export default function Base64EncoderDecoderClient({
             onClick={clearAll}
             className={`${secondaryButtonClasses} bg-gray-100 text-gray-700 hover:bg-gray-200`}
           >
-            <Trash2 className="w-5 h-5 inline mr-2" aria-hidden="true" />
+            <Trash2
+              className="w-5 h-5 inline mr-2"
+              aria-hidden="true"
+            />
             {clearButtonLabel}
           </button>
 
           <button
             type="button"
-            onClick={() =>
-              setMode((m) => (m === "encode" ? "decode" : "encode"))
-            }
+            onClick={() => {
+              const newMode = mode === "encode" ? "decode" : "encode";
+              const swappedInput = outputText;
+              const swappedOutput = inputText;
+              setInputText(swappedInput);
+              setOutputText(swappedOutput);
+              setMode(newMode);
+            }}
             className={`${secondaryButtonClasses} bg-gray-100 text-gray-700 hover:bg-gray-200`}
           >
-            {mode === "encode" ? switchToDecodeLabel : switchToEncodeLabel}
+            {mode === "encode"
+              ? switchToDecodeLabel
+              : switchToEncodeLabel}
           </button>
 
           <button
