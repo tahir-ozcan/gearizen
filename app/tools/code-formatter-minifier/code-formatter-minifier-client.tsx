@@ -6,6 +6,7 @@ import React, {
   useRef,
   useCallback,
   useEffect,
+  ChangeEvent,
 } from "react";
 import {
   Trash2,
@@ -29,6 +30,7 @@ export interface CodeFormatterMinifierProps {
   focusRingClass?: string;
   /** Labels & placeholders */
   inputLabel?: string;
+  languageLabel?: string;
   outputLabel?: string;
   placeholderInput?: string;
   placeholderOutput?: string;
@@ -48,8 +50,9 @@ export default function CodeFormatterMinifierClient({
   gradientClasses = "from-purple-500 via-pink-500 to-yellow-400",
   focusRingClass = "focus:ring-purple-500",
   inputLabel = "Your Code",
+  languageLabel = "Language",
   outputLabel = "Output",
-  placeholderInput = "Enter HTML, CSS, or JS code here…",
+  placeholderInput = "Enter code here…",
   placeholderOutput = "Result appears here…",
   clearButtonLabel = "Clear All",
   copyButtonLabel = "Copy",
@@ -58,12 +61,13 @@ export default function CodeFormatterMinifierClient({
   outputClassName,
   secondaryButtonClassName,
 }: CodeFormatterMinifierProps) {
-  const [inputCode, setInputCode] = useState<string>("");
-  const [formattedCode, setFormattedCode] = useState<string>("");
-  const [minifiedCode, setMinifiedCode] = useState<string>("");
-  const [minify, setMinify] = useState<boolean>(false);
+  const [inputCode, setInputCode] = useState("");
+  const [formattedCode, setFormattedCode] = useState("");
+  const [minifiedCode, setMinifiedCode] = useState("");
+  const [minify, setMinify] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState<boolean>(false);
+  const [copied, setCopied] = useState(false);
+  const [language, setLanguage] = useState<"html" | "css" | "js">("html");
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -77,14 +81,6 @@ export default function CodeFormatterMinifierClient({
     secondaryButtonClassName ??
     `inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-md transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300`;
 
-  // Auto-detect HTML, CSS, or JS
-  const detectLanguage = useCallback((code: string): "html" | "css" | "js" => {
-    const t = code.trim();
-    if (t.startsWith("<")) return "html";
-    if (/^\s*[.#]?[A-Za-z0-9_-]+\s*\{/.test(code)) return "css";
-    return "js";
-  }, []);
-
   const validateAndProcess = useCallback(
     (code: string) => {
       if (!code.trim()) {
@@ -94,13 +90,11 @@ export default function CodeFormatterMinifierClient({
         return;
       }
 
-      const lang = detectLanguage(code);
-
       // Syntax validation
       try {
-        if (lang === "js") {
+        if (language === "js") {
           new Function(code);
-        } else if (lang === "html") {
+        } else if (language === "html") {
           const parser = new DOMParser();
           const doc = parser.parseFromString(code, "text/html");
           if (doc.querySelector("parsererror")) {
@@ -121,36 +115,33 @@ export default function CodeFormatterMinifierClient({
         return;
       }
 
-      // Formatting & minifying
+      // Format & minify
       try {
         let fmt: string, min: string;
-        switch (lang) {
-          case "css":
-            fmt = beautifyCSS(code, { indent_size: 2 });
-            min = beautifyCSS(code, {
-              indent_size: 0,
-              max_preserve_newlines: 0,
-              wrap_line_length: 0,
-            });
-            break;
-          case "js":
-            fmt = beautifyJS(code, { indent_size: 2 });
-            min = beautifyJS(code, {
-              indent_size: 0,
-              max_preserve_newlines: 0,
-              wrap_line_length: 0,
-            });
-            break;
-          default:
-            fmt = beautifyHTML(code, {
-              indent_size: 2,
-              wrap_line_length: 0,
-            });
-            min = beautifyHTML(code, {
-              indent_size: 0,
-              max_preserve_newlines: 0,
-              wrap_line_length: 0,
-            });
+        if (language === "css") {
+          fmt = beautifyCSS(code, { indent_size: 2 });
+          min = beautifyCSS(code, {
+            indent_size: 0,
+            max_preserve_newlines: 0,
+            wrap_line_length: 0,
+          });
+        } else if (language === "js") {
+          fmt = beautifyJS(code, { indent_size: 2 });
+          min = beautifyJS(code, {
+            indent_size: 0,
+            max_preserve_newlines: 0,
+            wrap_line_length: 0,
+          });
+        } else {
+          fmt = beautifyHTML(code, {
+            indent_size: 2,
+            wrap_line_length: 0,
+          });
+          min = beautifyHTML(code, {
+            indent_size: 0,
+            max_preserve_newlines: 0,
+            wrap_line_length: 0,
+          });
         }
         setFormattedCode(fmt);
         setMinifiedCode(min);
@@ -161,13 +152,12 @@ export default function CodeFormatterMinifierClient({
         setMinifiedCode("");
       }
     },
-    [detectLanguage]
+    [language]
   );
 
-  // Re-run when input changes
   useEffect(() => {
     validateAndProcess(inputCode);
-  }, [inputCode, validateAndProcess]);
+  }, [inputCode, language, validateAndProcess]);
 
   const clearAll = useCallback(() => {
     setInputCode("");
@@ -193,6 +183,13 @@ export default function CodeFormatterMinifierClient({
     }
   }, [error, formattedCode, minifiedCode, minify]);
 
+  const handleLangChange = useCallback(
+    (e: ChangeEvent<HTMLSelectElement>) => {
+      setLanguage(e.target.value as "html" | "css" | "js");
+    },
+    []
+  );
+
   const outputValue = error
     ? error
     : minify
@@ -206,7 +203,7 @@ export default function CodeFormatterMinifierClient({
       className={`text-gray-900 antialiased ${rootClassName}`}
     >
       <div className="max-w-3xl mx-auto">
-        {/* Heading */}
+        {/* Header */}
         <header className="text-center space-y-6 mb-10">
           <h1
             id="formatter-heading"
@@ -240,7 +237,47 @@ export default function CodeFormatterMinifierClient({
             />
           </div>
 
-          {/* Controls */}
+          {/* Language Select */}
+          <div>
+            <label
+              htmlFor="language-select"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
+              {languageLabel}
+            </label>
+            <select
+              id="language-select"
+              value={language}
+              onChange={handleLangChange}
+              className={`w-full max-w-xs p-2 bg-gray-50 border border-gray-300 rounded-md focus:outline-none ${focusRingClass}`}
+            >
+              <option value="html">HTML</option>
+              <option value="css">CSS</option>
+              <option value="js">JavaScript</option>
+            </select>
+          </div>
+
+          {/* Output */}
+          <div>
+            <label
+              htmlFor="code-output"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
+              {outputLabel}
+            </label>
+            <textarea
+              id="code-output"
+              value={outputValue}
+              readOnly
+              placeholder={placeholderOutput}
+              className={
+                baseOutputClasses + (error ? " text-red-700" : "")
+              }
+              aria-readonly
+            />
+          </div>
+
+          {/* Controls (below output) */}
           <div className="flex flex-wrap items-center gap-4">
             <label className="flex items-center gap-2">
               <input
@@ -276,26 +313,6 @@ export default function CodeFormatterMinifierClient({
               <Trash2 className="w-5 h-5" aria-hidden="true" />
               {clearButtonLabel}
             </button>
-          </div>
-
-          {/* Single Output */}
-          <div>
-            <label
-              htmlFor="code-output"
-              className="block text-sm font-medium text-gray-800 mb-1"
-            >
-              {outputLabel}
-            </label>
-            <textarea
-              id="code-output"
-              value={outputValue}
-              readOnly
-              placeholder={placeholderOutput}
-              className={
-                baseOutputClasses + (error ? " text-red-700" : "")
-              }
-              aria-readonly
-            />
           </div>
         </div>
       </div>

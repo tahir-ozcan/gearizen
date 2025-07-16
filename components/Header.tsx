@@ -31,7 +31,6 @@ const CORE_NAV: NavItem[] = [
   { href: "/contact", label: "Contact Us",    Icon: Mail     },
 ];
 
-// LEGAL_NAV içine Icon da dahil edildi
 const LEGAL_NAV: NavItem[] = [
   { href: "/privacy", label: "Privacy Policy",   Icon: Lock },
   { href: "/cookies", label: "Cookie Policy",    Icon: Cookie },
@@ -42,13 +41,13 @@ export default function Header() {
   const pathname = usePathname();
 
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [desktopMoreOpen, setDesktopMoreOpen] = useState(false);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
+  const [desktopMoreOpen, setDesktopMoreOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const desktopMoreRef = useRef<HTMLDivElement>(null);
 
-  // Scroll’a göre gölge
+  // Sticky header shadow
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll);
@@ -56,7 +55,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Desktop “More” dışına tıklanınca kapat
+  // Desktop dışına tıklayınca “More”ı kapat
   useEffect(() => {
     if (!desktopMoreOpen) return;
     const onClickOutside = (e: MouseEvent) => {
@@ -71,26 +70,28 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, [desktopMoreOpen]);
 
-  // Mobil açıkken body scroll engelle
+  // Body scroll engelle / aç
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  // Handler’lar
-  const handleDesktopMore = useCallback(() => {
-    setDesktopMoreOpen(open => !open);
-  }, []);
   const handleMobileToggle = useCallback(() => {
-    setMobileOpen(open => !open);
+    setMobileOpen(o => !o);
     if (mobileMoreOpen) setMobileMoreOpen(false);
   }, [mobileMoreOpen]);
+
   const handleMobileMore = useCallback(() => {
-    setMobileMoreOpen(open => !open);
+    setMobileMoreOpen(o => !o);
   }, []);
+
   const closeMobile = useCallback(() => {
     setMobileOpen(false);
     setMobileMoreOpen(false);
+  }, []);
+
+  const handleDesktopMore = useCallback(() => {
+    setDesktopMoreOpen(o => !o);
   }, []);
 
   return (
@@ -103,7 +104,7 @@ export default function Header() {
       `}
       role="banner"
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-6 md:px-6">
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-6">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <Image
@@ -154,7 +155,7 @@ export default function Header() {
             >
               More
               {desktopMoreOpen
-                ? <ChevronUp   className="w-4 h-4" aria-hidden="true" />
+                ? <ChevronUp className="w-4 h-4" aria-hidden="true" />
                 : <ChevronDown className="w-4 h-4" aria-hidden="true" />
               }
             </button>
@@ -199,9 +200,9 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Mobile Menü Paneli */}
+      {/* Mobile Ana Menü Paneli */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-x-0 top-16 z-50 bg-white text-gray-800 shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
+        <div className="lg:hidden fixed inset-x-0 top-16 z-40 bg-white text-gray-800 shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
           <nav aria-label="Mobile">
             <ul className="space-y-1 p-4">
               {CORE_NAV.map(({ href, label, Icon }) => {
@@ -225,45 +226,43 @@ export default function Header() {
                 );
               })}
 
-              {/* Mobile “More” */}
-              <li className="border-t border-gray-200 mt-2 pt-2">
+              {/* Mobile “More” Butonu */}
+              <li className="border-t border-gray-200 mt-2 pt-2 px-4">
                 <button
                   onClick={handleMobileMore}
                   aria-expanded={mobileMoreOpen}
                   aria-haspopup="true"
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200 focus:outline-none"
+                  className="w-full flex items-center justify-between py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200 focus:outline-none"
                 >
                   <span>More</span>
                   {mobileMoreOpen
-                    ? <ChevronUp   className="w-5 h-5" aria-hidden="true" />
+                    ? <ChevronUp className="w-5 h-5" aria-hidden="true" />
                     : <ChevronDown className="w-5 h-5" aria-hidden="true" />
                   }
                 </button>
-                {mobileMoreOpen && (
-                  <ul className="mt-1 space-y-1 bg-white">
-                    {LEGAL_NAV.map(({ href, label, Icon }) => {
-                      const active = pathname === href;
-                      return (
-                        <li key={href}>
-                          <Link
-                            href={href}
-                            onClick={closeMobile}
-                            aria-current={active ? "page" : undefined}
-                            className={`
-                              flex items-center gap-3 px-5 py-2 rounded-lg font-medium
-                              ${active ? "bg-gray-100" : "hover:bg-gray-50"}
-                              transition-colors duration-200
-                            `}
-                          >
-                            <Icon className="w-5 h-5 text-gray-600" aria-hidden="true" />
-                            <span>{label}</span>
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
               </li>
+            </ul>
+          </nav>
+        </div>
+      )}
+
+      {/* Mobile “More” Alt-Menüsü (header’ın hemen altında) */}
+      {mobileOpen && mobileMoreOpen && (
+        <div className="lg:hidden fixed inset-x-0 top-16 z-50 bg-white text-gray-800 shadow-lg">
+          <nav aria-label="Mobile More">
+            <ul className="space-y-1 p-4">
+              {LEGAL_NAV.map(({ href, label, Icon }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    onClick={closeMobile}
+                    className="flex items-center gap-3 px-5 py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200"
+                  >
+                    <Icon className="w-5 h-5 text-gray-600" aria-hidden="true" />
+                    <span>{label}</span>
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>
