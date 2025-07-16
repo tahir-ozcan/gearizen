@@ -6,6 +6,7 @@ import React, {
   useRef,
   useCallback,
   useEffect,
+  ChangeEvent,
 } from "react";
 import {
   Trash2,
@@ -27,6 +28,13 @@ export interface CodeFormatterMinifierProps {
   gradientClasses?: string;
   /** Focus-ring Tailwind class */
   focusRingClass?: string;
+  /** Language select label */
+  languageLabel?: string;
+  /** Language option labels */
+  autoLabel?: string;
+  htmlLabel?: string;
+  cssLabel?: string;
+  jsLabel?: string;
   /** Labels & placeholders */
   inputLabel?: string;
   outputLabel?: string;
@@ -47,9 +55,14 @@ export default function CodeFormatterMinifierClient({
     "Instantly beautify and compress your HTML, CSS, and JavaScript code client-side—no uploads, privacy-first, zero signup, lightning-fast.",
   gradientClasses = "from-purple-500 via-pink-500 to-yellow-400",
   focusRingClass = "focus:ring-purple-500",
+  languageLabel = "Language",
+  autoLabel = "Auto-Detect",
+  htmlLabel = "HTML",
+  cssLabel = "CSS",
+  jsLabel = "JavaScript",
   inputLabel = "Your Code",
   outputLabel = "Output",
-  placeholderInput = "Enter HTML, CSS, or JS code here…",
+  placeholderInput = "Enter code here…",
   placeholderOutput = "Result appears here…",
   clearButtonLabel = "Clear All",
   copyButtonLabel = "Copy",
@@ -58,12 +71,17 @@ export default function CodeFormatterMinifierClient({
   outputClassName,
   secondaryButtonClassName,
 }: CodeFormatterMinifierProps) {
-  const [inputCode, setInputCode] = useState("");
-  const [formattedCode, setFormattedCode] = useState("");
-  const [minifiedCode, setMinifiedCode] = useState("");
-  const [minify, setMinify] = useState(false);
+  const [inputCode, setInputCode] = useState<string>("");
+  const [formattedCode, setFormattedCode] = useState<string>("");
+  const [minifiedCode, setMinifiedCode] = useState<string>("");
+  const [minify, setMinify] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<boolean>(false);
+
+  // 'auto' lets us fall back on detectLanguage; otherwise use explicit selection
+  const [selectedLang, setSelectedLang] = useState<"auto" | "html" | "css" | "js">(
+    "auto"
+  );
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -77,104 +95,96 @@ export default function CodeFormatterMinifierClient({
     secondaryButtonClassName ??
     `inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-md transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300`;
 
-  const detectLanguage = useCallback(
-    (code: string): "html" | "css" | "js" => {
-      const t = code.trim();
-      if (t.startsWith("<")) return "html";
-      if (/^\s*[.#]?[A-Za-z0-9_-]+\s*\{/.test(code)) return "css";
-      return "js";
+  const detectLanguage = useCallback((code: string): "html" | "css" | "js" => {
+    const t = code.trim();
+    if (t.startsWith("<")) return "html";
+    if (/^\s*[.#]?[A-Za-z0-9_-]+\s*\{/.test(code)) return "css";
+    return "js";
+  }, []);
+
+  const validateAndProcess = useCallback(
+    (code: string) => {
+      if (!code.trim()) {
+        setFormattedCode("");
+        setMinifiedCode("");
+        setError(null);
+        return;
+      }
+
+      const lang =
+        selectedLang === "auto" ? detectLanguage(code) : selectedLang;
+
+      // Syntax validation
+      try {
+        if (lang === "js") {
+          new Function(code);
+        } else if (lang === "html") {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(code, "text/html");
+          if (doc.querySelector("parsererror")) {
+            throw new Error("HTML syntax error");
+          }
+        } else {
+          const openCount = (code.match(/{/g) || []).length;
+          const closeCount = (code.match(/}/g) || []).length;
+          if (openCount !== closeCount) {
+            throw new Error("CSS syntax error: unmatched braces");
+          }
+        }
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
+        setError(message);
+        setFormattedCode("");
+        setMinifiedCode("");
+        return;
+      }
+
+      // Formatting & minifying
+      try {
+        let fmt: string, min: string;
+        switch (lang) {
+          case "css":
+            fmt = beautifyCSS(code, { indent_size: 2 });
+            min = beautifyCSS(code, {
+              indent_size: 0,
+              max_preserve_newlines: 0,
+              wrap_line_length: 0,
+            });
+            break;
+          case "js":
+            fmt = beautifyJS(code, { indent_size: 2 });
+            min = beautifyJS(code, {
+              indent_size: 0,
+              max_preserve_newlines: 0,
+              wrap_line_length: 0,
+            });
+            break;
+          default:
+            fmt = beautifyHTML(code, {
+              indent_size: 2,
+              wrap_line_length: 0,
+            });
+            min = beautifyHTML(code, {
+              indent_size: 0,
+              max_preserve_newlines: 0,
+              wrap_line_length: 0,
+            });
+        }
+        setFormattedCode(fmt);
+        setMinifiedCode(min);
+        setError(null);
+      } catch {
+        setError("❌ Processing failed");
+        setFormattedCode("");
+        setMinifiedCode("");
+      }
     },
-    []
+    [detectLanguage, selectedLang]
   );
 
-const validateAndProcess = useCallback(
-  (code: string) => {
-    if (!code.trim()) {
-      setFormattedCode("");
-      setMinifiedCode("");
-      setError(null);
-      return;
-    }
-
-    const lang = detectLanguage(code);
-
-    // Syntax validation
-    try {
-      if (lang === "js") {
-        // JS syntax check
-        new Function(code);
-      } else if (lang === "html") {
-        // HTML syntax check
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(code, "text/html");
-        if (doc.querySelector("parsererror")) {
-          throw new Error("HTML syntax error");
-        }
-      } else {
-        // CSS basic braces check
-        const open = (code.match(/{/g) || []).length;
-        const close = (code.match(/}/g) || []).length;
-        if (open !== close) {
-          throw new Error("CSS syntax error: unmatched braces");
-        }
-      }
-    } catch (e: unknown) {
-      // e’yi güvenli şekilde Error’a daraltıyoruz
-      const message = e instanceof Error ? e.message : String(e);
-      setError(message);
-      setFormattedCode("");
-      setMinifiedCode("");
-      return;
-    }
-
-    // Formatting & minifying
-    try {
-      let fmt: string;
-      let min: string;
-      switch (lang) {
-        case "css":
-          fmt = beautifyCSS(code, { indent_size: 2 });
-          min = beautifyCSS(code, {
-            indent_size: 0,
-            max_preserve_newlines: 0,
-            wrap_line_length: 0,
-          });
-          break;
-        case "js":
-          fmt = beautifyJS(code, { indent_size: 2 });
-          min = beautifyJS(code, {
-            indent_size: 0,
-            max_preserve_newlines: 0,
-            wrap_line_length: 0,
-          });
-          break;
-        default:
-          fmt = beautifyHTML(code, {
-            indent_size: 2,
-            wrap_line_length: 0,
-          });
-          min = beautifyHTML(code, {
-            indent_size: 0,
-            max_preserve_newlines: 0,
-            wrap_line_length: 0,
-          });
-      }
-      setFormattedCode(fmt);
-      setMinifiedCode(min);
-      setError(null);
-    } catch {
-      setError("❌ Processing failed");
-      setFormattedCode("");
-      setMinifiedCode("");
-    }
-  },
-  [detectLanguage]
-);
-
-  // Re-run when input or toggle changes
   useEffect(() => {
     validateAndProcess(inputCode);
-  }, [inputCode, validateAndProcess]);
+  }, [inputCode, selectedLang, validateAndProcess]);
 
   const clearAll = useCallback(() => {
     setInputCode("");
@@ -185,11 +195,7 @@ const validateAndProcess = useCallback(
   }, []);
 
   const handleCopy = useCallback(async () => {
-    const outputValue = error
-      ? ""
-      : minify
-      ? minifiedCode
-      : formattedCode;
+    const outputValue = error ? "" : minify ? minifiedCode : formattedCode;
     if (!outputValue) return;
     try {
       await navigator.clipboard.writeText(outputValue);
@@ -200,11 +206,14 @@ const validateAndProcess = useCallback(
     }
   }, [formattedCode, minifiedCode, minify, error]);
 
-  const outputValue = error
-    ? error
-    : minify
-    ? minifiedCode
-    : formattedCode;
+  const handleLangChange = useCallback(
+    (e: ChangeEvent<HTMLSelectElement>) => {
+      setSelectedLang(e.target.value as "auto" | "html" | "css" | "js");
+    },
+    []
+  );
+
+  const outputValue = error ? error : minify ? minifiedCode : formattedCode;
 
   return (
     <section
@@ -228,7 +237,7 @@ const validateAndProcess = useCallback(
         </header>
 
         <div className="space-y-6">
-          {/* Input */}
+          {/* Input + Language Select */}
           <div>
             <label
               htmlFor="code-input"
@@ -236,6 +245,25 @@ const validateAndProcess = useCallback(
             >
               {inputLabel}
             </label>
+            <div className="flex items-center gap-2 mb-2">
+              <label
+                htmlFor="language-select"
+                className="block text-sm font-medium text-gray-800"
+              >
+                {languageLabel}
+              </label>
+              <select
+                id="language-select"
+                value={selectedLang}
+                onChange={handleLangChange}
+                className={`bg-gray-50 border border-gray-300 rounded-md p-2 font-medium focus:outline-none ${focusRingClass}`}
+              >
+                <option value="auto">{autoLabel}</option>
+                <option value="html">{htmlLabel}</option>
+                <option value="css">{cssLabel}</option>
+                <option value="js">{jsLabel}</option>
+              </select>
+            </div>
             <textarea
               id="code-input"
               ref={inputRef}
@@ -277,10 +305,9 @@ const validateAndProcess = useCallback(
               value={outputValue}
               readOnly
               placeholder={placeholderOutput}
-              className={
-                baseOutputClasses +
-                (error ? " text-red-700" : "")
-              }
+              className={`${baseOutputClasses}${
+                error ? " text-red-700" : ""
+              }`}
               aria-readonly
             />
           </div>
@@ -297,10 +324,7 @@ const validateAndProcess = useCallback(
               {copied ? (
                 <Check className="w-5 h-5" aria-hidden="true" />
               ) : (
-                <ClipboardCopy
-                  className="w-5 h-5"
-                  aria-hidden="true"
-                />
+                <ClipboardCopy className="w-5 h-5" aria-hidden="true" />
               )}
               {copyButtonLabel}
             </button>
