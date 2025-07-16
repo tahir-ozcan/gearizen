@@ -66,7 +66,9 @@ export default function CodeFormatterMinifierClient({
     `w-full min-h-[14rem] p-4 bg-gray-50 border border-gray-300 rounded-md font-mono resize-y placeholder-gray-400 focus:outline-none ${focusRingClass}`;
   const baseOutputClasses =
     outputClassName ??
-    `w-full min-h-[14rem] p-4 bg-gray-50 border border-gray-300 rounded-md font-mono resize-none placeholder-gray-400 focus:outline-none ${focusRingClass}`;
+    `w-full min-h-[14rem] p-4 bg-gray-50 border ${
+      error ? "border-red-300" : "border-gray-300"
+    } rounded-md font-mono resize-none placeholder-gray-400 focus:outline-none ${focusRingClass}`;
   const secondaryBtnClasses =
     secondaryButtonClassName ??
     `inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-md transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300`;
@@ -173,12 +175,7 @@ export default function CodeFormatterMinifierClient({
   }, []);
 
   const handleCopy = useCallback(async () => {
-    const output =
-      error || (!formattedCode && !minifiedCode)
-        ? ""
-        : minify
-        ? minifiedCode
-        : formattedCode;
+    const output = minify ? minifiedCode : formattedCode;
     if (!output) return;
     try {
       await navigator.clipboard.writeText(output);
@@ -187,7 +184,7 @@ export default function CodeFormatterMinifierClient({
     } catch {
       /* silent */
     }
-  }, [error, formattedCode, minifiedCode, minify]);
+  }, [formattedCode, minifiedCode, minify]);
 
   const handleLangChange = useCallback(
     (e: ChangeEvent<HTMLSelectElement>) => {
@@ -203,11 +200,7 @@ export default function CodeFormatterMinifierClient({
     []
   );
 
-  const outputValue = error
-    ? error
-    : minify
-    ? minifiedCode
-    : formattedCode;
+  const outputValue = minify ? minifiedCode : formattedCode;
 
   return (
     <section
@@ -225,9 +218,7 @@ export default function CodeFormatterMinifierClient({
             {heading}
           </h1>
           <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-          <p className="text-lg sm:text-xl text-gray-600">
-            {description}
-          </p>
+          <p className="text-lg sm:text-xl text-gray-600">{description}</p>
         </header>
 
         <div className="space-y-6">
@@ -273,7 +264,7 @@ export default function CodeFormatterMinifierClient({
             </div>
 
             {/* Minify */}
-            <label className="flex items-center gap-2 mt-6">
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={minify}
@@ -313,6 +304,13 @@ export default function CodeFormatterMinifierClient({
             </button>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <p className="text-red-600 text-sm">
+              ⚠️ {error}
+            </p>
+          )}
+
           {/* Output */}
           <div>
             <label
@@ -326,9 +324,7 @@ export default function CodeFormatterMinifierClient({
               value={outputValue}
               readOnly
               placeholder={placeholderOutput}
-              className={
-                baseOutputClasses + (error ? " text-red-700" : "")
-              }
+              className={`${baseOutputClasses} ${error ? "text-red-700" : ""}`}
               aria-readonly
             />
           </div>

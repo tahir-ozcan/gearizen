@@ -32,13 +32,18 @@ const CORE_NAV: NavItem[] = [
 ];
 
 const LEGAL_NAV: NavItem[] = [
-  { href: "/privacy", label: "Privacy Policy",   Icon: Lock },
+  { href: "/privacy", label: "Privacy Policy",   Icon: Lock   },
   { href: "/cookies", label: "Cookie Policy",    Icon: Cookie },
-  { href: "/terms",   label: "Terms of Service", Icon: Info },
+  { href: "/terms",   label: "Terms of Service", Icon: Info   },
 ];
 
 export default function Header() {
   const pathname = usePathname();
+
+  // Header DOM referansı
+  const headerRef = useRef<HTMLElement>(null);
+  // Menüleri yerleştirmek için header'ın alt boşluğu
+  const [menuTop, setMenuTop] = useState(0);
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
@@ -47,7 +52,7 @@ export default function Header() {
 
   const desktopMoreRef = useRef<HTMLDivElement>(null);
 
-  // Sticky header shadow
+  // Sticky header gölgesi
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll);
@@ -55,7 +60,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Desktop dışına tıklayınca “More”ı kapat
+  // Desktop “More” dışına tıklayınca kapat
   useEffect(() => {
     if (!desktopMoreOpen) return;
     const onClickOutside = (e: MouseEvent) => {
@@ -70,16 +75,39 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, [desktopMoreOpen]);
 
-  // Body scroll engelle / aç
+  // Body scroll engelleme (mobil menü açıkken)
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
+  // Header'ın o anki alt konumunu hesapla: toast vs. ne kadar yukarıda olduğuna bak
+  const updateMenuTop = useCallback(() => {
+    if (headerRef.current) {
+      // getBoundingClientRect().bottom, viewport'un üstünden header'ın alt kenarına kadar px
+      setMenuTop(headerRef.current.getBoundingClientRect().bottom);
+    }
+  }, []);
+
+  // İlk render, resize ve mobil menü açıldığında güncelle
+  useEffect(() => {
+    updateMenuTop();
+    window.addEventListener("resize", updateMenuTop);
+    return () => window.removeEventListener("resize", updateMenuTop);
+  }, [updateMenuTop]);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      updateMenuTop();
+    } else {
+      setMobileMoreOpen(false);
+    }
+  }, [mobileOpen, updateMenuTop]);
+
+  // Handler’lar
   const handleMobileToggle = useCallback(() => {
     setMobileOpen(o => !o);
-    if (mobileMoreOpen) setMobileMoreOpen(false);
-  }, [mobileMoreOpen]);
+  }, []);
 
   const handleMobileMore = useCallback(() => {
     setMobileMoreOpen(o => !o);
@@ -96,6 +124,7 @@ export default function Header() {
 
   return (
     <header
+      ref={headerRef}
       className={`
         sticky top-0 inset-x-0 z-50
         gradient-bg text-white
@@ -200,9 +229,12 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Mobile Ana Menü Paneli */}
+      {/* Mobil Ana Menü */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-x-0 top-16 z-40 bg-white text-gray-800 shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
+        <div
+          className="lg:hidden fixed inset-x-0 z-40 bg-white text-gray-800 shadow-lg max-h-[calc(100vh)] overflow-y-auto"
+          style={{ top: menuTop }}
+        >
           <nav aria-label="Mobile">
             <ul className="space-y-1 p-4">
               {CORE_NAV.map(({ href, label, Icon }) => {
@@ -226,7 +258,7 @@ export default function Header() {
                 );
               })}
 
-              {/* Mobile “More” Butonu */}
+              {/* Mobil “More” Butonu */}
               <li className="border-t border-gray-200 mt-2 pt-2 px-4">
                 <button
                   onClick={handleMobileMore}
@@ -246,9 +278,12 @@ export default function Header() {
         </div>
       )}
 
-      {/* Mobile “More” Alt-Menüsü (header’ın hemen altında) */}
+      {/* Mobil “More” Alt-Menüsü */}
       {mobileOpen && mobileMoreOpen && (
-        <div className="lg:hidden fixed inset-x-0 top-16 z-50 bg-white text-gray-800 shadow-lg">
+        <div
+          className="lg:hidden fixed inset-x-0 z-50 bg-white text-gray-800 shadow-lg"
+          style={{ top: menuTop +  (/* ana menü yüksekliği */ 0) }}
+        >
           <nav aria-label="Mobile More">
             <ul className="space-y-1 p-4">
               {LEGAL_NAV.map(({ href, label, Icon }) => (
