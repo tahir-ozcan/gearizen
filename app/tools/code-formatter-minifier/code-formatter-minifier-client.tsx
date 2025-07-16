@@ -6,7 +6,6 @@ import React, {
   useRef,
   useCallback,
   useEffect,
-  ChangeEvent,
 } from "react";
 import {
   Trash2,
@@ -28,13 +27,6 @@ export interface CodeFormatterMinifierProps {
   gradientClasses?: string;
   /** Focus-ring Tailwind class */
   focusRingClass?: string;
-  /** Language select label */
-  languageLabel?: string;
-  /** Language option labels */
-  autoLabel?: string;
-  htmlLabel?: string;
-  cssLabel?: string;
-  jsLabel?: string;
   /** Labels & placeholders */
   inputLabel?: string;
   outputLabel?: string;
@@ -55,14 +47,9 @@ export default function CodeFormatterMinifierClient({
     "Instantly beautify and compress your HTML, CSS, and JavaScript code client-side—no uploads, privacy-first, zero signup, lightning-fast.",
   gradientClasses = "from-purple-500 via-pink-500 to-yellow-400",
   focusRingClass = "focus:ring-purple-500",
-  languageLabel = "Language",
-  autoLabel = "Auto-Detect",
-  htmlLabel = "HTML",
-  cssLabel = "CSS",
-  jsLabel = "JavaScript",
   inputLabel = "Your Code",
   outputLabel = "Output",
-  placeholderInput = "Enter code here…",
+  placeholderInput = "Enter HTML, CSS, or JS code here…",
   placeholderOutput = "Result appears here…",
   clearButtonLabel = "Clear All",
   copyButtonLabel = "Copy",
@@ -78,11 +65,6 @@ export default function CodeFormatterMinifierClient({
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
 
-  // 'auto' lets us fall back on detectLanguage; otherwise use explicit selection
-  const [selectedLang, setSelectedLang] = useState<"auto" | "html" | "css" | "js">(
-    "auto"
-  );
-
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const baseInputClasses =
@@ -95,6 +77,7 @@ export default function CodeFormatterMinifierClient({
     secondaryButtonClassName ??
     `inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-md transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300`;
 
+  // Simple language detector: html if starts with '<', css if it has selectors, otherwise js
   const detectLanguage = useCallback((code: string): "html" | "css" | "js" => {
     const t = code.trim();
     if (t.startsWith("<")) return "html";
@@ -111,8 +94,7 @@ export default function CodeFormatterMinifierClient({
         return;
       }
 
-      const lang =
-        selectedLang === "auto" ? detectLanguage(code) : selectedLang;
+      const lang = detectLanguage(code);
 
       // Syntax validation
       try {
@@ -179,12 +161,13 @@ export default function CodeFormatterMinifierClient({
         setMinifiedCode("");
       }
     },
-    [detectLanguage, selectedLang]
+    [detectLanguage]
   );
 
+  // Re-run when input or toggle changes
   useEffect(() => {
     validateAndProcess(inputCode);
-  }, [inputCode, selectedLang, validateAndProcess]);
+  }, [inputCode, validateAndProcess]);
 
   const clearAll = useCallback(() => {
     setInputCode("");
@@ -195,7 +178,11 @@ export default function CodeFormatterMinifierClient({
   }, []);
 
   const handleCopy = useCallback(async () => {
-    const outputValue = error ? "" : minify ? minifiedCode : formattedCode;
+    const outputValue = error
+      ? ""
+      : minify
+      ? minifiedCode
+      : formattedCode;
     if (!outputValue) return;
     try {
       await navigator.clipboard.writeText(outputValue);
@@ -206,13 +193,7 @@ export default function CodeFormatterMinifierClient({
     }
   }, [formattedCode, minifiedCode, minify, error]);
 
-  const handleLangChange = useCallback(
-    (e: ChangeEvent<HTMLSelectElement>) => {
-      setSelectedLang(e.target.value as "auto" | "html" | "css" | "js");
-    },
-    []
-  );
-
+  // Single output: either error or beautified/minified code
   const outputValue = error ? error : minify ? minifiedCode : formattedCode;
 
   return (
@@ -237,7 +218,7 @@ export default function CodeFormatterMinifierClient({
         </header>
 
         <div className="space-y-6">
-          {/* Input + Language Select */}
+          {/* Input */}
           <div>
             <label
               htmlFor="code-input"
@@ -245,25 +226,6 @@ export default function CodeFormatterMinifierClient({
             >
               {inputLabel}
             </label>
-            <div className="flex items-center gap-2 mb-2">
-              <label
-                htmlFor="language-select"
-                className="block text-sm font-medium text-gray-800"
-              >
-                {languageLabel}
-              </label>
-              <select
-                id="language-select"
-                value={selectedLang}
-                onChange={handleLangChange}
-                className={`bg-gray-50 border border-gray-300 rounded-md p-2 font-medium focus:outline-none ${focusRingClass}`}
-              >
-                <option value="auto">{autoLabel}</option>
-                <option value="html">{htmlLabel}</option>
-                <option value="css">{cssLabel}</option>
-                <option value="js">{jsLabel}</option>
-              </select>
-            </div>
             <textarea
               id="code-input"
               ref={inputRef}
@@ -305,9 +267,9 @@ export default function CodeFormatterMinifierClient({
               value={outputValue}
               readOnly
               placeholder={placeholderOutput}
-              className={`${baseOutputClasses}${
-                error ? " text-red-700" : ""
-              }`}
+              className={
+                baseOutputClasses + (error ? " text-red-700" : "")
+              }
               aria-readonly
             />
           </div>
