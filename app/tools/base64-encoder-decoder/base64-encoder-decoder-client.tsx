@@ -1,367 +1,418 @@
-// app/tools/base64-encoder-decoder/base64-encoder-decoder-client.tsx
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import {
-  Trash2,
-  ClipboardCopy,
-  Paperclip,
-  Share2,
-} from "lucide-react";
+import React, {
+  useState,
+  useRef,
+  ChangeEvent,
+  FormEvent,
+  DragEvent,
+  KeyboardEvent,
+} from "react";
+import dynamic from "next/dynamic";
 
-interface Base64EncoderDecoderClientProps {
-  defaultMode?: "encode" | "decode";       // Allow overriding the initial mode
-  showPresets?: boolean;                   // Toggle visibility of preset samples
-  showShare?: boolean;                     // Toggle shareable-link feature
-  debounceMs?: number;                     // Debounce interval for live processing
+/** Dynamic imports for icons to reduce initial bundle size */
+const Trash2Icon = dynamic(() =>
+  import("lucide-react").then((mod) => mod.Trash2)
+);
+const ClipboardCopyIcon = dynamic(() =>
+  import("lucide-react").then((mod) => mod.ClipboardCopy)
+);
+const PaperclipIcon = dynamic(() =>
+  import("lucide-react").then((mod) => mod.Paperclip)
+);
+
+/**
+ * Translations for all UI strings in the Base64 tool.
+ */
+export interface Translations {
+  toolTitle: string;
+  inputLabelEncode: string;
+  inputLabelDecode: string;
+  inputPlaceholderEncode: string;
+  inputPlaceholderDecode: string;
+  outputLabelEncode: string;
+  outputLabelDecode: string;
+  outputPlaceholder: string;
+  encodeButtonLabel: string;
+  decodeButtonLabel: string;
+  clearButtonLabel: string;
+  switchToEncodeLabel: string;
+  switchToDecodeLabel: string;
+  copiedNotification: string;
+  copyErrorNotification: string;
+  encodingErrorMessage: string;
+  decodingErrorMessage: string;
+  dragDropHint: string;
 }
 
-type Toast = {
-  id: string;
-  message: string;
-  type: "success" | "error";
+/**
+ * Theme tokens to allow overriding colors, fonts, etc.
+ */
+export interface ThemeTokens {
+  primaryColor?: string;    /** e.g. "indigo-600" or CSS variable */
+  textColor?: string;
+  borderColor?: string;
+  backgroundColor?: string;
+  fontFamily?: string;      /** e.g. "font-mono" or "font-sans" */
+}
+
+/**
+ * Layout options to show or hide specific UI features.
+ */
+export interface LayoutOptions {
+  showDragDropArea?: boolean;
+  showIcons?: boolean;
+}
+
+/**
+ * Props for Base64EncoderDecoderClient component.
+ */
+export interface Base64EncoderDecoderProps {
+  /** Initial mode: 'encode' or 'decode'. Default 'encode'. */
+  initialMode?: "encode" | "decode";
+  /** Override any of the default translations. */
+  translations?: Partial<Translations>;
+  /** Override default theme tokens. */
+  theme?: ThemeTokens;
+  /** Control visibility of extra UI features. */
+  layout?: LayoutOptions;
+}
+
+/** Default English translations. */
+const defaultTranslations: Translations = {
+  toolTitle: "Base64 Encoder/Decoder",
+  inputLabelEncode: "Text to Encode",
+  inputLabelDecode: "Base64 to Decode",
+  inputPlaceholderEncode: "Enter text or drop a file…",
+  inputPlaceholderDecode: "Enter Base64 string to decode…",
+  outputLabelEncode: "Base64 Output",
+  outputLabelDecode: "Decoded Text",
+  outputPlaceholder: "Result appears here…",
+  encodeButtonLabel: "Encode →",
+  decodeButtonLabel: "Decode →",
+  clearButtonLabel: "Clear All",
+  switchToEncodeLabel: "Switch to Encode",
+  switchToDecodeLabel: "Switch to Decode",
+  copiedNotification: "✅ Copied to clipboard!",
+  copyErrorNotification: "❌ Copy failed.",
+  encodingErrorMessage: "❌ Encoding failed.",
+  decodingErrorMessage: "❌ Decoding failed.",
+  dragDropHint: "Drag and drop a file here or click to select.",
 };
 
+/** Default theme settings. */
+const defaultTheme: Required<ThemeTokens> = {
+  primaryColor: "indigo-600",
+  textColor: "gray-900",
+  borderColor: "gray-300",
+  backgroundColor: "white",
+  fontFamily: "font-mono",
+};
+
+/** Default layout settings. */
+const defaultLayout: Required<LayoutOptions> = {
+  showDragDropArea: true,
+  showIcons: true,
+};
+
+/**
+ * Base64 Encoder/Decoder Client Component
+ *
+ * Convert text and files to and from Base64, fully client-side and customizable.
+ *
+ * @example
+ * ```tsx
+ * <Base64EncoderDecoderClient
+ *   initialMode="decode"
+ *   translations={{ encodeButtonLabel: "Encode Base64" }}
+ *   theme={{ primaryColor: "purple-500", fontFamily: "font-sans" }}
+ *   layout={{ showIcons: false }}
+ * />
+ * ```
+ */
 export default function Base64EncoderDecoderClient({
-  defaultMode = "encode",
-  showPresets = true,
-  showShare = true,
-  debounceMs = 300,
-}: Base64EncoderDecoderClientProps) {
-  // ─── State & Refs ───────────────────────────────────────────────────────────
-  const [mode, setMode] = useState<"encode" | "decode">(defaultMode);
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
+  initialMode = "encode",
+  translations = {},
+  theme = {},
+  layout = {},
+}: Base64EncoderDecoderProps) {
+  const t: Translations = { ...defaultTranslations, ...translations };
+  const th = { ...defaultTheme, ...theme };
+  const lo = { ...defaultLayout, ...layout };
+
+  const [mode, setMode] = useState<"encode" | "decode">(initialMode);
+  const [input, setInput] = useState<string>("");
+  const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [autoProcess, setAutoProcess] = useState(false);         // Live-process toggle
-  const [toasts, setToasts] = useState<Toast[]>([]);              // Toast notifications
-
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ─── Helpers ────────────────────────────────────────────────────────────────
-  const addToast = (message: string, type: Toast["type"] = "success") => {
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 3000);
-  };
+  /** Focus the text input */
+  const focusInput = () => inputRef.current?.focus();
 
-  /** Perform encoding or decoding, with error handling */
-  const processBase64 = useCallback(() => {
-    try {
-      setError(null);
-      if (input.trim() === "") {
-        setOutput("");
-        return;
-      }
-      if (mode === "encode") {
-        // UTF-8 → Base64
-        const utf8 = unescape(encodeURIComponent(input));
-        setOutput(btoa(utf8));
-      } else {
-        // Base64 → UTF-8
-        const binary = atob(input);
-        setOutput(decodeURIComponent(escape(binary)));
-      }
-    } catch {
-      setError(
-        mode === "encode"
-          ? "❌ Encoding failed. Please check your input."
-          : "❌ Decoding failed. Ensure the Base64 string is valid."
-      );
-      setOutput("");
-    }
-  }, [input, mode]);
-
-  // Debounced live processing when autoProcess is enabled
-  useEffect(() => {
-    if (!autoProcess) return;
-    const handler = setTimeout(processBase64, debounceMs);
-    return () => clearTimeout(handler);
-  }, [input, mode, autoProcess, processBase64, debounceMs]);
-
+  /**
+   * Clear all fields and reset focus.
+   */
   function clearAll() {
     setInput("");
     setOutput("");
     setError(null);
-    inputRef.current?.focus();
+    focusInput();
   }
 
-  // ─── Drag & Drop Handlers ───────────────────────────────────────────────────
-  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+  /**
+   * Encode a UTF-8 string to Base64.
+   * @param text UTF-8 input
+   */
+  function encodeText(text: string): string {
+    if (!text) return "";
+    const utf8Bytes = new TextEncoder().encode(text);
+    return btoa(String.fromCharCode(...utf8Bytes));
+  }
+
+  /**
+   * Decode a Base64 string to UTF-8.
+   * Throws if invalid input.
+   * @param base64 Base64 input
+   */
+  function decodeText(base64: string): string {
+    if (!base64) return "";
+    const binary = atob(base64);
+    const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  }
+
+  /** Handle file drops for encoding */
+  function handleDrop(e: DragEvent<HTMLDivElement>) {
     e.preventDefault();
+    setError(null);
     const file = e.dataTransfer.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
       if (reader.result instanceof ArrayBuffer) {
         const bytes = new Uint8Array(reader.result);
-        let str = "";
-        for (const b of bytes) str += String.fromCharCode(b);
-        const b64 = btoa(str);
+        const str = String.fromCharCode(...bytes);
         setMode("encode");
         setInput("");
-        setOutput(b64);
+        setOutput(btoa(str));
       }
     };
     reader.readAsArrayBuffer(file);
   }
-  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
+
+  /** Prevent default dragover behavior */
+  function handleDragOver(e: DragEvent<HTMLDivElement>) {
     e.preventDefault();
   }
 
-  // ─── Event Handlers ─────────────────────────────────────────────────────────
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  /** Trigger hidden file input on keyboard activation */
+  function handleDropZoneKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      fileInputRef.current?.click();
+    }
+  }
+
+  /** Handle manual file selection */
+  function handleFileSelect(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.result instanceof ArrayBuffer) {
+        const bytes = new Uint8Array(reader.result);
+        setMode("encode");
+        setInput("");
+        setOutput(btoa(String.fromCharCode(...bytes)));
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  /** Update input text */
+  function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value);
     setError(null);
-    if (!autoProcess) setOutput("");
-  };
+    setOutput("");
+  }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  /** Process encode/decode on submit */
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    processBase64();
-    addToast(
-      mode === "encode"
-        ? "✅ Text encoded successfully!"
-        : "✅ Text decoded successfully!"
-    );
-  };
+    setError(null);
+    setOutput("");
+    try {
+      const result = mode === "encode" ? encodeText(input) : decodeText(input);
+      setOutput(result);
+    } catch {
+      setError(
+        mode === "encode" ? t.encodingErrorMessage : t.decodingErrorMessage
+      );
+    }
+  }
 
-  const handleCopy = async () => {
+  /** Copy output to clipboard with user feedback */
+  async function copyOutput() {
     if (!output) return;
     try {
       await navigator.clipboard.writeText(output);
-      addToast("✅ Copied to clipboard!", "success");
+      alert(t.copiedNotification);
     } catch {
-      addToast("❌ Copy failed.", "error");
+      alert(t.copyErrorNotification);
     }
-  };
+  }
 
-  const handleShare = async () => {
-    if (!output) return;
-    const shareUrl = `${window.location.origin}${
-      window.location.pathname
-    }?data=${encodeURIComponent(output)}&mode=${mode}`;
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: "Gearizen Base64 Tool",
-          text: "Check out my Base64 conversion!",
-          url: shareUrl,
-        });
-        addToast("✅ Shared successfully!", "success");
-      } else {
-        await navigator.clipboard.writeText(shareUrl);
-        addToast("✅ Share link copied!", "success");
-      }
-    } catch {
-      addToast("❌ Share failed.", "error");
-    }
-  };
-
-  // ─── Preset Samples ──────────────────────────────────────────────────────────
-  const presets = [
-    { label: "Hello World", value: "Hello World", mode: "encode" as const },
-    {
-      label: "SGVsbG8gd29ybGQh",
-      value: "SGVsbG8gd29ybGQh",
-      mode: "decode" as const,
-    },
-    {
-      label: "Sample JSON",
-      value: JSON.stringify({ hello: "world", count: 123 }, null, 2),
-      mode: "encode" as const,
-    },
-  ];
-
-  // ─── Character Counts ───────────────────────────────────────────────────────
   const inputCount = input.length.toLocaleString();
   const outputCount = output.length.toLocaleString();
 
-  // ─── Render ──────────────────────────────────────────────────────────────────
   return (
-    <>
-      <section
-        id="base64-encoder-decoder"
-        aria-labelledby="base64-heading"
-        className="container mx-auto px-4 py-8 space-y-12 text-gray-900 antialiased"
+    <section
+      id="base64-tool"
+      aria-labelledby="base64-tool-heading"
+      role="region"
+      className={`space-y-8 ${th.textColor}`}
+    >
+      {/* Title & Hint */}
+      <div className="text-center">
+        <h1 id="base64-tool-heading" className="text-3xl font-bold">
+          {t.toolTitle}
+        </h1>
+        {lo.showDragDropArea && (
+          <p className="text-sm text-gray-600 mt-1">{t.dragDropHint}</p>
+        )}
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-3xl mx-auto space-y-6"
+        noValidate
       >
-        {/* Heading & Description */}
-        <div className="text-center space-y-4">
-          <h1
-            id="base64-heading"
-            className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-pink-500 to-yellow-400 text-3xl sm:text-4xl md:text-5xl font-extrabold"
-          >
-            Base64 Encoder &amp; Decoder
-          </h1>
-          <p className="text-gray-700 max-w-2xl mx-auto leading-relaxed">
-            Convert text and files to/from Base64 instantly. Drag &amp; drop
-            files, live preview, presets, shareable links—no server required.
-          </p>
-        </div>
-
-        {/* Presets & Mode Toggle */}
-        <div className="flex flex-wrap items-center justify-center gap-4">
-          {showPresets &&
-            presets.map((p) => (
-              <button
-                key={p.label}
-                onClick={() => {
-                  setMode(p.mode);
-                  setInput(p.value);
-                  setError(null);
-                  inputRef.current?.focus();
-                }}
-                className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 text-sm"
-              >
-                {p.label}
-              </button>
-            ))}
-          <button
-            type="button"
-            onClick={() => setMode((m) => (m === "encode" ? "decode" : "encode"))}
-            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
-            aria-label="Switch between encode and decode modes"
-          >
-            <Paperclip className="w-4 h-4" />
-            {mode === "encode" ? "Decode Mode" : "Encode Mode"}
-          </button>
-          <label className="inline-flex items-center gap-2 text-sm text-gray-600">
-            <input
-              type="checkbox"
-              checked={autoProcess}
-              onChange={() => setAutoProcess((v) => !v)}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Input */}
+          <div className="flex flex-col">
+            <label htmlFor="base64-input" className="font-medium mb-1">
+              {mode === "encode"
+                ? t.inputLabelEncode
+                : t.inputLabelDecode}
+            </label>
+            <textarea
+              id="base64-input"
+              ref={inputRef}
+              value={input}
+              onChange={handleInputChange}
+              placeholder={
+                mode === "encode"
+                  ? t.inputPlaceholderEncode
+                  : t.inputPlaceholderDecode
+              }
+              className={`
+                w-full min-h-[200px] p-3 border ${th.borderColor}
+                rounded focus:outline-none focus:ring-2 focus:ring-${th.primaryColor}
+                ${th.fontFamily}
+              `}
             />
-            Auto-Process
-          </label>
-        </div>
-
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-8 max-w-4xl mx-auto"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Input */}
-            <div className="flex flex-col">
-              <label
-                htmlFor="base64-input"
-                className="block text-sm font-medium text-gray-800 mb-1"
-              >
-                {mode === "encode" ? "Text to Encode" : "Base64 to Decode"}
-              </label>
-              <textarea
-                id="base64-input"
-                ref={inputRef}
-                value={input}
-                onChange={handleInputChange}
-                placeholder={
-                  mode === "encode"
-                    ? "Type or drop file…"
-                    : "Paste Base64 string…"
-                }
-                aria-invalid={Boolean(error)}
-                aria-required="true"
-                className="w-full h-40 p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                {inputCount} chars
-              </p>
-              {error && (
-                <p role="alert" className="mt-2 text-sm text-red-600">
-                  {error}
-                </p>
-              )}
-            </div>
-
-            {/* Output */}
-            <div
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              className="relative flex flex-col border-2 border-dashed border-gray-300 rounded-md p-4 hover:border-indigo-500 transition"
-            >
-              <label
-                htmlFor="base64-output"
-                className="block text-sm font-medium text-gray-800 mb-1"
-              >
-                {mode === "encode" ? "Base64 Output" : "Decoded Text"}
-              </label>
-              <textarea
-                id="base64-output"
-                value={output}
-                readOnly
-                placeholder="Result appears here…"
-                className="w-full h-40 p-4 border border-gray-300 rounded-md bg-gray-50 focus:ring-2 focus:ring-indigo-500 font-mono resize-y transition"
-              />
-              <div className="absolute top-2 right-2 flex items-center space-x-2">
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  disabled={!output}
-                  aria-label="Copy output"
-                  className="p-1 hover:text-indigo-600 disabled:opacity-50"
-                >
-                  <ClipboardCopy className="w-5 h-5" />
-                </button>
-                {showShare && (
-                  <button
-                    type="button"
-                    onClick={handleShare}
-                    disabled={!output}
-                    aria-label="Share result"
-                    className="p-1 hover:text-indigo-600 disabled:opacity-50"
-                  >
-                    <Share2 className="w-5 h-5" />
-                  </button>
-                )}
-              </div>
-              <p className="mt-1 text-xs text-gray-500">
-                {outputCount} chars
-              </p>
-            </div>
+            <p className="mt-1 text-xs text-gray-500">
+              {inputCount} characters
+            </p>
           </div>
 
-          {/* Actions */}
-          {!autoProcess && (
-            <div className="flex flex-wrap items-center gap-4">
-              <button
-                type="submit"
-                className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 transition font-medium"
-              >
-                {mode === "encode" ? "Encode →" : "Decode →"}
-              </button>
+          {/* Output / Drag-Drop */}
+          <div
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onKeyDown={handleDropZoneKeyDown}
+            role={lo.showDragDropArea ? "button" : undefined}
+            tabIndex={lo.showDragDropArea ? 0 : undefined}
+            aria-label="File drop zone"
+            className={`
+              relative flex flex-col p-3 border ${th.borderColor}
+              rounded bg-gray-50 focus:outline-none focus:ring-2 focus:ring-${th.primaryColor}
+              ${!lo.showDragDropArea ? "pointer-events-none opacity-50" : ""}
+            `}
+          >
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              className="sr-only"
+            />
+            <label htmlFor="base64-output" className="font-medium mb-1">
+              {mode === "encode"
+                ? t.outputLabelEncode
+                : t.outputLabelDecode}
+            </label>
+            <textarea
+              id="base64-output"
+              value={output}
+              readOnly
+              placeholder={t.outputPlaceholder}
+              className={`
+                w-full min-h-[200px] p-3 pr-10 border ${th.borderColor}
+                rounded bg-gray-50 focus:outline-none focus:ring-2 focus:ring-${th.primaryColor}
+                ${th.fontFamily}
+              `}
+            />
+            {lo.showIcons && (
               <button
                 type="button"
-                onClick={clearAll}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:ring-2 focus:ring-gray-300 transition text-sm"
+                onClick={copyOutput}
+                disabled={!output}
+                aria-label="Copy output"
+                className="absolute top-2 right-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
-                <Trash2 className="w-5 h-5" />
-                Clear All
+                <ClipboardCopyIcon />
               </button>
-            </div>
-          )}
-        </form>
-      </section>
-
-      {/* Toast notifications (aria-live) */}
-      <div
-        aria-live="polite"
-        className="fixed bottom-4 right-4 space-y-2 z-50"
-      >
-        {toasts.map((t) => (
-          <div
-            key={t.id}
-            className={`px-4 py-2 rounded-md shadow-md font-medium ${
-              t.type === "success"
-                ? "bg-green-500 text-white"
-                : "bg-red-500 text-white"
-            }`}
-          >
-            {t.message}
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              {outputCount} characters
+            </p>
           </div>
-        ))}
-      </div>
-    </>
+        </div>
+
+        {error && (
+          <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="submit"
+            className={`
+              px-5 py-2 bg-${th.primaryColor} text-white rounded
+              focus:outline-none focus:ring-2 focus:ring-${th.primaryColor}
+            `}
+          >
+            {mode === "encode"
+              ? t.encodeButtonLabel
+              : t.decodeButtonLabel}
+          </button>
+
+          <button
+            type="button"
+            onClick={clearAll}
+            className="inline-flex items-center gap-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-gray-300"
+          >
+            {lo.showIcons && <Trash2Icon />}
+            {t.clearButtonLabel}
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              setMode((m) => (m === "encode" ? "decode" : "encode"))
+            }
+            className="inline-flex items-center gap-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            {lo.showIcons && <PaperclipIcon />}
+            {mode === "encode"
+              ? t.switchToDecodeLabel
+              : t.switchToEncodeLabel}
+          </button>
+        </div>
+      </form>
+    </section>
   );
 }
