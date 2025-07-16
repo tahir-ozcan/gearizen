@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "Base64 Encoder & Decoder | Gearizen",
   description:
-    "Convert text and files to and from Base64 with drag-and-drop support—fully client-side, privacy-first, zero signup, instant results.",
+    "Convert text and files to/from Base64 with drag-and-drop support—fully client-side, privacy-first, zero signup, instant results.",
   keywords: [
     "Base64 encoder",
     "Base64 decoder",
@@ -22,18 +22,22 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
   robots: { index: true, follow: true },
-  alternates: { canonical: "https://gearizen.com/tools/base64-encoder-decoder" },
+  alternates: {
+    canonical:
+      "https://gearizen.com/tools/base64-encoder-decoder",
+  },
   openGraph: {
     title: "Base64 Encoder & Decoder | Gearizen",
     description:
-      "Convert text and files to and from Base64 with drag-and-drop support—fully client-side, privacy-first, zero signup, instant results.",
+      "Convert text and files to/from Base64 with drag-and-drop support—fully client-side, privacy-first, zero signup, instant results.",
     url: "https://gearizen.com/tools/base64-encoder-decoder",
     siteName: "Gearizen",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "https://gearizen.com/og/base64-encoder-decoder.png",
+        url:
+          "https://gearizen.com/og/base64-encoder-decoder.png",
         width: 1200,
         height: 630,
         alt: "Gearizen Base64 Encoder & Decoder Preview",
@@ -44,11 +48,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Base64 Encoder & Decoder | Gearizen",
     description:
-      "Convert text and files to and from Base64 with drag-and-drop support—fully client-side, privacy-first, zero signup, instant results.",
+      "Convert text and files to/from Base64 with drag-and-drop support—fully client-side, privacy-first, zero signup, instant results.",
     creator: "@gearizen",
     images: [
       {
-        url: "https://gearizen.com/og/base64-encoder-decoder.png",
+        url:
+          "https://gearizen.com/og/base64-encoder-decoder.png",
         alt: "Preview of Gearizen Base64 Encoder & Decoder",
       },
     ],
@@ -63,7 +68,7 @@ const structuredData = {
       name: "Base64 Encoder & Decoder | Gearizen",
       url: "https://gearizen.com/tools/base64-encoder-decoder",
       description:
-        "Convert text and files to and from Base64 with drag-and-drop support—fully client-side, privacy-first, zero signup, instant results.",
+        "Convert text and files to/from Base64 with drag-and-drop support—fully client-side, privacy-first, zero signup, instant results.",
       publisher: {
         "@type": "Organization",
         name: "Gearizen",
