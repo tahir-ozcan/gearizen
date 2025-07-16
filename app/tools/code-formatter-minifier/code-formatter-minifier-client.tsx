@@ -1,10 +1,13 @@
 // app/tools/code-formatter-minifier/code-formatter-minifier-client.tsx
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+} from "react";
 import {
-  Code2,
-  Minimize2,
   Trash2,
   ClipboardCopy,
   Check,
@@ -25,25 +28,17 @@ export interface CodeFormatterMinifierProps {
   /** Focus-ring Tailwind class */
   focusRingClass?: string;
   /** Labels & placeholders */
-  languageLabel?: string;
   inputLabel?: string;
   outputLabelFormat?: string;
   outputLabelMinify?: string;
   placeholderInput?: string;
   placeholderOutput?: string;
-  formatButtonLabel?: string;
-  minifyButtonLabel?: string;
   clearButtonLabel?: string;
   copyButtonLabel?: string;
-  /** Language options */
-  languages?: { value: "html" | "css" | "js"; label: string }[];
-  initialLanguage?: "html" | "css" | "js";
   /** Extra classes for overrides */
   rootClassName?: string;
   inputClassName?: string;
   outputClassName?: string;
-  selectClassName?: string;
-  primaryButtonClassName?: string;
   secondaryButtonClassName?: string;
 }
 
@@ -53,35 +48,23 @@ export default function CodeFormatterMinifierClient({
     "Instantly beautify and compress your HTML, CSS, and JavaScript code client-side—no uploads, privacy-first, zero signup, lightning-fast.",
   gradientClasses = "from-purple-500 via-pink-500 to-yellow-400",
   focusRingClass = "focus:ring-purple-500",
-  languageLabel = "Language",
   inputLabel = "Your Code",
   outputLabelFormat = "Beautified Code",
   outputLabelMinify = "Minified Code",
-  placeholderInput = "Paste your code here…",
+  placeholderInput = "Enter HTML, CSS, or JS code here…",
   placeholderOutput = "Result appears here…",
-  formatButtonLabel = "Beautify",
-  minifyButtonLabel = "Minify",
   clearButtonLabel = "Clear All",
   copyButtonLabel = "Copy",
-  languages = [
-    { value: "html", label: "HTML" },
-    { value: "css", label: "CSS" },
-    { value: "js", label: "JavaScript" },
-  ],
-  initialLanguage = "html",
   rootClassName = "",
   inputClassName,
   outputClassName,
-  selectClassName,
-  primaryButtonClassName,
   secondaryButtonClassName,
 }: CodeFormatterMinifierProps) {
-  const [language, setLanguage] = useState(initialLanguage);
   const [inputCode, setInputCode] = useState("");
-  const [outputCode, setOutputCode] = useState("");
-  const [mode, setMode] = useState<"format" | "minify">("format");
-  const [error, setError] = useState<string | null>(null);
+  const [formattedCode, setFormattedCode] = useState("");
+  const [minifiedCode, setMinifiedCode] = useState("");
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -91,98 +74,95 @@ export default function CodeFormatterMinifierClient({
   const baseOutputClasses =
     outputClassName ??
     `w-full min-h-[14rem] p-4 bg-gray-50 border border-gray-300 rounded-md font-mono resize-none placeholder-gray-400 focus:outline-none ${focusRingClass}`;
-  const selectClasses =
-    selectClassName ??
-    `block w-full p-2 bg-white border border-gray-300 rounded-md focus:outline-none ${focusRingClass}`;
-  const primaryBtnClasses =
-    primaryButtonClassName ??
-    `inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed`;
   const secondaryBtnClasses =
     secondaryButtonClassName ??
-    `inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-md transition hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300`;
+    `inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-md transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300`;
 
-  const handleBeautify = useCallback(() => {
-    setMode("format");
-    if (!inputCode.trim()) {
-      setOutputCode("");
-      setError(null);
-      return;
-    }
-    try {
-      let result: string;
-      switch (language) {
-        case "css":
-          result = beautifyCSS(inputCode, { indent_size: 2 });
-          break;
-        case "js":
-          result = beautifyJS(inputCode, { indent_size: 2 });
-          break;
-        default:
-          result = beautifyHTML(inputCode, {
-            indent_size: 2,
-            wrap_line_length: 0,
-          });
+  const detectLanguage = useCallback(
+    (code: string): "html" | "css" | "js" => {
+      const trimmed = code.trim();
+      if (trimmed.startsWith("<")) return "html";
+      if (/^\s*[.#]?[A-Za-z0-9_-]+\s*\{/.test(code)) return "css";
+      return "js";
+    },
+    []
+  );
+
+  const processCode = useCallback(
+    (code: string) => {
+      if (!code.trim()) {
+        setFormattedCode("");
+        setMinifiedCode("");
+        setError(null);
+        return;
       }
-      setOutputCode(result);
-      setError(null);
-    } catch {
-      setError("❌ Formatting failed");
-      setOutputCode("");
-    }
-  }, [inputCode, language]);
-
-  const handleMinify = useCallback(() => {
-    setMode("minify");
-    if (!inputCode.trim()) {
-      setOutputCode("");
-      setError(null);
-      return;
-    }
-    try {
-      let result: string;
-      const minifyOpts = {
-        indent_size: 0,
-        max_preserve_newlines: 0,
-        wrap_line_length: 0,
-      };
-      switch (language) {
-        case "css":
-          result = beautifyCSS(inputCode, minifyOpts);
-          break;
-        case "js":
-          result = beautifyJS(inputCode, minifyOpts);
-          break;
-        default:
-          result = beautifyHTML(inputCode, minifyOpts);
+      try {
+        const lang = detectLanguage(code);
+        let fmt: string;
+        let min: string;
+        switch (lang) {
+          case "css":
+            fmt = beautifyCSS(code, { indent_size: 2 });
+            min = beautifyCSS(code, {
+              indent_size: 0,
+              max_preserve_newlines: 0,
+              wrap_line_length: 0,
+            });
+            break;
+          case "js":
+            fmt = beautifyJS(code, { indent_size: 2 });
+            min = beautifyJS(code, {
+              indent_size: 0,
+              max_preserve_newlines: 0,
+              wrap_line_length: 0,
+            });
+            break;
+          default:
+            fmt = beautifyHTML(code, {
+              indent_size: 2,
+              wrap_line_length: 0,
+            });
+            min = beautifyHTML(code, {
+              indent_size: 0,
+              max_preserve_newlines: 0,
+              wrap_line_length: 0,
+            });
+        }
+        setFormattedCode(fmt);
+        setMinifiedCode(min);
+        setError(null);
+      } catch {
+        setError("❌ Processing failed");
+        setFormattedCode("");
+        setMinifiedCode("");
       }
-      setOutputCode(result);
-      setError(null);
-    } catch {
-      setError("❌ Minifying failed");
-      setOutputCode("");
-    }
-  }, [inputCode, language]);
+    },
+    [detectLanguage]
+  );
 
-  const handleCopy = useCallback(async () => {
-    if (!outputCode) return;
-    try {
-      await navigator.clipboard.writeText(outputCode);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // silent
-    }
-  }, [outputCode]);
+  // Run on every input change
+  useEffect(() => {
+    processCode(inputCode);
+  }, [inputCode, processCode]);
 
   const clearAll = useCallback(() => {
     setInputCode("");
-    setOutputCode("");
+    setFormattedCode("");
+    setMinifiedCode("");
     setError(null);
     inputRef.current?.focus();
   }, []);
 
-  const outputLabel =
-    mode === "format" ? outputLabelFormat : outputLabelMinify;
+  const handleCopy = useCallback(async () => {
+    if (!formattedCode) return;
+    try {
+      await navigator.clipboard.writeText(formattedCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* silent */
+    }
+  }, [formattedCode]);
 
   return (
     <section
@@ -206,30 +186,6 @@ export default function CodeFormatterMinifierClient({
         </header>
 
         <div className="space-y-6">
-          {/* Language Selector */}
-          <div className="w-40">
-            <label
-              htmlFor="language-select"
-              className="block text-sm font-medium text-gray-800 mb-1"
-            >
-              {languageLabel}
-            </label>
-            <select
-              id="language-select"
-              value={language}
-              onChange={(e) =>
-                setLanguage(e.target.value as "html" | "css" | "js")
-              }
-              className={selectClasses}
-            >
-              {languages.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
           {/* Input */}
           <div>
             <label
@@ -249,24 +205,6 @@ export default function CodeFormatterMinifierClient({
             />
           </div>
 
-          {/* Output */}
-          <div>
-            <label
-              htmlFor="code-output"
-              className="block text-sm font-medium text-gray-800 mb-1"
-            >
-              {outputLabel}
-            </label>
-            <textarea
-              id="code-output"
-              value={outputCode}
-              readOnly
-              placeholder={placeholderOutput}
-              className={baseOutputClasses}
-              aria-readonly
-            />
-          </div>
-
           {/* Error */}
           {error && (
             <div
@@ -277,30 +215,48 @@ export default function CodeFormatterMinifierClient({
             </div>
           )}
 
+          {/* Beautified Output */}
+          <div>
+            <label
+              htmlFor="formatted-output"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
+              {outputLabelFormat}
+            </label>
+            <textarea
+              id="formatted-output"
+              value={formattedCode}
+              readOnly
+              placeholder={placeholderOutput}
+              className={baseOutputClasses}
+              aria-readonly
+            />
+          </div>
+
+          {/* Minified Output */}
+          <div>
+            <label
+              htmlFor="minified-output"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
+              {outputLabelMinify}
+            </label>
+            <textarea
+              id="minified-output"
+              value={minifiedCode}
+              readOnly
+              placeholder={placeholderOutput}
+              className={baseOutputClasses}
+              aria-readonly
+            />
+          </div>
+
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-4">
             <button
               type="button"
-              onClick={handleBeautify}
-              aria-label={formatButtonLabel}
-              className={primaryBtnClasses}
-            >
-              <Code2 className="w-5 h-5" aria-hidden="true" />
-              {formatButtonLabel}
-            </button>
-            <button
-              type="button"
-              onClick={handleMinify}
-              aria-label={minifyButtonLabel}
-              className={primaryBtnClasses}
-            >
-              <Minimize2 className="w-5 h-5" aria-hidden="true" />
-              {minifyButtonLabel}
-            </button>
-            <button
-              type="button"
               onClick={handleCopy}
-              disabled={!outputCode}
+              disabled={!formattedCode}
               aria-label={copyButtonLabel}
               className={secondaryBtnClasses}
             >
@@ -314,6 +270,7 @@ export default function CodeFormatterMinifierClient({
               )}
               {copyButtonLabel}
             </button>
+
             <button
               type="button"
               onClick={clearAll}
