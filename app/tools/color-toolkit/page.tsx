@@ -1,14 +1,14 @@
 // app/tools/color-toolkit/page.tsx
-
-import ColorToolkitClient from "./color-toolkit-client";
-import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
+import { Metadata } from "next";
 import Script from "next/script";
+import { ColorToolkitClient } from "./color-toolkit-client";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 
-export const metadata = {
+export const metadata: Metadata = {
   metadataBase: new URL("https://gearizen.com"),
   title: "Color Toolkit | Gearizen",
   description:
-    "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Generate complementary, analogous, and triadic palettes, tints & shades, and verify WCAG-compliant contrast ratios—100% client-side, privacy-first, zero signup, instant results.",
+    "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Generate complementary, tints & shades, and verify WCAG-compliant contrast ratios—100% client-side, privacy-first, zero signup, instant results.",
   keywords: [
     "color converter",
     "hex to rgb",
@@ -17,25 +17,26 @@ export const metadata = {
     "rgb to hsl",
     "cmyk converter",
     "complementary colors",
-    "analogous colors",
-    "triadic palette",
     "color tints",
     "color shades",
     "contrast checker",
     "WCAG compliance",
-    "color accessibility",
     "online color tool",
     "client-side color toolkit",
     "privacy-first color tool",
-    "Gearizen color tools"
+    "Gearizen color tools",
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
-  robots: { index: true, follow: true },
-  alternates: { canonical: "https://gearizen.com/tools/color-toolkit" },
+  robots: "index, follow",
+  alternates: { canonical: "/tools/color-toolkit" },
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
   openGraph: {
     title: "Color Toolkit | Gearizen",
     description:
-      "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Generate complementary, analogous, and triadic palettes, tints & shades, and verify WCAG-compliant contrast ratios—100% client-side, privacy-first, zero signup, instant results.",
+      "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Generate complementary, tints & shades, and verify WCAG-compliant contrast ratios—100% client-side, privacy-first.",
     url: "https://gearizen.com/tools/color-toolkit",
     siteName: "Gearizen",
     locale: "en_US",
@@ -45,19 +46,21 @@ export const metadata = {
         url: "https://gearizen.com/og/color-toolkit.png",
         width: 1200,
         height: 630,
-        alt: "Gearizen Color Toolkit Preview"
-      }
-    ]
+        alt: "Gearizen Color Toolkit Preview",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Color Toolkit | Gearizen",
     description:
-      "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Generate complementary, analogous, and triadic palettes, tints & shades, and verify WCAG-compliant contrast ratios—100% client-side, privacy-first, zero signup, instant results.",
+      "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Privacy-first, zero signup, instant results.",
     creator: "@gearizen",
-    images: ["https://gearizen.com/og/color-toolkit.png"],
-    imageAlt: "Gearizen Color Toolkit Preview"
-  }
+    images: [{
+      url: "https://gearizen.com/og/color-toolkit.png",
+      alt: "Gearizen Color Toolkit Preview",
+    }],
+  },
 };
 
 export default function ColorToolkitPage() {
@@ -69,15 +72,15 @@ export default function ColorToolkitPage() {
         name: "Color Toolkit | Gearizen",
         url: "https://gearizen.com/tools/color-toolkit",
         description:
-          "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Generate complementary, analogous, and triadic palettes, tints & shades, and verify WCAG-compliant contrast ratios—100% client-side, privacy-first, zero signup, instant results.",
+          "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Generate complementary, tints & shades, and verify WCAG-compliant contrast ratios—100% client-side, privacy-first, zero signup, instant results.",
         publisher: {
           "@type": "Organization",
           name: "Gearizen",
           url: "https://gearizen.com",
           logo: {
             "@type": "ImageObject",
-            url: "https://gearizen.com/logo.png"
-          }
+            url: "https://gearizen.com/logo.png",
+          },
         },
         breadcrumb: {
           "@type": "BreadcrumbList",
@@ -86,22 +89,22 @@ export default function ColorToolkitPage() {
               "@type": "ListItem",
               position: 1,
               name: "Home",
-              item: "https://gearizen.com"
+              item: "https://gearizen.com",
             },
             {
               "@type": "ListItem",
               position: 2,
               name: "Tools",
-              item: "https://gearizen.com/tools"
+              item: "https://gearizen.com/tools",
             },
             {
               "@type": "ListItem",
               position: 3,
               name: "Color Toolkit",
-              item: "https://gearizen.com/tools/color-toolkit"
-            }
-          ]
-        }
+              item: "https://gearizen.com/tools/color-toolkit",
+            },
+          ],
+        },
       },
       {
         "@type": "SoftwareApplication",
@@ -112,20 +115,19 @@ export default function ColorToolkitPage() {
         offers: {
           "@type": "Offer",
           price: "0",
-          priceCurrency: "USD"
+          priceCurrency: "USD",
         },
         publisher: {
           "@type": "Organization",
           name: "Gearizen",
-          url: "https://gearizen.com"
-        }
-      }
-    ]
+          url: "https://gearizen.com",
+        },
+      },
+    ],
   };
 
   return (
     <>
-      {/* JSON-LD for structured data */}
       <Script
         id="ld-json"
         type="application/ld+json"
@@ -134,14 +136,12 @@ export default function ColorToolkitPage() {
         {JSON.stringify(structuredData)}
       </Script>
 
-      {/* Breadcrumb structured data */}
       <BreadcrumbJsonLd
         pageTitle="Color Toolkit"
         pageUrl="https://gearizen.com/tools/color-toolkit"
       />
 
-      {/* Main client component */}
-      <main>
+      <main id="color-toolkit-page" className="py-12 px-4 sm:px-6 lg:px-8">
         <ColorToolkitClient />
       </main>
     </>
