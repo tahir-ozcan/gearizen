@@ -99,7 +99,7 @@ export default function Base64EncoderDecoderClient({
 
   const dropZoneClasses =
     dropZoneClassName ??
-    `w-full p-2 border-2 border-dashed rounded-md transition ${
+    `w-full border-2 border-dashed rounded-md transition ${
       isDragging
         ? "border-blue-500 bg-blue-50"
         : "border-gray-300 bg-white"
@@ -257,13 +257,14 @@ export default function Base64EncoderDecoderClient({
     >
       <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         {/* Heading */}
-        <header className="text-center space-y-4 mb-10">
+        <header className="text-center space-y-6 mb-10">
           <h1
             id="base64-heading"
-            className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight`}
+            className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight`}
           >
             {heading}
           </h1>
+          <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
           <p className="text-lg sm:text-xl text-gray-600">
             {description}
           </p>
