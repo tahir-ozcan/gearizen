@@ -77,7 +77,7 @@ export default function CodeFormatterMinifierClient({
     secondaryButtonClassName ??
     `inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-md transition hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300`;
 
-  // Simple language detector: html if starts with '<', css if it has selectors, otherwise js
+  // Auto-detect HTML, CSS, or JS
   const detectLanguage = useCallback((code: string): "html" | "css" | "js" => {
     const t = code.trim();
     if (t.startsWith("<")) return "html";
@@ -107,15 +107,15 @@ export default function CodeFormatterMinifierClient({
             throw new Error("HTML syntax error");
           }
         } else {
-          const openCount = (code.match(/{/g) || []).length;
-          const closeCount = (code.match(/}/g) || []).length;
-          if (openCount !== closeCount) {
+          const opens = (code.match(/{/g) || []).length;
+          const closes = (code.match(/}/g) || []).length;
+          if (opens !== closes) {
             throw new Error("CSS syntax error: unmatched braces");
           }
         }
       } catch (e: unknown) {
-        const message = e instanceof Error ? e.message : String(e);
-        setError(message);
+        const msg = e instanceof Error ? e.message : String(e);
+        setError(msg);
         setFormattedCode("");
         setMinifiedCode("");
         return;
@@ -164,7 +164,7 @@ export default function CodeFormatterMinifierClient({
     [detectLanguage]
   );
 
-  // Re-run when input or toggle changes
+  // Re-run when input changes
   useEffect(() => {
     validateAndProcess(inputCode);
   }, [inputCode, validateAndProcess]);
@@ -178,23 +178,26 @@ export default function CodeFormatterMinifierClient({
   }, []);
 
   const handleCopy = useCallback(async () => {
-    const outputValue = error
+    const output = error
       ? ""
       : minify
       ? minifiedCode
       : formattedCode;
-    if (!outputValue) return;
+    if (!output) return;
     try {
-      await navigator.clipboard.writeText(outputValue);
+      await navigator.clipboard.writeText(output);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
       /* silent */
     }
-  }, [formattedCode, minifiedCode, minify, error]);
+  }, [error, formattedCode, minifiedCode, minify]);
 
-  // Single output: either error or beautified/minified code
-  const outputValue = error ? error : minify ? minifiedCode : formattedCode;
+  const outputValue = error
+    ? error
+    : minify
+    ? minifiedCode
+    : formattedCode;
 
   return (
     <section
@@ -218,7 +221,7 @@ export default function CodeFormatterMinifierClient({
         </header>
 
         <div className="space-y-6">
-          {/* Input */}
+          {/* Code Input */}
           <div>
             <label
               htmlFor="code-input"
@@ -237,45 +240,19 @@ export default function CodeFormatterMinifierClient({
             />
           </div>
 
-          {/* Minify Toggle */}
-          <div className="flex items-center gap-2">
-            <input
-              id="minify-toggle"
-              type="checkbox"
-              checked={minify}
-              onChange={(e) => setMinify(e.target.checked)}
-              className="h-4 w-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            <label
-              htmlFor="minify-toggle"
-              className="text-sm text-gray-800 select-none"
-            >
-              Minify
-            </label>
-          </div>
-
-          {/* Single Output */}
-          <div>
-            <label
-              htmlFor="code-output"
-              className="block text-sm font-medium text-gray-800 mb-1"
-            >
-              {outputLabel}
-            </label>
-            <textarea
-              id="code-output"
-              value={outputValue}
-              readOnly
-              placeholder={placeholderOutput}
-              className={
-                baseOutputClasses + (error ? " text-red-700" : "")
-              }
-              aria-readonly
-            />
-          </div>
-
-          {/* Actions */}
+          {/* Controls */}
           <div className="flex flex-wrap items-center gap-4">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={minify}
+                onChange={(e) => setMinify(e.target.checked)}
+                className="h-4 w-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <span className="text-sm text-gray-800 select-none">
+                Minify
+              </span>
+            </label>
             <button
               type="button"
               onClick={handleCopy}
@@ -299,6 +276,26 @@ export default function CodeFormatterMinifierClient({
               <Trash2 className="w-5 h-5" aria-hidden="true" />
               {clearButtonLabel}
             </button>
+          </div>
+
+          {/* Single Output */}
+          <div>
+            <label
+              htmlFor="code-output"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
+              {outputLabel}
+            </label>
+            <textarea
+              id="code-output"
+              value={outputValue}
+              readOnly
+              placeholder={placeholderOutput}
+              className={
+                baseOutputClasses + (error ? " text-red-700" : "")
+              }
+              aria-readonly
+            />
           </div>
         </div>
       </div>
