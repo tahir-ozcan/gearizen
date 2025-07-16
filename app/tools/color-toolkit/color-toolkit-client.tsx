@@ -295,7 +295,7 @@ export const ColorToolkitClient: FC<ColorToolkitClientProps> = ({
     <section
       id="color-toolkit"
       aria-labelledby="color-toolkit-heading"
-      className={`space-y-16 antialiased mx-auto max-w-4xl ${containerClassName}`}
+      className={`space-y-16 antialiased mx-auto ${containerClassName}`}
     >
       {/* Hidden live region for copy status */}
       <div aria-live="polite" className="sr-only">
@@ -304,7 +304,7 @@ export const ColorToolkitClient: FC<ColorToolkitClientProps> = ({
 
       {/* Heading */}
       <div
-        className={`text-center space-y-6 px-4 ${headingWrapperClassName}`}
+        className={`text-center space-y-6 ${headingWrapperClassName}`}
       >
         <h1
           id="color-toolkit-heading"
@@ -332,7 +332,7 @@ export const ColorToolkitClient: FC<ColorToolkitClientProps> = ({
 
       {/* Input */}
       <div
-        className={`max-w-lg mx-auto space-y-4 px-4 ${inputContainerClassName}`}
+        className={`max-w-lg mx-auto space-y-4 ${inputContainerClassName}`}
       >
         <label
           htmlFor="color-input"

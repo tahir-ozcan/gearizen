@@ -141,9 +141,7 @@ export default function ColorToolkitPage() {
         pageUrl="https://gearizen.com/tools/color-toolkit"
       />
 
-      <main id="color-toolkit-page" className="py-12 px-4 sm:px-6 lg:px-8">
-        <ColorToolkitClient />
-      </main>
+      <ColorToolkitClient />
     </>
   );
 }
