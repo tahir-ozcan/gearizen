@@ -1,37 +1,24 @@
 {
   "compilerOptions": {
-    /* Hedeflenen JS sürümü ve DOM / ESNext API’leri */
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-
-    /* Modül sistemi ve çözümleme */
     "module": "ESNext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-
-    /* Çıktı üretme: Next.js kendisi derleyecek */
     "noEmit": true,
     "isolatedModules": true,
     "jsx": "preserve",
-
-    /* Katı tip denetimi */
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "allowJs": true,
-
-    /* Proje içi alias’lar */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
     },
-
-    /* Yeniden derleme hızlandırma */
     "incremental": true,
-
-    /* Özel tip kökleri (ambient .d.ts dosyalarınız burada aranacak) */
     "typeRoots": ["./types", "./node_modules/@types"]
   },
   "include": [

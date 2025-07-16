@@ -1,33 +1,33 @@
 // types/pdfjs-worker.d.ts
-import type { PageViewport } from "pdfjs-dist/types/src/display/api";
 
-declare module "pdfjs-dist/legacy/build/pdf" {
-  export interface GlobalWorkerOptions { workerSrc: string }
-  export interface PDFDocumentProxy {
-    numPages: number;
-    getPage(index: number): Promise<PDFPageProxy>;
-  }
-  export interface PDFPageProxy {
-    getViewport(params: { scale: number }): PageViewport;
-    getTextContent(): Promise<TextContent>;
-    render(params: {
-      canvasContext: CanvasRenderingContext2D;
-      viewport: PageViewport;
-    }): { promise: Promise<void> };
-  }
-  export interface TextItem {
-    str: string;
-    transform?: number[];
-    fontName?: string;
-  }
-  export interface TextContent { items: TextItem[] }
-  export function getDocument(
-    source: string | Uint8Array | { data: ArrayBuffer }
-  ): { promise: Promise<PDFDocumentProxy> };
-  export const GlobalWorkerOptions: GlobalWorkerOptions;
+// 1) Worker URL import’ları için ambient modül bildirimi:
+declare module "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url" {
+  const workerSrc: string;
+  export default workerSrc;
+}
+declare module "pdfjs-dist/legacy/build/pdf.worker.min.js?url" {
+  const workerSrc: string;
+  export default workerSrc;
 }
 
-declare module "pdfjs-dist/legacy/build/pdf.worker.min.js?url" {
-  const workerUrl: string;
-  export default workerUrl;
+// 2) Core PDF.js API’larının tip tanımlamaları:
+//    (pdfjs-dist paketi içinde types yoksa, buradan aktarabilirsiniz)
+declare module "pdfjs-dist/legacy/build/pdf" {
+  import {
+    GlobalWorkerOptions as _G,
+    getDocument as _getDocument,
+    PDFDocumentProxy as _P,
+    PDFPageProxy as _PP,
+    TextContent as _TC,
+    TextItem as _TI,
+  } from "pdfjs-dist";
+
+  export const GlobalWorkerOptions: typeof _G;
+  export function getDocument(
+    source: Parameters<typeof _getDocument>[0]
+  ): ReturnType<typeof _getDocument>;
+  export type PDFDocumentProxy = _P;
+  export type PDFPageProxy = _PP;
+  export type TextContent = _TC;
+  export type TextItem = _TI;
 }
