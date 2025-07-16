@@ -1,6 +1,7 @@
 // app/tools/base64-encoder-decoder/page.tsx
 import { Metadata } from "next";
 import Script from "next/script";
+import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 import Base64EncoderDecoderClient from "./base64-encoder-decoder-client";
 
 export const metadata: Metadata = {
@@ -111,6 +112,11 @@ export default function Page() {
       >
         {JSON.stringify(structuredData)}
       </Script>
+      <BreadcrumbJsonLd
+        pageTitle="Base64 Encoder & Decoder "
+        pageUrl="https://gearizen.com/tools/base64-encoder-decoder"
+      />
+
       <Base64EncoderDecoderClient />
     </>
   );

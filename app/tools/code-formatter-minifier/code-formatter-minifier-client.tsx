@@ -1,258 +1,330 @@
 // app/tools/code-formatter-minifier/code-formatter-minifier-client.tsx
 "use client";
 
+import React, { useState, useRef, useCallback } from "react";
 import {
-  useState,
-  useRef,
-  ChangeEvent,
-  FormEvent,
-} from "react";
-import { Trash2, ClipboardCopy } from "lucide-react";
+  Code2,
+  Minimize2,
+  Trash2,
+  ClipboardCopy,
+  Check,
+} from "lucide-react";
 import {
-  js as beautifyJs,
-  css as beautifyCss,
-  html as beautifyHtml,
+  html as beautifyHTML,
+  css as beautifyCSS,
+  js as beautifyJS,
 } from "js-beautify";
 
-/**
- * Code Formatter & Minifier Tool
- *
- * Beautify or compress HTML, CSS and JavaScript code for readability
- * or performance gains—no uploads, no server.
- * 100% client-side, instant results.
- */
-export default function CodeFormatterMinifierClient() {
+export interface CodeFormatterMinifierProps {
+  /** Main heading text */
+  heading?: string;
+  /** Subtitle/description text */
+  description?: string;
+  /** Gradient classes for headings and accents */
+  gradientClasses?: string;
+  /** Focus-ring Tailwind class */
+  focusRingClass?: string;
+  /** Labels & placeholders */
+  languageLabel?: string;
+  inputLabel?: string;
+  outputLabelFormat?: string;
+  outputLabelMinify?: string;
+  placeholderInput?: string;
+  placeholderOutput?: string;
+  formatButtonLabel?: string;
+  minifyButtonLabel?: string;
+  clearButtonLabel?: string;
+  copyButtonLabel?: string;
+  /** Language options */
+  languages?: { value: "html" | "css" | "js"; label: string }[];
+  initialLanguage?: "html" | "css" | "js";
+  /** Extra classes for overrides */
+  rootClassName?: string;
+  inputClassName?: string;
+  outputClassName?: string;
+  selectClassName?: string;
+  primaryButtonClassName?: string;
+  secondaryButtonClassName?: string;
+}
+
+export default function CodeFormatterMinifierClient({
+  heading = "Code Formatter & Minifier",
+  description =
+    "Instantly beautify and compress your HTML, CSS, and JavaScript code client-side—no uploads, privacy-first, zero signup, lightning-fast.",
+  gradientClasses = "from-purple-500 via-pink-500 to-yellow-400",
+  focusRingClass = "focus:ring-purple-500",
+  languageLabel = "Language",
+  inputLabel = "Your Code",
+  outputLabelFormat = "Beautified Code",
+  outputLabelMinify = "Minified Code",
+  placeholderInput = "Paste your code here…",
+  placeholderOutput = "Result appears here…",
+  formatButtonLabel = "Beautify",
+  minifyButtonLabel = "Minify",
+  clearButtonLabel = "Clear All",
+  copyButtonLabel = "Copy",
+  languages = [
+    { value: "html", label: "HTML" },
+    { value: "css", label: "CSS" },
+    { value: "js", label: "JavaScript" },
+  ],
+  initialLanguage = "html",
+  rootClassName = "",
+  inputClassName,
+  outputClassName,
+  selectClassName,
+  primaryButtonClassName,
+  secondaryButtonClassName,
+}: CodeFormatterMinifierProps) {
+  const [language, setLanguage] = useState(initialLanguage);
+  const [inputCode, setInputCode] = useState("");
+  const [outputCode, setOutputCode] = useState("");
   const [mode, setMode] = useState<"format" | "minify">("format");
-  const [language, setLanguage] = useState<"js" | "css" | "html">("js");
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // ─── Helpers ───────────────────────────────────────────────────────────────
-  function clearAll() {
-    setInput("");
-    setOutput("");
+  const baseInputClasses =
+    inputClassName ??
+    `w-full min-h-[14rem] p-4 bg-transparent rounded-md font-mono resize-y placeholder-gray-400 focus:outline-none ${focusRingClass}`;
+  const baseOutputClasses =
+    outputClassName ??
+    `w-full min-h-[14rem] p-4 bg-gray-50 border border-gray-300 rounded-md font-mono resize-none placeholder-gray-400 focus:outline-none ${focusRingClass}`;
+  const selectClasses =
+    selectClassName ??
+    `block w-full p-2 bg-white border border-gray-300 rounded-md focus:outline-none ${focusRingClass}`;
+  const primaryBtnClasses =
+    primaryButtonClassName ??
+    `inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed`;
+  const secondaryBtnClasses =
+    secondaryButtonClassName ??
+    `inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-md transition hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300`;
+
+  const handleBeautify = useCallback(() => {
+    setMode("format");
+    if (!inputCode.trim()) {
+      setOutputCode("");
+      setError(null);
+      return;
+    }
+    try {
+      let result: string;
+      switch (language) {
+        case "css":
+          result = beautifyCSS(inputCode, { indent_size: 2 });
+          break;
+        case "js":
+          result = beautifyJS(inputCode, { indent_size: 2 });
+          break;
+        default:
+          result = beautifyHTML(inputCode, {
+            indent_size: 2,
+            wrap_line_length: 0,
+          });
+      }
+      setOutputCode(result);
+      setError(null);
+    } catch {
+      setError("❌ Formatting failed");
+      setOutputCode("");
+    }
+  }, [inputCode, language]);
+
+  const handleMinify = useCallback(() => {
+    setMode("minify");
+    if (!inputCode.trim()) {
+      setOutputCode("");
+      setError(null);
+      return;
+    }
+    try {
+      let result: string;
+      const minifyOpts = {
+        indent_size: 0,
+        max_preserve_newlines: 0,
+        wrap_line_length: 0,
+      };
+      switch (language) {
+        case "css":
+          result = beautifyCSS(inputCode, minifyOpts);
+          break;
+        case "js":
+          result = beautifyJS(inputCode, minifyOpts);
+          break;
+        default:
+          result = beautifyHTML(inputCode, minifyOpts);
+      }
+      setOutputCode(result);
+      setError(null);
+    } catch {
+      setError("❌ Minifying failed");
+      setOutputCode("");
+    }
+  }, [inputCode, language]);
+
+  const handleCopy = useCallback(async () => {
+    if (!outputCode) return;
+    try {
+      await navigator.clipboard.writeText(outputCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // silent
+    }
+  }, [outputCode]);
+
+  const clearAll = useCallback(() => {
+    setInputCode("");
+    setOutputCode("");
     setError(null);
     inputRef.current?.focus();
-  }
+  }, []);
 
-  function formatText(text: string) {
-    const opts = { indent_size: 2, space_in_empty_paren: true };
-    if (language === "js") return beautifyJs(text, opts);
-    if (language === "css") return beautifyCss(text, opts);
-    return beautifyHtml(text, opts);
-  }
+  const outputLabel =
+    mode === "format" ? outputLabelFormat : outputLabelMinify;
 
-  function minifyText(text: string) {
-    const opts = { indent_size: 0, max_preserve_newlines: 0 };
-    if (language === "js") return beautifyJs(text, opts);
-    if (language === "css") return beautifyCss(text, opts);
-    return beautifyHtml(text, opts);
-  }
-
-  // ─── Form Handlers ─────────────────────────────────────────────────────────
-  function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    setInput(e.target.value);
-    setError(null);
-    setOutput("");
-  }
-
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setOutput("");
-
-    try {
-      const result =
-        mode === "format" ? formatText(input) : minifyText(input);
-      setOutput(result);
-    } catch {
-      setError(
-        mode === "format" ? "❌ Formatting failed." : "❌ Minification failed."
-      );
-    }
-  }
-
-  async function copyOutput() {
-    if (!output) return;
-    try {
-      await navigator.clipboard.writeText(output);
-      alert("✅ Copied to clipboard!");
-    } catch {
-      alert("❌ Copy failed.");
-    }
-  }
-
-  // ─── Character Counts ───────────────────────────────────────────────────────
-  const inputCount = input.length.toLocaleString();
-  const outputCount = output.length.toLocaleString();
-
-  // ─── Render ─────────────────────────────────────────────────────────────────
   return (
     <section
       id="code-formatter-minifier"
-      aria-labelledby="code-formatter-heading"
-      className="space-y-16 text-gray-900 antialiased"
+      aria-labelledby="formatter-heading"
+      className={`text-gray-900 antialiased ${rootClassName}`}
     >
-      {/* Heading & Description */}
-      <div className="text-center space-y-6 sm:px-0">
-        <h1
-          id="code-formatter-heading"
-          className="
-            bg-clip-text text-transparent
-            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
-            text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
-          "
-        >
-          Code Formatter & Minifier
-        </h1>
-        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-        <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Beautify or compress HTML, CSS and JavaScript code for readability or performance gains—no uploads, no server.
-        </p>
-      </div>
+      <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        {/* Heading */}
+        <header className="text-center space-y-4 mb-10">
+          <h1
+            id="formatter-heading"
+            className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight`}
+          >
+            {heading}
+          </h1>
+          <p className="text-lg sm:text-xl text-gray-600">
+            {description}
+          </p>
+        </header>
 
-      {/* Controls */}
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-3xl mx-auto space-y-8 sm:px-0"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
+        <div className="space-y-6">
+          {/* Language Selector */}
+          <div className="w-40">
             <label
               htmlFor="language-select"
-              className="text-sm font-medium text-gray-800"
+              className="block text-sm font-medium text-gray-800 mb-1"
             >
-              Language:
+              {languageLabel}
             </label>
             <select
               id="language-select"
               value={language}
               onChange={(e) =>
-                setLanguage(e.target.value as "js" | "css" | "html")
+                setLanguage(e.target.value as "html" | "css" | "js")
               }
-              className="
-                py-1 px-2 border border-gray-300 rounded-md
-                focus:outline-none focus:ring-2 focus:ring-[#7c3aed]
-                transition text-sm
-              "
+              className={selectClasses}
             >
-              <option value="js">JavaScript</option>
-              <option value="css">CSS</option>
-              <option value="html">HTML</option>
+              {languages.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
             </select>
           </div>
 
-          <button
-            type="button"
-            onClick={() =>
-              setMode((m) => (m === "format" ? "minify" : "format"))
-            }
-            className="
-              inline-flex items-center gap-2 px-4 py-2
-              border border-gray-300 rounded-md
-              hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7c3aed]
-              transition text-sm font-medium text-gray-700
-            "
-          >
-            {mode === "format" ? "Switch to Minify" : "Switch to Format"}
-          </button>
-        </div>
-
-        {/* Input & Output */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Input */}
-          <div className="flex flex-col">
+          <div>
             <label
               htmlFor="code-input"
               className="block text-sm font-medium text-gray-800 mb-1"
             >
-              {mode === "format" ? "Code to Format" : "Code to Minify"}
+              {inputLabel}
             </label>
             <textarea
               id="code-input"
               ref={inputRef}
-              value={input}
-              onChange={handleInputChange}
-              placeholder="Paste your code here…"
-              className="
-                w-full h-64 p-4 border border-gray-300 rounded-md bg-white
-                focus:ring-2 focus:ring-[#7c3aed] font-mono resize-y transition
-              "
+              value={inputCode}
+              onChange={(e) => setInputCode(e.target.value)}
+              placeholder={placeholderInput}
+              className={baseInputClasses}
+              aria-multiline
             />
-            <p className="mt-1 text-xs text-gray-500">
-              {inputCount} characters
-            </p>
           </div>
 
           {/* Output */}
-          <div className="relative flex flex-col">
+          <div>
             <label
               htmlFor="code-output"
               className="block text-sm font-medium text-gray-800 mb-1"
             >
-              {mode === "format" ? "Formatted Code" : "Minified Code"}
+              {outputLabel}
             </label>
-            <div className="relative">
-              <textarea
-                id="code-output"
-                value={output}
-                readOnly
-                placeholder="Result appears here…"
-                className="
-                  w-full h-64 pl-4 pr-12 py-4 border border-gray-300 rounded-md bg-gray-50
-                  focus:ring-2 focus:ring-[#7c3aed] font-mono resize-y transition
-                "
-              />
-              <button
-                type="button"
-                onClick={copyOutput}
-                disabled={!output}
-                aria-label="Copy output"
-                className="
-                  absolute top-2 right-2 p-2 text-gray-500 hover:text-[#7c3aed]
-                  disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition
-                "
-              >
-                <ClipboardCopy className="w-6 h-6" />
-              </button>
+            <textarea
+              id="code-output"
+              value={outputCode}
+              readOnly
+              placeholder={placeholderOutput}
+              className={baseOutputClasses}
+              aria-readonly
+            />
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div
+              role="alert"
+              className="text-red-700 bg-red-50 border border-red-200 p-4 rounded-md"
+            >
+              {error}
             </div>
-            <p className="mt-1 text-xs text-gray-500">
-              {outputCount} characters
-            </p>
+          )}
+
+          {/* Actions */}
+          <div className="flex flex-wrap items-center gap-4">
+            <button
+              type="button"
+              onClick={handleBeautify}
+              aria-label={formatButtonLabel}
+              className={primaryBtnClasses}
+            >
+              <Code2 className="w-5 h-5" aria-hidden="true" />
+              {formatButtonLabel}
+            </button>
+            <button
+              type="button"
+              onClick={handleMinify}
+              aria-label={minifyButtonLabel}
+              className={primaryBtnClasses}
+            >
+              <Minimize2 className="w-5 h-5" aria-hidden="true" />
+              {minifyButtonLabel}
+            </button>
+            <button
+              type="button"
+              onClick={handleCopy}
+              disabled={!outputCode}
+              aria-label={copyButtonLabel}
+              className={secondaryBtnClasses}
+            >
+              {copied ? (
+                <Check className="w-5 h-5" aria-hidden="true" />
+              ) : (
+                <ClipboardCopy
+                  className="w-5 h-5"
+                  aria-hidden="true"
+                />
+              )}
+              {copyButtonLabel}
+            </button>
+            <button
+              type="button"
+              onClick={clearAll}
+              aria-label={clearButtonLabel}
+              className={secondaryBtnClasses}
+            >
+              <Trash2 className="w-5 h-5" aria-hidden="true" />
+              {clearButtonLabel}
+            </button>
           </div>
         </div>
-
-        {error && (
-          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
-            {error}
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="flex flex-wrap items-center gap-4">
-          <button
-            type="submit"
-            className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
-          >
-            {mode === "format" ? "Format →" : "Minify →"}
-          </button>
-          <button
-            type="button"
-            onClick={clearAll}
-            className="
-              inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md
-              hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300
-              transition text-sm
-            "
-          >
-            <Trash2 className="w-5 h-5" />
-            Clear All
-          </button>
-        </div>
-      </form>
+      </div>
     </section>
   );
 }
