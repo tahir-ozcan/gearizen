@@ -42,6 +42,16 @@ export interface Base64EncoderDecoderProps {
   dropZoneLabel?: string;
   /** Extra classes for the root container */
   rootClassName?: string;
+  /** Override CSS class for input textarea */
+  inputClassName?: string;
+  /** Override CSS class for drop zone container */
+  dropZoneClassName?: string;
+  /** Override CSS class for primary action button (encode/decode) */
+  actionButtonClassName?: string;
+  /** Override CSS class for secondary buttons (clear, switch mode, file-upload) */
+  secondaryButtonClassName?: string;
+  /** Override CSS class for the copy button */
+  copyButtonClassName?: string;
 }
 
 export default function Base64EncoderDecoderClient({
@@ -67,43 +77,84 @@ export default function Base64EncoderDecoderClient({
   fileUploadButtonLabel = "Upload File",
   dropZoneLabel = "Drag & drop file here, or click to upload",
   rootClassName = "",
+  inputClassName,
+  dropZoneClassName,
+  actionButtonClassName,
+  secondaryButtonClassName,
+  copyButtonClassName,
 }: Base64EncoderDecoderProps) {
   const [mode, setMode] = useState<"encode" | "decode">(initialMode);
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
+  const [inputText, setInputText] = useState("");
+  const [outputText, setOutputText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [liveMessage, setLiveMessage] = useState("");
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Class-name overrides
+  const inputClasses = inputClassName
+    ? inputClassName
+    : `w-full h-48 p-4 border border-gray-300 rounded-md bg-white ${focusRingClass} font-mono resize-y transition focus:outline-none`;
+  const dropZoneClasses = dropZoneClassName
+    ? dropZoneClassName
+    : `flex flex-col p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-indigo-500 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500 transition cursor-pointer`;
+  const primaryButtonClasses = actionButtonClassName
+    ? actionButtonClassName
+    : `px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 focus:outline-none transition font-medium`;
+  const secondaryButtonClasses = secondaryButtonClassName
+    ? secondaryButtonClassName
+    : `inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus-visible:ring-2 focus-visible:ring-gray-300 focus:outline-none transition text-sm`;
+  const copyBtnClasses = copyButtonClassName
+    ? copyButtonClassName
+    : `absolute top-2 right-2 p-2 text-gray-500 hover:text-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition`;
+
+  // Helpers
   const clearAll = useCallback(() => {
-    setInput("");
-    setOutput("");
+    setInputText("");
+    setOutputText("");
     setError(null);
+    setLiveMessage("");
     inputRef.current?.focus();
   }, []);
 
   const encodeText = useCallback((text: string) => {
-    const utf8 = unescape(encodeURIComponent(text));
-    return btoa(utf8);
+    // UTF-8 safe
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    let binary = "";
+    data.forEach((byte) => (binary += String.fromCharCode(byte)));
+    return btoa(binary);
   }, []);
 
   const decodeText = useCallback((text: string) => {
     const binary = atob(text);
-    return decodeURIComponent(escape(binary));
+    const bytes = Uint8Array.from(
+      [...binary].map((char) => char.charCodeAt(0))
+    );
+    const decoder = new TextDecoder();
+    return decoder.decode(bytes);
   }, []);
 
+  const announce = (msg: string) => {
+    setLiveMessage(msg);
+    setTimeout(() => setLiveMessage(""), 3000);
+  };
+
+  // File → Base64
   const handleFile = useCallback((file: File) => {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result;
       if (result instanceof ArrayBuffer) {
         const bytes = new Uint8Array(result);
-        let str = "";
-        for (const b of bytes) str += String.fromCharCode(b);
+        let binary = "";
+        bytes.forEach((b) => (binary += String.fromCharCode(b)));
         setMode("encode");
-        setInput("");
-        setOutput(btoa(str));
+        setInputText("");
+        setOutputText(btoa(binary));
+        setError(null);
+        announce("File converted to Base64");
       }
     };
     reader.readAsArrayBuffer(file);
@@ -117,11 +168,9 @@ export default function Base64EncoderDecoderClient({
     },
     [handleFile]
   );
-
   const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   }, []);
-
   const handleDropZoneKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -131,46 +180,46 @@ export default function Base64EncoderDecoderClient({
     },
     []
   );
-
   const handleInputChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
-      setInput(e.target.value);
+      setInputText(e.target.value);
       setError(null);
-      setOutput("");
+      setOutputText("");
     },
     []
   );
-
   const handleSubmit = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
       setError(null);
-      setOutput("");
+      setOutputText("");
       try {
         const result =
-          mode === "encode" ? encodeText(input) : decodeText(input);
-        setOutput(result);
-      } catch {
-        setError(
           mode === "encode"
-            ? "❌ Encoding failed."
-            : "❌ Decoding failed."
+            ? encodeText(inputText)
+            : decodeText(inputText);
+        setOutputText(result);
+        announce(
+          mode === "encode" ? "Text encoded" : "Text decoded"
         );
+      } catch {
+        const msg =
+          mode === "encode" ? "❌ Encoding failed" : "❌ Decoding failed";
+        setError(msg);
+        announce(msg);
       }
     },
-    [mode, input, encodeText, decodeText]
+    [mode, inputText, encodeText, decodeText]
   );
-
   const handleCopy = useCallback(async () => {
-    if (!output) return;
+    if (!outputText) return;
     try {
-      await navigator.clipboard.writeText(output);
-      alert("✅ Copied to clipboard!");
+      await navigator.clipboard.writeText(outputText);
+      announce("Copied to clipboard");
     } catch {
-      alert("❌ Copy failed.");
+      announce("❌ Copy failed");
     }
-  }, [output]);
-
+  }, [outputText]);
   const handleFileSelect = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -179,8 +228,8 @@ export default function Base64EncoderDecoderClient({
     [handleFile]
   );
 
-  const inputCount = input.length.toLocaleString();
-  const outputCount = output.length.toLocaleString();
+  const inputCount = inputText.length.toLocaleString();
+  const outputCount = outputText.length.toLocaleString();
 
   return (
     <section
@@ -188,8 +237,13 @@ export default function Base64EncoderDecoderClient({
       aria-labelledby="base64-heading"
       className={`space-y-12 text-gray-900 antialiased ${rootClassName}`}
     >
-      {/* Heading & Subtitle */}
-      <div className="text-center space-y-4">
+      {/* Invisible live-region for announcements */}
+      <div aria-live="polite" className="sr-only">
+        {liveMessage}
+      </div>
+
+      {/* Heading & subtitle */}
+      <div className="text-center space-y-4 px-4">
         <h1
           id="base64-heading"
           className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight`}
@@ -204,13 +258,13 @@ export default function Base64EncoderDecoderClient({
         </p>
       </div>
 
-      {/* Tool Form */}
+      {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="max-w-3xl mx-auto space-y-8"
+        className="max-w-3xl mx-auto space-y-8 px-4"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Textarea + File Upload */}
+          {/* Input area + file upload */}
           <div className="flex flex-col space-y-2">
             <label
               htmlFor="base64-input"
@@ -223,14 +277,14 @@ export default function Base64EncoderDecoderClient({
             <textarea
               id="base64-input"
               ref={inputRef}
-              value={input}
+              value={inputText}
               onChange={handleInputChange}
               placeholder={
                 mode === "encode"
                   ? placeholderEncode
                   : placeholderDecode
               }
-              className={`w-full h-48 p-4 border border-gray-300 rounded-md bg-white ${focusRingClass} font-mono resize-y transition focus:outline-none`}
+              className={inputClasses}
             />
             <p className="text-xs text-gray-500">
               {inputCount} characters
@@ -239,7 +293,8 @@ export default function Base64EncoderDecoderClient({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 transition text-sm"
+                className={secondaryButtonClasses}
+                aria-label={fileUploadButtonLabel}
               >
                 <Paperclip className="w-5 h-5" />
                 {fileUploadButtonLabel}
@@ -249,11 +304,12 @@ export default function Base64EncoderDecoderClient({
                 ref={fileInputRef}
                 className="sr-only"
                 onChange={handleFileSelect}
+                aria-hidden="true"
               />
             </div>
           </div>
 
-          {/* Drop-zone & Output */}
+          {/* Drop-zone & output */}
           <div
             role="button"
             tabIndex={0}
@@ -261,7 +317,7 @@ export default function Base64EncoderDecoderClient({
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onKeyDown={handleDropZoneKeyDown}
-            className="flex flex-col p-4 border-2 border-dashed border-gray-300 rounded-md hover:border-indigo-500 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500 transition cursor-pointer"
+            className={dropZoneClasses}
           >
             <label
               htmlFor="base64-output"
@@ -274,18 +330,20 @@ export default function Base64EncoderDecoderClient({
             <div className="relative flex-1">
               <textarea
                 id="base64-output"
-                value={output}
+                value={outputText}
                 readOnly
                 placeholder={resultPlaceholder}
+                className={`${inputClasses} bg-transparent resize-none`}
                 aria-live="polite"
-                className="w-full h-48 p-4 bg-transparent resize-none font-mono outline-none"
+                aria-readonly="true"
               />
               <button
                 type="button"
                 onClick={handleCopy}
-                disabled={!output}
-                className="absolute top-2 right-2 p-2 text-gray-500 hover:text-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition"
+                disabled={!outputText}
+                className={copyBtnClasses}
                 aria-label={copyButtonAriaLabel}
+                aria-disabled={!outputText}
               >
                 <ClipboardCopy className="w-6 h-6" />
               </button>
@@ -307,10 +365,7 @@ export default function Base64EncoderDecoderClient({
 
         {/* Actions */}
         <div className="flex flex-wrap items-center gap-4">
-          <button
-            type="submit"
-            className={`px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium`}
-          >
+          <button type="submit" className={primaryButtonClasses}>
             {mode === "encode"
               ? encodeButtonLabel
               : decodeButtonLabel}
@@ -318,7 +373,7 @@ export default function Base64EncoderDecoderClient({
           <button
             type="button"
             onClick={clearAll}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 transition text-sm"
+            className={secondaryButtonClasses}
           >
             <Trash2 className="w-5 h-5" />
             {clearButtonLabel}
@@ -328,7 +383,7 @@ export default function Base64EncoderDecoderClient({
             onClick={() =>
               setMode((m) => (m === "encode" ? "decode" : "encode"))
             }
-            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition text-sm font-medium text-gray-700"
+            className={secondaryButtonClasses}
           >
             {mode === "encode"
               ? switchToDecodeLabel
