@@ -7,6 +7,10 @@ import AnalyticsLoader from "./components/AnalyticsLoader";
 import { Inter } from "next/font/google";
 import { Info } from "lucide-react";
 
+// Optional Google Search Console verification code
+const GOOGLE_SITE_VERIFICATION =
+  process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
+
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
@@ -86,19 +90,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover"
         />
+        {GOOGLE_SITE_VERIFICATION && (
+          <meta
+            name="google-site-verification"
+            content={GOOGLE_SITE_VERIFICATION}
+          />
+        )}
 
         {/* Favicons */}
-        <link
-          rel="icon"
-          href="/favicon.png"
-          type="image/png"
-          sizes="32x32"
-        />
-        <link
-          rel="alternate icon"
-          href="/favicon.ico"
-          type="image/x-icon"
-        />
+        <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
+        <link rel="alternate icon" href="/favicon.ico" type="image/x-icon" />
 
         {/* Preconnect for analytics & ads */}
         <link
@@ -113,10 +114,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
 
         {/* AdSense publisher ID */}
-        <meta
-          name="google-adsense-account"
-          content="ca-pub-2108375251131552"
-        />
+        <meta name="google-adsense-account" content="ca-pub-2108375251131552" />
 
         {/* Analytics scripts */}
         <AnalyticsLoader />
@@ -124,19 +122,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="flex min-h-screen flex-col">
         {/* Launch banner */}
         <aside className="bg-indigo-50 border-b border-indigo-200 text-indigo-700 px-4 py-3 flex justify-center">
-          <Info
-            className="flex-shrink-0 mr-2 h-5 w-5"
-            aria-hidden="true"
-          />
+          <Info className="flex-shrink-0 mr-2 h-5 w-5" aria-hidden="true" />
           <div className="text-sm font-medium text-center">
-            We just launched our site! Some tools may be incomplete or buggy
-            — we’re fixing them now.
+            We just launched our site! Some tools may be incomplete or buggy —
+            we’re fixing them now.
             <p className="mt-1 font-normal">
               Last updated: July 16, 2025 at 21:00 (GMT+3). Feedback?{" "}
-              <a
-                href="/contact"
-                className="underline hover:text-indigo-800"
-              >
+              <a href="/contact" className="underline hover:text-indigo-800">
                 Contact us
               </a>
               .
