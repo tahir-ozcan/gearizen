@@ -27,8 +27,8 @@ export const metadata: Metadata = {
     "Gearizen color tools",
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
-  robots: "index, follow",
-  alternates: { canonical: "/tools/color-toolkit" },
+  robots: { index: true, follow: true },
+  alternates: { canonical: "https://gearizen.com/tools/color-toolkit" },
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#000000" },
@@ -56,10 +56,12 @@ export const metadata: Metadata = {
     description:
       "Convert, manipulate, and analyze colors in HEX, RGB, HSL & CMYK. Privacy-first, zero signup, instant results.",
     creator: "@gearizen",
-    images: [{
-      url: "https://gearizen.com/og/color-toolkit.png",
-      alt: "Gearizen Color Toolkit Preview",
-    }],
+    images: [
+      {
+        url: "https://gearizen.com/og/color-toolkit.png",
+        alt: "Gearizen Color Toolkit Preview",
+      },
+    ],
   },
 };
 
