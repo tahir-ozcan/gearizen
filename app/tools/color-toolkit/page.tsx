@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     "Gearizen color tools",
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
-  robots: "index, follow",
+  robots: { index: true, follow: true },
   alternates: { canonical: "/tools/color-toolkit" },
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
