@@ -1,202 +1,243 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
-  xmlns:xhtml="http://www.w3.org/1999/xhtml"
->
-  <!-- Core Pages -->
+<?xml version="1.0"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://gearizen.com/</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <lastmod>2025-07-22T21:17:33.453Z</lastmod>
     <changefreq>daily</changefreq>
-    <priority>1.00</priority>
-    <image:image>
-      <image:loc>https://gearizen.com/og-placeholder.svg</image:loc>
-      <image:caption>Gearizen – Free Client-Side Digital Tools</image:caption>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://gearizen.com/tools</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.90</priority>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/" />
   </url>
   <url>
     <loc>https://gearizen.com/about</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <lastmod>2025-07-22T21:17:33.453Z</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.50</priority>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/about" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/about" />
   </url>
   <url>
     <loc>https://gearizen.com/contact</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <lastmod>2025-07-22T21:17:33.453Z</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.50</priority>
-  </url>
-  <url>
-    <loc>https://gearizen.com/privacy</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.40</priority>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/contact" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/contact" />
   </url>
   <url>
     <loc>https://gearizen.com/cookies</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.40</priority>
+    <lastmod>2025-07-22T21:17:33.453Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/cookies" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/cookies" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/privacy</loc>
+    <lastmod>2025-07-22T21:17:33.453Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/privacy" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/privacy" />
   </url>
   <url>
     <loc>https://gearizen.com/terms</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.40</priority>
-  </url>
-
-  <!-- Generators -->
-  <url>
-    <loc>https://gearizen.com/tools/password-generator</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <lastmod>2025-07-22T21:17:33.453Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/terms" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/terms" />
   </url>
   <url>
-    <loc>https://gearizen.com/tools/uuid-generator</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <loc>https://gearizen.com/tools</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-  </url>
-  <url>
-    <loc>https://gearizen.com/tools/lorem-ipsum-generator</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-  </url>
-  <url>
-    <loc>https://gearizen.com/tools/qr-code-generator</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-
-  <!-- Converters & Transformers -->
-  <url>
-    <loc>https://gearizen.com/tools/text-case-converter</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.78</priority>
-  </url>
-  <url>
-    <loc>https://gearizen.com/tools/unit-converter</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.78</priority>
-  </url>
-  <url>
-    <loc>https://gearizen.com/tools/markdown-converter</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-  </url>
-  <url>
-    <loc>https://gearizen.com/tools/image-toolkit</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-  </url>
-  <url>
-    <loc>https://gearizen.com/tools/html-to-pdf</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-  </url>
-  <url>
-    <loc>https://gearizen.com/tools/pdf-toolkit</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-  </url>
-  <url>
-    <loc>https://gearizen.com/tools/data-converter</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-  </url>
-  <url>
-    <loc>https://gearizen.com/tools/url-tools</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.78</priority>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools" />
   </url>
   <url>
     <loc>https://gearizen.com/tools/base64-encoder-decoder</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <lastmod>2025-07-22T21:17:33.453Z</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.78</priority>
-  </url>
-
-  <!-- Analyzers & Formatters -->
-  <url>
-    <loc>https://gearizen.com/tools/text-counter</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gearizen.com/tools/text-diff</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gearizen.com/tools/regex-tester</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gearizen.com/tools/json-formatter</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/base64-encoder-decoder" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/base64-encoder-decoder" />
   </url>
   <url>
     <loc>https://gearizen.com/tools/code-formatter-minifier</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <lastmod>2025-07-22T21:17:33.453Z</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/code-formatter-minifier" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/code-formatter-minifier" />
   </url>
-
-  <!-- Security & SEO -->
+  <url>
+    <loc>https://gearizen.com/tools/color-toolkit</loc>
+    <lastmod>2025-07-22T21:17:33.453Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/color-toolkit" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/color-toolkit" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/data-converter</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/data-converter" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/data-converter" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/html-to-pdf</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/html-to-pdf" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/html-to-pdf" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/image-toolkit</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/image-toolkit" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/image-toolkit" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/json-formatter</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/json-formatter" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/json-formatter" />
+  </url>
   <url>
     <loc>https://gearizen.com/tools/jwt-hash-generator</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/jwt-hash-generator" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/jwt-hash-generator" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/lorem-ipsum-generator</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/lorem-ipsum-generator" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/lorem-ipsum-generator" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/markdown-converter</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/markdown-converter" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/markdown-converter" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/password-generator</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/password-generator" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/password-generator" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/pdf-toolkit</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/pdf-toolkit" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/pdf-toolkit" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/qr-code-generator</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/qr-code-generator" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/qr-code-generator" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/regex-tester</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/regex-tester" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/regex-tester" />
   </url>
   <url>
     <loc>https://gearizen.com/tools/seo-meta-tag-generator</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/seo-meta-tag-generator" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/seo-meta-tag-generator" />
   </url>
   <url>
     <loc>https://gearizen.com/tools/sitemap-generator</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/sitemap-generator" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/sitemap-generator" />
   </url>
-
-  <!-- Design & Misc -->
   <url>
-    <loc>https://gearizen.com/tools/color-toolkit</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <loc>https://gearizen.com/tools/text-case-converter</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/text-case-converter" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/text-case-converter" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/text-counter</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/text-counter" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/text-counter" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/text-diff</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/text-diff" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/text-diff" />
   </url>
   <url>
     <loc>https://gearizen.com/tools/time-converter</loc>
-    <lastmod>2025-07-15T00:00:00+00:00</lastmod>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/time-converter" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/time-converter" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/unit-converter</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/unit-converter" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/unit-converter" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/url-tools</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/url-tools" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/url-tools" />
+  </url>
+  <url>
+    <loc>https://gearizen.com/tools/uuid-generator</loc>
+    <lastmod>2025-07-22T21:17:33.457Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gearizen.com/tools/uuid-generator" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://gearizen.com/tr/tools/uuid-generator" />
   </url>
 </urlset>
