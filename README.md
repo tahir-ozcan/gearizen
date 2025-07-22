@@ -132,6 +132,13 @@ npm start
 vercel
 ```
 
+Sitemap and robots.txt files are automatically generated after the build step. To
+run the generator manually, execute:
+
+```bash
+npm run generate-sitemap
+```
+
 ### License
 
 MIT License. See LICENSE for full text.
