@@ -1,30 +1,54 @@
 // app/tools/password-generator/password-generator-client.tsx
 "use client";
 
-import { useState, useEffect, useCallback, ChangeEvent } from "react";
+import React, {
+  FC,
+  useState,
+  useEffect,
+  useCallback,
+  ChangeEvent,
+  useRef,
+} from "react";
 
 /**
  * Strong Password Generator Tool
  *
  * Instantly generate secure, customizable passwords client-side
- * with options for length, complexity and entropy visualization.
+ * with options for length, complexity and entropy calculation.
  */
+
+export interface PasswordGeneratorClientProps {
+  /** Main heading text */
+  heading?: string;
+  /** Subtitle/description text */
+  description?: string;
+  /** Gradient classes for headings */
+  gradientClasses?: string;
+  /** Tailwind focus-ring class */
+  focusRingClass?: string;
+  /** Override CSS for inputs */
+  inputClassName?: string;
+  /** Override CSS for toggles */
+  toggleClassName?: string;
+  /** Override CSS for buttons */
+  buttonClassName?: string;
+  /** Extra classes for root section */
+  rootClassName?: string;
+}
 
 // Character sets
 const UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const LOWER = "abcdefghijklmnopqrstuvwxyz";
 const DIGITS = "0123456789";
 const SYMBOLS = "!@#$%^&*()-_=+[]{}|;:,.<>?/";
-
-// Characters to exclude if desired
+// Similar-looking characters
 const SIMILAR = new Set(["I", "l", "1", "O", "0"]);
 
-// Pick a random character from a string
+/** Pick a random character from a string */
 function randChar(str: string): string {
-  return str.charAt(Math.floor(Math.random() * str.length));
+  return str[Math.floor(Math.random() * str.length)] || "";
 }
-
-// Fisher–Yates shuffle
+/** Shuffle an array in place (Fisher–Yates) */
 function shuffle<T>(arr: T[]): T[] {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -32,8 +56,7 @@ function shuffle<T>(arr: T[]): T[] {
   }
   return arr;
 }
-
-// Calculate Shannon entropy in bits
+/** Calculate Shannon entropy in bits */
 function calculateEntropy(pwd: string): number {
   if (!pwd) return 0;
   const freq: Record<string, number> = {};
@@ -46,97 +69,64 @@ function calculateEntropy(pwd: string): number {
   return ent * pwd.length;
 }
 
-/**
- * Generate a password based on options.
- */
+/** Generate a password given the options */
 function generatePassword(options: {
   length: number;
-  upper?: boolean;
-  lower?: boolean;
-  digits?: boolean;
-  symbols?: boolean;
-  excludeSimilar?: boolean;
-  pattern?: string;
-  avoidRepeats?: boolean;
-  minUpper?: number;
-  minLower?: number;
-  minDigits?: number;
-  minSymbols?: number;
+  useUpper: boolean;
+  useLower: boolean;
+  useDigits: boolean;
+  useSymbols: boolean;
+  excludeSimilar: boolean;
+  avoidRepeats: boolean;
+  minUpper: number;
+  minLower: number;
+  minDigits: number;
+  minSymbols: number;
 }): string {
   const {
     length,
-    upper = true,
-    lower = true,
-    digits = true,
-    symbols = false,
-    excludeSimilar = false,
-    pattern,
-    avoidRepeats = false,
-    minUpper = 0,
-    minLower = 0,
-    minDigits = 0,
-    minSymbols = 0,
+    useUpper,
+    useLower,
+    useDigits,
+    useSymbols,
+    excludeSimilar,
+    avoidRepeats,
+    minUpper,
+    minLower,
+    minDigits,
+    minSymbols,
   } = options;
 
-  // Pattern mode
-  if (pattern) {
-    const out: string[] = [];
-    for (const p of pattern) {
-      let pool = "";
-      if (p === "A") pool = UPPER;
-      else if (p === "a") pool = LOWER;
-      else if (p === "0") pool = DIGITS;
-      else if (p === "$") pool = SYMBOLS;
-      else if (p === "?") pool = UPPER + LOWER + DIGITS + SYMBOLS;
-      else pool = p; // literal character
-
-      if (excludeSimilar) {
-        pool = [...pool].filter(c => !SIMILAR.has(c)).join("");
-      }
-      out.push(randChar(pool || (UPPER + LOWER + DIGITS)));
-    }
-    return out.join("");
-  }
-
-  // Build pool
+  // Build character pool
   let pool = "";
-  if (upper) pool += UPPER;
-  if (lower) pool += LOWER;
-  if (digits) pool += DIGITS;
-  if (symbols) pool += SYMBOLS;
+  if (useUpper) pool += UPPER;
+  if (useLower) pool += LOWER;
+  if (useDigits) pool += DIGITS;
+  if (useSymbols) pool += SYMBOLS;
   if (excludeSimilar) {
-    pool = [...pool].filter(c => !SIMILAR.has(c)).join("");
+    pool = [...pool].filter((c) => !SIMILAR.has(c)).join("");
   }
-  if (!pool) throw new Error("No character sets selected.");
+  if (!pool) {
+    throw new Error("Select at least one character type.");
+  }
 
   const chars: string[] = [];
+
   // Enforce minimum counts
   for (let i = 0; i < minUpper; i++) {
-    const set = excludeSimilar
-      ? [...UPPER].filter(c => !SIMILAR.has(c)).join("")
-      : UPPER;
-    chars.push(randChar(set));
+    chars.push(randChar(excludeSimilar ? [...UPPER].filter(c => !SIMILAR.has(c)).join("") : UPPER));
   }
   for (let i = 0; i < minLower; i++) {
-    const set = excludeSimilar
-      ? [...LOWER].filter(c => !SIMILAR.has(c)).join("")
-      : LOWER;
-    chars.push(randChar(set));
+    chars.push(randChar(excludeSimilar ? [...LOWER].filter(c => !SIMILAR.has(c)).join("") : LOWER));
   }
   for (let i = 0; i < minDigits; i++) {
-    const set = excludeSimilar
-      ? [...DIGITS].filter(c => !SIMILAR.has(c)).join("")
-      : DIGITS;
-    chars.push(randChar(set));
+    chars.push(randChar(excludeSimilar ? [...DIGITS].filter(c => !SIMILAR.has(c)).join("") : DIGITS));
   }
   for (let i = 0; i < minSymbols; i++) {
-    const set = excludeSimilar
-      ? [...SYMBOLS].filter(c => !SIMILAR.has(c)).join("")
-      : SYMBOLS;
-    chars.push(randChar(set));
+    chars.push(randChar(excludeSimilar ? [...SYMBOLS].filter(c => !SIMILAR.has(c)).join("") : SYMBOLS));
   }
 
-  // Fill remaining length
+  // Fill remaining
   while (chars.length < length) {
     const c = randChar(pool);
     if (avoidRepeats && chars.includes(c)) continue;
@@ -146,47 +136,58 @@ function generatePassword(options: {
   return shuffle(chars).join("");
 }
 
-export default function PasswordGeneratorClient() {
+const PasswordGeneratorClient: FC<PasswordGeneratorClientProps> = ({
+  heading = "Strong Password Generator",
+  description =
+    "Instantly generate secure, customizable passwords client-side with length, complexity and entropy info.",
+  gradientClasses = "from-purple-500 via-pink-500 to-yellow-400",
+  focusRingClass = "focus:ring-indigo-500",
+  inputClassName,
+  toggleClassName,
+  buttonClassName,
+  rootClassName = "",
+}) => {
+  // options state
   const [length, setLength] = useState(16);
   const [useUpper, setUseUpper] = useState(true);
   const [useLower, setUseLower] = useState(true);
   const [useDigits, setUseDigits] = useState(true);
   const [useSymbols, setUseSymbols] = useState(false);
   const [excludeSimilar, setExcludeSimilar] = useState(false);
-  const [pattern, setPattern] = useState("");
   const [avoidRepeats, setAvoidRepeats] = useState(false);
   const [minUpper, setMinUpper] = useState(1);
   const [minLower, setMinLower] = useState(1);
   const [minDigits, setMinDigits] = useState(1);
-  const [minSymbols, setMinSymbols] = useState(1);
+  const [minSymbols, setMinSymbols] = useState(0);
+
+  // generated
   const [password, setPassword] = useState("");
   const [entropy, setEntropy] = useState(0);
   const [copied, setCopied] = useState(false);
+  const pwdRef = useRef<HTMLInputElement>(null);
 
-  // Whether we're in pattern‐override mode
-  const isPatternMode = pattern.trim().length > 0;
-
-  const generate = useCallback(() => {
+  // regenerate on any option change
+  const regenerate = useCallback(() => {
     try {
       const pwd = generatePassword({
         length,
-        upper: isPatternMode ? undefined : useUpper,
-        lower: isPatternMode ? undefined : useLower,
-        digits: isPatternMode ? undefined : useDigits,
-        symbols: isPatternMode ? undefined : useSymbols,
+        useUpper,
+        useLower,
+        useDigits,
+        useSymbols,
         excludeSimilar,
-        pattern: pattern || undefined,
         avoidRepeats,
-        minUpper: isPatternMode ? undefined : minUpper,
-        minLower: isPatternMode ? undefined : minLower,
-        minDigits: isPatternMode ? undefined : minDigits,
-        minSymbols: isPatternMode ? undefined : minSymbols,
+        minUpper,
+        minLower,
+        minDigits,
+        minSymbols,
       });
       setPassword(pwd);
       setEntropy(calculateEntropy(pwd));
       setCopied(false);
-    } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Password generation error.");
+    } catch {
+      setPassword("");
+      setEntropy(0);
     }
   }, [
     length,
@@ -195,101 +196,81 @@ export default function PasswordGeneratorClient() {
     useDigits,
     useSymbols,
     excludeSimilar,
-    pattern,
     avoidRepeats,
     minUpper,
     minLower,
     minDigits,
     minSymbols,
-    isPatternMode,
   ]);
 
-  // Generate once on mount
   useEffect(() => {
-    generate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    regenerate();
+  }, [regenerate]);
 
-  const copyPassword = async () => {
+  const copyToClipboard = useCallback(async () => {
     if (!password) return;
-    try {
-      await navigator.clipboard.writeText(password);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      alert("❌ Failed to copy.");
-    }
-  };
+    await navigator.clipboard.writeText(password);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [password]);
+
+  // CSS helpers
+  const sliderClasses = inputClassName ??
+    `w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer focus:outline-none ${focusRingClass}`;
+  const checkboxClasses = toggleClassName ??
+    `h-4 w-4 text-indigo-600 focus:ring-2 ${focusRingClass} border-gray-300 rounded`;
+  const btnClasses = buttonClassName ??
+    `inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r ${gradientClasses} text-white font-semibold rounded-md transition focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed`;
 
   return (
-    <section id="password-generator" aria-labelledby="password-generator-heading" className="space-y-16 text-gray-900 antialiased">
-      {/* Heading & Description */}
-      <div className="text-center space-y-6 sm:px-0">
+    <section
+      id="password-generator"
+      aria-labelledby="password-generator-heading"
+      className={`space-y-16 text-gray-900 antialiased ${rootClassName}`}
+    >
+      {/* Header */}
+      <div className="max-w-3xl mx-auto text-center space-y-6">
         <h1
           id="password-generator-heading"
-          className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight"
+          className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight`}
         >
-          Strong Password Generator
+          {heading}
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-        <p className="mx-auto max-w-2xl text-lg sm:text-xl text-gray-700 leading-relaxed">
-          Instantly generate secure, customizable passwords client-side with options for length, complexity and entropy visualization.
-        </p>
+        <p className="text-lg sm:text-xl text-gray-600">{description}</p>
       </div>
 
-      {/* Generated Password & Entropy */}
-      <div className="max-w-2xl mx-auto bg-gray-50 p-6 rounded-lg shadow">
-        <label htmlFor="generated-password" className="block text-sm font-medium text-gray-800 mb-2">
+      {/* Output & Copy */}
+      <div className="max-w-2xl mx-auto bg-gray-50 p-6 rounded-lg shadow space-y-4">
+        <label htmlFor="generated-password" className="block text-sm font-medium text-gray-800">
           Your Password
         </label>
-        <div className="flex items-center gap-3">
+        <div className="flex gap-3">
           <input
             id="generated-password"
+            ref={pwdRef}
             type="text"
             readOnly
             value={password}
-            className="flex-grow p-3 border border-gray-300 rounded-md font-mono focus:ring-2 focus:ring-[#7c3aed] transition overflow-x-auto"
+            className="flex-grow p-3 border border-gray-300 rounded-md font-mono focus:ring-2 focus:ring-indigo-500 transition overflow-x-auto"
           />
           <button
-            onClick={copyPassword}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-[#7c3aed] transition"
+            onClick={copyToClipboard}
+            className={btnClasses}
           >
             {copied ? "Copied!" : "Copy"}
           </button>
         </div>
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="text-sm text-gray-600">
           Entropy: <span className="font-semibold">{entropy.toFixed(1)}</span> bits
         </p>
       </div>
 
-      {/* Controls Form */}
-      <form onSubmit={e => { e.preventDefault(); generate(); }} className="max-w-2xl mx-auto space-y-8 sm:px-0">
-        <button
-          type="submit"
-          className="w-full inline-flex justify-center px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-[#7c3aed] transition font-medium"
-        >
-          Generate Password
-        </button>
-
-        {/* Pattern Input */}
+      {/* Controls */}
+      <div className="max-w-2xl mx-auto space-y-8">
+        {/* Length */}
         <div>
-          <label htmlFor="pattern" className="block text-sm font-medium text-gray-800 mb-1">
-            Pattern (A=upper, a=lower, 0=digit, $=symbol, ?=any)
-          </label>
-          <input
-            id="pattern"
-            type="text"
-            value={pattern}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setPattern(e.target.value)}
-            placeholder="e.g. Aa0$?"
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#7c3aed] transition"
-          />
-          {isPatternMode && <p className="mt-1 text-sm text-gray-500">Pattern mode overrides other toggles.</p>}
-        </div>
-
-        {/* Length Slider */}
-        <div>
-          <label htmlFor="length" className="block text-sm font-medium text-gray-800 mb-1">
+          <label htmlFor="length" className="block mb-1 font-medium text-gray-800">
             Length: <span className="font-semibold">{length}</span>
           </label>
           <input
@@ -299,81 +280,74 @@ export default function PasswordGeneratorClient() {
             max={64}
             value={length}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setLength(Number(e.target.value))}
-            disabled={isPatternMode}
-            className="w-full"
+            className={sliderClasses}
           />
         </div>
 
-        {/* Character Set Toggles */}
+        {/* Character Types */}
         <fieldset className="space-y-4">
-          <legend className="text-lg font-semibold text-gray-800">Include Character Types</legend>
-          {isPatternMode && <p className="text-sm text-gray-500">Disabled in pattern mode.</p>}
+          <legend className="text-lg font-semibold text-gray-800">Include</legend>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <label className="inline-flex items-center space-x-2">
+            <label className="inline-flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={useUpper}
                 onChange={() => setUseUpper(u => !u)}
-                disabled={isPatternMode}
-                className="h-4 w-4 text-[#7c3aed] border-gray-300 rounded focus:ring-[#7c3aed]"
+                className={checkboxClasses}
               />
-              <span>Uppercase (A–Z)</span>
+              Uppercase
             </label>
-            <label className="inline-flex items-center space-x-2">
+            <label className="inline-flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={useLower}
                 onChange={() => setUseLower(l => !l)}
-                disabled={isPatternMode}
-                className="h-4 w-4 text-[#7c3aed] border-gray-300 rounded focus:ring-[#7c3aed]"
+                className={checkboxClasses}
               />
-              <span>Lowercase (a–z)</span>
+              Lowercase
             </label>
-            <label className="inline-flex items-center space-x-2">
+            <label className="inline-flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={useDigits}
                 onChange={() => setUseDigits(d => !d)}
-                disabled={isPatternMode}
-                className="h-4 w-4 text-[#7c3aed] border-gray-300 rounded focus:ring-[#7c3aed]"
+                className={checkboxClasses}
               />
-              <span>Digits (0–9)</span>
+              Digits
             </label>
-            <label className="inline-flex items-center space-x-2">
+            <label className="inline-flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={useSymbols}
                 onChange={() => setUseSymbols(s => !s)}
-                disabled={isPatternMode}
-                className="h-4 w-4 text-[#7c3aed] border-gray-300 rounded focus:ring-[#7c3aed]"
+                className={checkboxClasses}
               />
-              <span>Symbols (!@#$%)</span>
+              Symbols
             </label>
-            <label className="inline-flex items-center space-x-2 col-span-2">
+            <label className="inline-flex items-center gap-2 col-span-2">
               <input
                 type="checkbox"
                 checked={excludeSimilar}
-                onChange={() => setExcludeSimilar(s => !s)}
-                className="h-4 w-4 text-[#7c3aed] border-gray-300 rounded focus:ring-[#7c3aed]"
+                onChange={() => setExcludeSimilar(e => !e)}
+                className={checkboxClasses}
               />
-              <span>Exclude similar (I, l, 1, O, 0)</span>
+              Exclude similar (I, l, 1, O, 0)
             </label>
-            <label className="inline-flex items-center space-x-2 col-span-2">
+            <label className="inline-flex items-center gap-2 col-span-2">
               <input
                 type="checkbox"
                 checked={avoidRepeats}
-                onChange={() => setAvoidRepeats(a => !a)}
-                className="h-4 w-4 text-[#7c3aed] border-gray-300 rounded focus:ring-[#7c3aed]"
+                onChange={() => setAvoidRepeats(r => !r)}
+                className={checkboxClasses}
               />
-              <span>Avoid repeated characters</span>
+              Avoid repeats
             </label>
           </div>
         </fieldset>
 
-        {/* Minimum Counts */}
+        {/* Minimum counts */}
         <fieldset className="space-y-4">
-          <legend className="text-lg font-semibold text-gray-800">Minimum Counts</legend>
-          {isPatternMode && <p className="text-sm text-gray-500">Disabled in pattern mode.</p>}
+          <legend className="text-lg font-semibold text-gray-800">Minimum in Password</legend>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <label className="flex items-center justify-between">
               <span>Min Upper</span>
@@ -382,8 +356,7 @@ export default function PasswordGeneratorClient() {
                 min={0}
                 value={minUpper}
                 onChange={e => setMinUpper(Number(e.target.value))}
-                disabled={!useUpper || isPatternMode}
-                className="w-16 p-1 border border-gray-300 rounded focus:ring-[#7c3aed]"
+                className="w-16 p-1 border border-gray-300 rounded focus:ring-indigo-500"
               />
             </label>
             <label className="flex items-center justify-between">
@@ -393,8 +366,7 @@ export default function PasswordGeneratorClient() {
                 min={0}
                 value={minLower}
                 onChange={e => setMinLower(Number(e.target.value))}
-                disabled={!useLower || isPatternMode}
-                className="w-16 p-1 border border-gray-300 rounded focus:ring-[#7c3aed]"
+                className="w-16 p-1 border border-gray-300 rounded focus:ring-indigo-500"
               />
             </label>
             <label className="flex items-center justify-between">
@@ -404,8 +376,7 @@ export default function PasswordGeneratorClient() {
                 min={0}
                 value={minDigits}
                 onChange={e => setMinDigits(Number(e.target.value))}
-                disabled={!useDigits || isPatternMode}
-                className="w-16 p-1 border border-gray-300 rounded focus:ring-[#7c3aed]"
+                className="w-16 p-1 border border-gray-300 rounded focus:ring-indigo-500"
               />
             </label>
             <label className="flex items-center justify-between">
@@ -415,13 +386,14 @@ export default function PasswordGeneratorClient() {
                 min={0}
                 value={minSymbols}
                 onChange={e => setMinSymbols(Number(e.target.value))}
-                disabled={!useSymbols || isPatternMode}
-                className="w-16 p-1 border border-gray-300 rounded focus:ring-[#7c3aed]"
+                className="w-16 p-1 border border-gray-300 rounded focus:ring-indigo-500"
               />
             </label>
           </div>
         </fieldset>
-      </form>
+      </div>
     </section>
   );
-}
+};
+
+export default PasswordGeneratorClient;
