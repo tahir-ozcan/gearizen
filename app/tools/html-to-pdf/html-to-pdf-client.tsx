@@ -1,28 +1,76 @@
 // app/tools/html-to-pdf/html-to-pdf-client.tsx
 "use client";
 
-import { useState, useRef, ChangeEvent } from "react";
+import React, {
+  useState,
+  useRef,
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  FC,
+} from "react";
+import { Trash2, ArrowDown } from "lucide-react";
 
-export default function HtmlToPdfClient() {
+export interface HtmlToPdfClientProps {
+  /** Main heading text */
+  heading?: string;
+  /** Subtitle/description text */
+  description?: string;
+  /** Gradient classes for headings */
+  gradientClasses?: string;
+  /** Focus‑ring Tailwind class */
+  focusRingClass?: string;
+  /** Override CSS class for primary button */
+  primaryButtonClassName?: string;
+  /** Override CSS class for secondary button */
+  secondaryButtonClassName?: string;
+  /** Override CSS class for textarea */
+  textareaClassName?: string;
+  /** Extra classes for the root section */
+  rootClassName?: string;
+}
+
+const HtmlToPdfClient: FC<HtmlToPdfClientProps> = ({
+  heading = "HTML to PDF Converter",
+  description =
+    "Render any HTML snippet into a high‑quality PDF entirely client‑side, with custom margins, format, and orientation.",
+  gradientClasses = "from-purple-500 via-pink-500 to-yellow-400",
+  focusRingClass = "focus:ring-purple-500",
+  primaryButtonClassName,
+  secondaryButtonClassName,
+  textareaClassName,
+  rootClassName = "",
+}) => {
   const [htmlInput, setHtmlInput] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
-  const [processing, setProcessing] = useState<boolean>(false);
-
-  // Layout kontrolleri
   const [margin, setMargin] = useState<number>(0.5);
   const [format, setFormat] = useState<"letter" | "a4">("letter");
   const [orientation, setOrientation] = useState<"portrait" | "landscape">(
     "portrait"
   );
+  const [error, setError] = useState<string | null>(null);
+  const [processing, setProcessing] = useState<boolean>(false);
 
   const previewRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  // Shared classes
+  const baseTextareaClasses = textareaClassName ??
+    `w-full p-4 border border-gray-300 rounded-md bg-white font-mono resize-y focus:outline-none ${focusRingClass} transition`;
+
+  const primaryBtnClasses = primaryButtonClassName ??
+    `inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed`;
+
+  const secondaryBtnClasses = secondaryButtonClassName ??
+    `inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-md transition hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300`;
+
+  // Handle input
   const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setHtmlInput(e.target.value);
     setError(null);
   };
 
-  const generatePdf = async () => {
+  // Generate PDF
+  const generatePdf = useCallback(async () => {
     if (!htmlInput.trim()) {
       setError("❌ Please enter some HTML to convert.");
       return;
@@ -30,28 +78,28 @@ export default function HtmlToPdfClient() {
     if (!previewRef.current) return;
 
     setProcessing(true);
+    setError(null);
+
     try {
-      // Dinamik import
       const { default: html2pdf } = await import("html2pdf.js");
 
-      // Sayfa boyutunu piksele çevir (96dpi)
+      // Build a hidden container for rendering
       const dpi = 96;
-      const sizeIn = format === "letter"
-        ? { width: 8.5, height: 11 }
-        : { width: 8.27, height: 11.69 };
-      // orientation’a göre swap
-      const pageW = orientation === "portrait" ? sizeIn.width : sizeIn.height;
-      const pageH = orientation === "portrait" ? sizeIn.height : sizeIn.width;
+      const size = format === "letter"
+        ? { w: 8.5, h: 11 }
+        : { w: 8.27, h: 11.69 };
+      const pageW = orientation === "portrait" ? size.w : size.h;
+      const pageH = orientation === "portrait" ? size.h : size.w;
 
-      // Önizleme konteynerini hazırlama
-      previewRef.current.style.width = `${pageW * dpi}px`;
-      previewRef.current.style.minHeight = `${pageH * dpi}px`;
-      previewRef.current.style.background = "#ffffff";
-      previewRef.current.innerHTML = htmlInput;
+      const container = previewRef.current;
+      container.innerHTML = htmlInput;
+      container.style.width = `${pageW * dpi}px`;
+      container.style.minHeight = `${pageH * dpi}px`;
+      container.style.background = "#ffffff";
 
       await html2pdf()
         .set({
-          margin, // inç
+          margin,
           filename: "document.pdf",
           image: { type: "jpeg", quality: 1.0 },
           html2canvas: {
@@ -67,9 +115,8 @@ export default function HtmlToPdfClient() {
             compressPdf: true,
           },
         })
-        .from(previewRef.current)
-        .save(); // sadece indirme tetiklenir
-
+        .from(container)
+        .save();
     } catch (err) {
       console.error(err);
       setError(
@@ -78,55 +125,45 @@ export default function HtmlToPdfClient() {
     } finally {
       setProcessing(false);
     }
-  };
+  }, [htmlInput, margin, format, orientation]);
+
+  // Clear all
+  const clearAll = useCallback(() => {
+    setHtmlInput("");
+    setError(null);
+    inputRef.current?.focus();
+  }, []);
 
   return (
     <section
       id="html-to-pdf"
       aria-labelledby="html-to-pdf-heading"
-      className="space-y-16 text-gray-900 antialiased"
+      className={`space-y-16 text-gray-900 antialiased ${rootClassName}`}
     >
-      {/* Başlık & Açıklama */}
-      <div className="text-center space-y-6 sm:px-0">
+      {/* Header */}
+      <div className="max-w-3xl mx-auto text-center space-y-6">
         <h1
           id="html-to-pdf-heading"
-          className="
+          className={`
             bg-clip-text text-transparent
-            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
-            text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
-          "
+            bg-gradient-to-r ${gradientClasses}
+            text-4xl sm:text-5xl md:text-6xl
+            font-extrabold tracking-tight
+          `}
         >
-          HTML to PDF Converter
+          {heading}
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-        <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Render any webpage or HTML snippet into a high-quality PDF entirely
-          client-side, with custom margins, format, and orientation.
+        <p className="mt-4 text-lg sm:text-xl text-gray-600 leading-relaxed">
+          {description}
         </p>
       </div>
 
-      {/* HTML Giriş & Düzen Ayarları */}
-      <div className="max-w-3xl mx-auto space-y-8 sm:px-0">
-        <textarea
-          id="html-input"
-          value={htmlInput}
-          onChange={handleInputChange}
-          placeholder="<h1>Hello, world!</h1>"
-          rows={10}
-          className="
-            w-full p-4 border border-gray-300 rounded-md bg-white
-            focus:outline-none focus:ring-2 focus:ring-indigo-500
-            font-mono text-sm resize-y transition
-          "
-        />
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* Margin */}
-          <div>
-            <label
-              htmlFor="margin-input"
-              className="block text-sm font-medium text-gray-800 mb-1"
-            >
+      <div className="max-w-3xl mx-auto space-y-8">
+        {/* Controls */}
+        <div className="flex flex-wrap items-end gap-6 justify-center">
+          <div className="flex flex-col">
+            <label htmlFor="margin-input" className="text-sm font-medium text-gray-800 mb-1">
               Margin (inches)
             </label>
             <input
@@ -137,56 +174,46 @@ export default function HtmlToPdfClient() {
               max={2}
               value={margin}
               onChange={(e) => setMargin(Number(e.target.value))}
-              className="
-                w-full p-2 border border-gray-300 rounded-md
+              className={`
+                w-24 p-2 border border-gray-300 rounded-md
                 focus:outline-none focus:ring-2 focus:ring-indigo-500
-                transition
-              "
+                transition text-sm
+              `}
             />
           </div>
 
-          {/* Page Format */}
-          <div>
-            <label
-              htmlFor="format-select"
-              className="block text-sm font-medium text-gray-800 mb-1"
-            >
+          <div className="flex flex-col">
+            <label htmlFor="format-select" className="text-sm font-medium text-gray-800 mb-1">
               Page Format
             </label>
             <select
               id="format-select"
               value={format}
               onChange={(e) => setFormat(e.target.value as "letter" | "a4")}
-              className="
-                w-full p-2 border border-gray-300 rounded-md
+              className={`
+                w-28 p-2 border border-gray-300 rounded-md
                 focus:outline-none focus:ring-2 focus:ring-indigo-500
-                transition
-              "
+                transition text-sm
+              `}
             >
               <option value="letter">Letter</option>
               <option value="a4">A4</option>
             </select>
           </div>
 
-          {/* Orientation */}
-          <div>
-            <label
-              htmlFor="orient-select"
-              className="block text-sm font-medium text-gray-800 mb-1"
-            >
+          <div className="flex flex-col">
+            <label htmlFor="orientation-select" className="text-sm font-medium text-gray-800 mb-1">
               Orientation
             </label>
             <select
-              id="orient-select"
+              id="orientation-select"
               value={orientation}
-              onChange={(e) =>
-                setOrientation(e.target.value as "portrait" | "landscape")
-              }
-              className="
-                w-full p-2 border border-gray-300 rounded-md
+              onChange={(e) => setOrientation(e.target.value as "portrait" | "landscape")}
+              className={`
+                w-32 p-2 border border-gray-300 rounded-md
                 focus:outline-none focus:ring-2 focus:ring-indigo-500
-                transition
-              "
+                transition text-sm
+              `}
             >
               <option value="portrait">Portrait</option>
               <option value="landscape">Landscape</option>
@@ -194,33 +221,55 @@ export default function HtmlToPdfClient() {
           </div>
         </div>
 
-        {/* Hata Mesajı */}
+        {/* HTML Input */}
+        <div>
+          <label htmlFor="html-input" className="block text-sm font-medium text-gray-800 mb-1">
+            HTML Input
+          </label>
+          <textarea
+            id="html-input"
+            ref={inputRef}
+            value={htmlInput}
+            onChange={handleInputChange}
+            placeholder="<h1>Hello, world!</h1>"
+            rows={10}
+            className={baseTextareaClasses}
+          />
+        </div>
+
+        {/* Error */}
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md text-center">
+          <div role="alert" className="text-red-700 bg-red-50 border border-red-200 p-4 rounded-md text-center">
             {error}
           </div>
         )}
 
-        {/* Generate Butonu */}
-        <div className="text-center">
+        {/* Actions */}
+        <div className="flex flex-wrap items-center justify-center gap-6">
           <button
             type="button"
             onClick={generatePdf}
             disabled={processing}
-            className={`
-              px-6 py-3 bg-indigo-600 text-white rounded-md
-              hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-indigo-500
-              transition font-medium
-              ${processing ? "opacity-50 cursor-not-allowed" : ""}
-            `}
+            className={primaryButtonClassName ?? primaryBtnClasses}
           >
+            <ArrowDown className="w-5 h-5" aria-hidden="true" />
             {processing ? "Generating PDF…" : "Generate PDF"}
+          </button>
+          <button
+            type="button"
+            onClick={clearAll}
+            className={secondaryButtonClassName ?? secondaryBtnClasses}
+          >
+            <Trash2 className="w-5 h-5" aria-hidden="true" />
+            Clear All
           </button>
         </div>
       </div>
 
-      {/* Gizli preview konteyneri (html2pdf.js için) */}
+      {/* Hidden preview container for html2pdf.js */}
       <div ref={previewRef} className="hidden" />
     </section>
   );
-}
+};
+
+export default HtmlToPdfClient;

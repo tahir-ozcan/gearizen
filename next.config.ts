@@ -1,43 +1,63 @@
 // next.config.ts
 import type { NextConfig } from "next";
 
-const ContentSecurityPolicy = [
-  "default-src 'self';",
-  // Inline scripts are needed for Next.js hydration & Google Tag Manager
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://pagead2.googlesyndication.com;",
-  // Allow analytics & ads images + data URIs for our canvas exports
-  "img-src 'self' data: https://www.google-analytics.com https://pagead2.googlesyndication.com;",
-  // Allow in-page styles for our Tailwind utility CSS
-  "style-src 'self' 'unsafe-inline';",
-  // Allow fetch/beacon calls to analytics & ad endpoints
-  "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://pagead2.googlesyndication.com;",
-  // Allow ad frames
-  "frame-src https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com;"
-].join(" ");
+//
+// Content Security Policy
+// ——————————————————————————————————————————————
+const ContentSecurityPolicy = `
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://pagead2.googlesyndication.com;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: https://www.google-analytics.com https://pagead2.googlesyndication.com;
+  connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://pagead2.googlesyndication.com;
+  frame-src https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com;
+`.trim().replace(/\s{2,}/g, " ");
+
+//
+// Diğer Güvenlik Başlıkları
+// ——————————————————————————————————————————————
+const securityHeaders = [
+  {
+    key: "Content-Security-Policy",
+    value: ContentSecurityPolicy,
+  },
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
+  {
+    key: "X-Frame-Options",
+    value: "SAMEORIGIN",
+  },
+  {
+    key: "X-Content-Type-Options",
+    value: "nosniff",
+  },
+  {
+    key: "Referrer-Policy",
+    value: "strict-origin-when-cross-origin",
+  },
+  {
+    key: "Permissions-Policy",
+    value: "geolocation=(), microphone=(), camera=()",
+  },
+];
 
 const nextConfig: NextConfig = {
-  // Eğer PDF.js worker'ı public/pdf.worker.min.js olarak kopyaladıysanız,
-  // webpack tarafında ekstra ayar yapmaya gerek kalmaz. workerSrc = '/pdf.worker.min.js'
-  // kodunuzda bu yolu kullanabilirsiniz.
+  reactStrictMode: true,
 
-  // Global olarak tüm yanıt başlıklarına CSP ekleyelim
+  // Tüm yollar için güvenlik başlıklarını ekle
   async headers() {
     return [
       {
         source: "/:path*",
-        headers: [
-          {
-            key: "Content-Security-Policy",
-            value: ContentSecurityPolicy,
-          },
-        ],
+        headers: securityHeaders,
       },
     ];
   },
 
-  // Geliştirme / üretim modu için ek ayarlar
-  reactStrictMode: true,
-  swcMinify: true,
+  // Next 15+’ta SWC minify varsayılan, swcMinify bayrağına gerek yok
+  // swcMinify: true, ← kaldırıldı
 };
 
 export default nextConfig;

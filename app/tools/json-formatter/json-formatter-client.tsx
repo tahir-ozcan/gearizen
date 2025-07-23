@@ -1,40 +1,79 @@
 // app/tools/json-formatter/json-formatter-client.tsx
 "use client";
 
-import { useState, useRef, ChangeEvent, FormEvent } from "react";
-import { Trash2, ClipboardCopy } from "lucide-react";
+import React, {
+  FC,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  ChangeEvent,
+} from "react";
+import { Trash2, ClipboardCopy, Check } from "lucide-react";
 
-/**
- * JSON Formatter & Validator Tool
- *
- * Validate, beautify, minify and lint JSON instantly in your browser with real-time error reporting—100% client-side, no signup required.
- */
-export default function JsonFormatterClient() {
+export interface JsonFormatterClientProps {
+  /** Main heading text */
+  heading?: string;
+  /** Subtitle/description text */
+  description?: string;
+  /** Gradient classes for headings */
+  gradientClasses?: string;
+  /** Focus-ring Tailwind class */
+  focusRingClass?: string;
+  /** Override CSS class for input textarea */
+  inputClassName?: string;
+  /** Override CSS class for output textarea */
+  outputClassName?: string;
+  /** Override CSS class for primary buttons (copy) */
+  primaryButtonClassName?: string;
+  /** Override CSS class for secondary buttons (toggle/clear) */
+  secondaryButtonClassName?: string;
+  /** Extra classes for the root container */
+  rootClassName?: string;
+}
+
+const JsonFormatterClient: FC<JsonFormatterClientProps> = ({
+  heading = "JSON Formatter & Validator",
+  description =
+    "Validate, beautify, minify and lint JSON instantly—100% client-side with real-time error reporting, no signup required.",
+  gradientClasses = "from-purple-500 via-pink-500 to-yellow-400",
+  focusRingClass = "focus:ring-purple-500",
+  inputClassName,
+  outputClassName,
+  primaryButtonClassName,
+  secondaryButtonClassName,
+  rootClassName = "",
+}) => {
   const [mode, setMode] = useState<"beautify" | "minify">("beautify");
   const [indent, setIndent] = useState<number>(2);
   const [input, setInput] = useState<string>("");
   const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState<boolean>(false);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  function clearAll() {
-    setInput("");
-    setOutput("");
-    setError(null);
-    inputRef.current?.focus();
-  }
+  // Classes
+  const baseInputClasses =
+    inputClassName ??
+    `w-full min-h-[14rem] p-4 border border-gray-300 rounded-md bg-white font-mono resize-y placeholder-gray-400 focus:outline-none ${focusRingClass}`;
+  const baseOutputClasses =
+    outputClassName ??
+    `w-full min-h-[14rem] p-4 border border-gray-300 rounded-md bg-gray-50 font-mono resize-none placeholder-gray-400 focus:outline-none ${focusRingClass}`;
+  const primaryBtnClasses =
+    primaryButtonClassName ??
+    `inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed`;
+  const secondaryBtnClasses =
+    secondaryButtonClassName ??
+    `inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-md transition hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300`;
 
-  function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    setInput(e.target.value);
-    setError(null);
-    setOutput("");
-  }
-
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setOutput("");
+  // Real-time conversion
+  const convert = useCallback(() => {
+    if (!input.trim()) {
+      setOutput("");
+      setError(null);
+      return;
+    }
     try {
       const parsed = JSON.parse(input);
       const result =
@@ -42,93 +81,68 @@ export default function JsonFormatterClient() {
           ? JSON.stringify(parsed, null, indent)
           : JSON.stringify(parsed);
       setOutput(result);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid JSON");
+      setError(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Invalid JSON");
+      setOutput("");
     }
-  }
+  }, [input, mode, indent]);
 
-  async function copyOutput() {
+  useEffect(() => {
+    convert();
+  }, [input, mode, indent, convert]);
+
+  // Handlers
+  const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+  };
+
+  const toggleMode = useCallback(() => {
+    setMode((m) => (m === "beautify" ? "minify" : "beautify"));
+    setError(null);
+  }, []);
+
+  const handleIndentChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const v = Math.max(0, Math.min(8, Number(e.target.value) || 0));
+    setIndent(v);
+  };
+
+  const copyOutput = useCallback(async () => {
     if (!output) return;
-    try {
-      await navigator.clipboard.writeText(output);
-      alert("✅ Copied to clipboard!");
-    } catch {
-      alert("❌ Copy failed.");
-    }
-  }
+    await navigator.clipboard.writeText(output);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [output]);
 
-  const inputCount = input.length.toLocaleString();
-  const outputCount = output.length.toLocaleString();
+  const clearAll = useCallback(() => {
+    setInput("");
+    setOutput("");
+    setError(null);
+    inputRef.current?.focus();
+  }, []);
 
   return (
     <section
       id="json-formatter"
       aria-labelledby="json-formatter-heading"
-      className="space-y-16 text-gray-900 antialiased"
+      className={`text-gray-900 antialiased ${rootClassName}`}
     >
-      {/* Heading & Description */}
-      <div className="text-center space-y-6 sm:px-0">
-        <h1
-          id="json-formatter-heading"
-          className="
-            bg-clip-text text-transparent
-            bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]
-            text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight
-          "
-        >
-          JSON Formatter & Validator
-        </h1>
-        <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
-        <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Validate, beautify, minify and lint JSON instantly in your browser with real-time error reporting—100% client-side, no signup required.
-        </p>
-      </div>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto space-y-8 sm:px-0">
-        {/* Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <label htmlFor="indent-input" className="text-sm font-medium text-gray-800">
-              Indent:
-            </label>
-            <input
-              id="indent-input"
-              type="number"
-              min={0}
-              max={8}
-              disabled={mode === "minify"}
-              value={indent}
-              onChange={(e) =>
-                setIndent(Math.min(8, Math.max(0, Number(e.target.value))))
-              }
-              className="
-                w-16 py-1 px-2 border border-gray-300 rounded-md
-                focus:outline-none focus:ring-2 focus:ring-[#7c3aed]
-                text-sm transition
-              "
-            />
-          </div>
-          <button
-            type="button"
-            onClick={() =>
-              setMode((m) => (m === "beautify" ? "minify" : "beautify"))
-            }
-            className="
-              inline-flex items-center gap-2 px-4 py-2
-              border border-gray-300 rounded-md
-              hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7c3aed]
-              transition text-sm font-medium text-gray-700
-            "
+      <div className="max-w-3xl mx-auto space-y-6">
+        {/* Header */}
+        <header className="text-center space-y-4">
+          <h1
+            id="json-formatter-heading"
+            className={`bg-clip-text text-transparent bg-gradient-to-r ${gradientClasses} text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight`}
           >
-            {mode === "beautify" ? "Switch to Minify" : "Switch to Beautify"}
-          </button>
-        </div>
+            {heading}
+          </h1>
+          <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
+          <p className="text-lg sm:text-xl text-gray-600">{description}</p>
+        </header>
 
-        {/* Input & Output */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* JSON Input */}
-          <div className="flex flex-col">
+        <div className="space-y-6">
+          {/* Input */}
+          <div>
             <label
               htmlFor="json-input"
               className="block text-sm font-medium text-gray-800 mb-1"
@@ -141,79 +155,95 @@ export default function JsonFormatterClient() {
               value={input}
               onChange={handleInputChange}
               placeholder="Paste your JSON here…"
-              className="
-                w-full h-64 p-4 border border-gray-300 rounded-md bg-white
-                focus:ring-2 focus:ring-[#7c3aed] font-mono resize-y transition
-              "
+              className={baseInputClasses}
             />
-            <p className="mt-1 text-xs text-gray-500">{inputCount} characters</p>
           </div>
 
-          {/* JSON Output */}
-          <div className="relative flex flex-col">
+          {/* Controls */}
+          <div className="flex flex-wrap items-center gap-4">
+            <button
+              type="button"
+              onClick={toggleMode}
+              className={secondaryBtnClasses}
+            >
+              {mode === "beautify"
+                ? "Switch to Minify"
+                : "Switch to Beautify"}
+            </button>
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="indent-input"
+                className="text-sm text-gray-800"
+              >
+                Indent:
+              </label>
+              <input
+                id="indent-input"
+                type="number"
+                min={0}
+                max={8}
+                disabled={mode === "minify"}
+                value={indent}
+                onChange={handleIndentChange}
+                className={`${inputClassName ??
+                  "w-16 p-1 border border-gray-300 rounded-md"} focus:outline-none ${focusRingClass}`}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={copyOutput}
+              disabled={!output}
+              className={primaryBtnClasses}
+            >
+              {copied ? (
+                <Check className="w-5 h-5 text-green-500" />
+              ) : (
+                <ClipboardCopy className="w-5 h-5" />
+              )}
+              Copy
+            </button>
+            <button
+              type="button"
+              onClick={clearAll}
+              className={secondaryBtnClasses}
+            >
+              <Trash2 className="w-5 h-5" />
+              Clear All
+            </button>
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div
+              role="alert"
+              className="text-red-700 bg-red-50 border border-red-200 p-4 rounded-md"
+            >
+              {error}
+            </div>
+          )}
+
+          {/* Output */}
+          <div>
             <label
               htmlFor="json-output"
               className="block text-sm font-medium text-gray-800 mb-1"
             >
-              {mode === "beautify" ? "Beautified JSON" : "Minified JSON"}
+              {mode === "beautify"
+                ? "Beautified JSON"
+                : "Minified JSON"}
             </label>
-            <div className="relative">
-              <textarea
-                id="json-output"
-                value={output}
-                readOnly
-                placeholder="Result appears here…"
-                className="
-                  w-full h-64 pl-4 pr-12 py-4 border border-gray-300 rounded-md bg-gray-50
-                  focus:ring-2 focus:ring-[#7c3aed] font-mono resize-y transition
-                "
-              />
-              <button
-                type="button"
-                onClick={copyOutput}
-                disabled={!output}
-                aria-label="Copy output"
-                className="
-                  absolute top-2 right-2 p-2 text-gray-500 hover:text-[#7c3aed]
-                  disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none transition
-                "
-              >
-                <ClipboardCopy className="w-6 h-6" />
-              </button>
-            </div>
-            <p className="mt-1 text-xs text-gray-500">{outputCount} characters</p>
+            <textarea
+              id="json-output"
+              value={output}
+              readOnly
+              placeholder="Result appears here…"
+              className={baseOutputClasses}
+            />
           </div>
         </div>
-
-        {/* Error */}
-        {error && (
-          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
-            {error}
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="flex flex-wrap items-center gap-4">
-          <button
-            type="submit"
-            className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
-          >
-            {mode === "beautify" ? "Beautify →" : "Minify →"}
-          </button>
-          <button
-            type="button"
-            onClick={clearAll}
-            className="
-              inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md
-              hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-300
-              transition text-sm
-            "
-          >
-            <Trash2 className="w-5 h-5" />
-            Clear All
-          </button>
-        </div>
-      </form>
+      </div>
     </section>
   );
-}
+};
+
+export default JsonFormatterClient;
