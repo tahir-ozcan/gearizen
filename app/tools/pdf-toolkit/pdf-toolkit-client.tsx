@@ -15,10 +15,7 @@ import {
   getDocument,
   GlobalWorkerOptions,
 } from "pdfjs-dist";
-import type {
-  PDFDocumentProxy,
-  PDFPageProxy as _PDFPageProxy,
-} from "pdfjs-dist";
+import type { PDFDocumentProxy } from "pdfjs-dist";
 
 // 2) Build the PDF.js worker URL at runtime so the bundler picks it up
 const workerSrc = new URL(
@@ -200,7 +197,8 @@ export default function PdfToolkitClient() {
           for (const line of lines) {
             paras.push(
               new Paragraph({
-                heading: sizePt >= threshold ? HeadingLevel.HEADING_1 : undefined,
+                heading:
+                  sizePt >= threshold ? HeadingLevel.HEADING_1 : undefined,
                 children: [
                   new TextRun({
                     text: line,
@@ -277,7 +275,7 @@ export default function PdfToolkitClient() {
             )}
 
             {selectedFile && (
-              <div className="w-full p-4 border border-gray-200 rounded-lg bg-gray-50">
+              <div className="w-full п‑4 border border-gray-200 rounded-lg bg-gray-50">
                 {extractionMode === "image" && (
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-800">

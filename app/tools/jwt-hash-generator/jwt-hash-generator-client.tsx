@@ -27,10 +27,6 @@ export interface JwtHashGeneratorClientProps {
   gradientClasses?: string;
   /** Focus‑ring Tailwind class */
   focusRingClass?: string;
-  /** Override CSS for action buttons */
-  primaryButtonClassName?: string;
-  /** Override CSS for toggle/clear buttons */
-  secondaryButtonClassName?: string;
   /** Override CSS for textareas */
   textareaClassName?: string;
   /** Extra classes for root section */
@@ -43,8 +39,6 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
     "Decode JWTs or generate cryptographic hashes (MD5, SHA‑1, SHA‑256, bcrypt) entirely client‑side.",
   gradientClasses = "from-purple-500 via-pink-500 to-yellow-400",
   focusRingClass = "focus:ring-purple-500",
-  primaryButtonClassName,
-  secondaryButtonClassName,
   textareaClassName,
   rootClassName = "",
 }) => {
@@ -81,12 +75,9 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
   const baseOutputClasses = `${textareaBase} resize-none bg-gray-50 placeholder-gray-400`;
 
   const secondaryBtnClasses = (active = false) =>
-    `${secondaryButtonClassName ??
-      "px-4 py-2 rounded-md font-medium transition"} ${
-      active
-        ? "bg-indigo-600 text-white"
-        : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-    }`;
+    `${active
+      ? "px-4 py-2 rounded-md font-medium bg-indigo-600 text-white"
+      : "px-4 py-2 rounded-md font-medium border border-gray-300 text-gray-700 hover:bg-gray-50"} transition`;
 
   // Decode helper
   const decodeSegment = useCallback((seg: string) => {
@@ -110,8 +101,9 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
         if (parts.length !== 3) throw new Error("JWT must have exactly 3 parts");
         setDecodedHeader(decodeSegment(parts[0]));
         setDecodedPayload(decodeSegment(parts[1]));
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to decode JWT");
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        setError(msg);
       }
     },
     [jwtInput, decodeSegment]
@@ -145,8 +137,9 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
             throw new Error("Unsupported algorithm");
         }
         setHashOutput(result);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Hash generation failed");
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        setError(msg);
       }
     },
     [hashInput, hashAlg, bcryptRounds]
@@ -185,14 +178,20 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
       <div className="flex justify-center gap-4">
         <button
           type="button"
-          onClick={() => { setMode("decode"); setError(null); }}
+          onClick={() => {
+            setMode("decode");
+            setError(null);
+          }}
           className={secondaryBtnClasses(mode === "decode")}
         >
           Decode JWT
         </button>
         <button
           type="button"
-          onClick={() => { setMode("hash"); setError(null); }}
+          onClick={() => {
+            setMode("hash");
+            setError(null);
+          }}
           className={secondaryBtnClasses(mode === "hash")}
         >
           Generate Hash
@@ -210,7 +209,10 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
       {mode === "decode" && (
         <form onSubmit={handleDecode} className="max-w-3xl mx-auto space-y-6">
           <div>
-            <label htmlFor="jwt-input" className="block text-sm font-medium text-gray-800 mb-1">
+            <label
+              htmlFor="jwt-input"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
               JWT Token
             </label>
             <textarea
@@ -218,7 +220,9 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
               ref={jwtRef}
               rows={4}
               value={jwtInput}
-              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setJwtInput(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                setJwtInput(e.target.value)
+              }
               placeholder="Paste your JWT here…"
               className={baseInputClasses}
             />
@@ -242,11 +246,18 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
                 <button
                   type="button"
                   onClick={() =>
-                    copyText(JSON.stringify(decodedHeader, null, 2), setHeaderCopied)
+                    copyText(
+                      JSON.stringify(decodedHeader, null, 2),
+                      setHeaderCopied
+                    )
                   }
                   className="mt-2 inline-flex items-center gap-2 text-sm text-indigo-600 hover:underline"
                 >
-                  {headerCopied ? <Check className="w-4 h-4" /> : <ClipboardCopy className="w-4 h-4" />}
+                  {headerCopied ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    <ClipboardCopy className="w-4 h-4" />
+                  )}
                   Copy Header
                 </button>
               </div>
@@ -258,11 +269,18 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
                 <button
                   type="button"
                   onClick={() =>
-                    copyText(JSON.stringify(decodedPayload, null, 2), setPayloadCopied)
+                    copyText(
+                      JSON.stringify(decodedPayload, null, 2),
+                      setPayloadCopied
+                    )
                   }
                   className="mt-2 inline-flex items-center gap-2 text-sm text-indigo-600 hover:underline"
                 >
-                  {payloadCopied ? <Check className="w-4 h-4" /> : <ClipboardCopy className="w-4 h-4" />}
+                  {payloadCopied ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    <ClipboardCopy className="w-4 h-4" />
+                  )}
                   Copy Payload
                 </button>
               </div>
@@ -275,7 +293,10 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
       {mode === "hash" && (
         <form onSubmit={handleHash} className="max-w-3xl mx-auto space-y-6">
           <div>
-            <label htmlFor="hash-input" className="block text-sm font-medium text-gray-800 mb-1">
+            <label
+              htmlFor="hash-input"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
               Input Text
             </label>
             <textarea
@@ -283,7 +304,9 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
               ref={hashRef}
               rows={4}
               value={hashInput}
-              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setHashInput(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                setHashInput(e.target.value)
+              }
               placeholder="Enter text to hash…"
               className={baseInputClasses}
             />
@@ -291,7 +314,10 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
 
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex-1 min-w-[140px]">
-              <label htmlFor="alg-select" className="block text-sm font-medium text-gray-800 mb-1">
+              <label
+                htmlFor="alg-select"
+                className="block text-sm font-medium text-gray-800 mb-1"
+              >
                 Algorithm
               </label>
               <select
@@ -309,7 +335,10 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
 
             {hashAlg === "bcrypt" && (
               <div className="flex-1 min-w-[140px]">
-                <label htmlFor="rounds-input" className="block text-sm font-medium text-gray-800 mb-1">
+                <label
+                  htmlFor="rounds-input"
+                  className="block text-sm font-medium text-gray-800 mb-1"
+                >
                   Salt Rounds
                 </label>
                 <input
@@ -336,7 +365,10 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
 
           {hashOutput && (
             <div className="space-y-2">
-              <label htmlFor="hash-output" className="block text-sm font-medium text-gray-800 mb-1">
+              <label
+                htmlFor="hash-output"
+                className="block text-sm font-medium text-gray-800 mb-1"
+              >
                 Hash Output
               </label>
               <div className="relative">
@@ -353,7 +385,11 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
                   disabled={!hashOutput}
                   className="absolute top-2 right-2 p-2 text-gray-500 hover:text-indigo-600 focus:outline-none transition"
                 >
-                  {hashCopied ? <Check className="w-6 h-6 text-green-500" /> : <ClipboardCopy className="w-6 h-6" />}
+                  {hashCopied ? (
+                    <Check className="w-6 h-6 text-green-500" />
+                  ) : (
+                    <ClipboardCopy className="w-6 h-6" />
+                  )}
                 </button>
               </div>
             </div>
