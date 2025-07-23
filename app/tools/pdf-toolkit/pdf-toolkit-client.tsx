@@ -1,3 +1,4 @@
+// app/tools/pdf-toolkit/pdf-toolkit-client.tsx
 "use client";
 
 import {
@@ -16,11 +17,14 @@ import {
 } from "pdfjs-dist";
 import type {
   PDFDocumentProxy,
-  PDFPageProxy,
+  PDFPageProxy as _PDFPageProxy,
 } from "pdfjs-dist";
 
-// 2) Worker URL (matches our shim)
-import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+// 2) Build the PDF.js worker URL at runtime so the bundler picks it up
+const workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
+).toString();
 
 // 3) The only way to get TextContent/TextItem types is from the internal types folder
 import type { TextContent, TextItem } from "pdfjs-dist/types/src/display/api";
@@ -52,7 +56,7 @@ export default function PdfToolkitClient() {
     useState<ExtractionMode>("image");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Point PDF.js at its worker
+  // Point PDF.js at its worker URL
   useEffect(() => {
     GlobalWorkerOptions.workerSrc = workerSrc;
   }, []);
@@ -113,8 +117,9 @@ export default function PdfToolkitClient() {
       a.download = `compressed-${selectedFile.name}`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (err: any) {
-      setErrorMessage(`❌ Compression error: ${err.message || err}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setErrorMessage(`❌ Compression error: ${msg}`);
     } finally {
       setCurrentAction("idle");
     }
@@ -220,8 +225,9 @@ export default function PdfToolkitClient() {
       a.download = selectedFile.name.replace(/\.pdf$/i, ".docx");
       a.click();
       URL.revokeObjectURL(url);
-    } catch (err: any) {
-      setErrorMessage(`❌ Conversion error: ${err.message || err}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setErrorMessage(`❌ Conversion error: ${msg}`);
     } finally {
       setCurrentAction("idle");
     }
@@ -233,6 +239,7 @@ export default function PdfToolkitClient() {
 
   return (
     <section id="pdf-toolkit" className="space-y-16 text-gray-900 antialiased">
+      {/* Header */}
       <div className="text-center space-y-6">
         <h1 className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
           PDF Toolkit: Compress &amp; Convert
@@ -243,8 +250,10 @@ export default function PdfToolkitClient() {
         </p>
       </div>
 
+      {/* Form */}
       <form onSubmit={(e: FormEvent) => e.preventDefault()} className="max-w-3xl mx-auto space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left column */}
           <div className="flex flex-col items-center space-y-4">
             <input
               type="file"
@@ -302,6 +311,7 @@ export default function PdfToolkitClient() {
             )}
           </div>
 
+          {/* Right column */}
           <div className="flex flex-col justify-center space-y-4">
             {errorMessage && (
               <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
