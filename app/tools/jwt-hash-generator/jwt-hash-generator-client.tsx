@@ -9,7 +9,7 @@ import React, {
   FormEvent,
   useCallback,
 } from "react";
-import { Trash2, ClipboardCopy, Check } from "lucide-react";
+import { ClipboardCopy, Check } from "lucide-react";
 // @ts-expect-error crypto-js has no bundled types
 import MD5 from "crypto-js/md5";
 // @ts-expect-error crypto-js has no bundled types
@@ -79,10 +79,6 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
 
   const baseInputClasses = `${textareaBase} resize-y bg-white placeholder-gray-400`;
   const baseOutputClasses = `${textareaBase} resize-none bg-gray-50 placeholder-gray-400`;
-
-  const primaryBtnClasses =
-    primaryButtonClassName ??
-    `inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r ${gradientClasses} text-white font-semibold rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed`;
 
   const secondaryBtnClasses = (active = false) =>
     `${secondaryButtonClassName ??
@@ -166,17 +162,6 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
     },
     []
   );
-
-  // Clear all
-  const clearAll = useCallback(() => {
-    setJwtInput("");
-    setDecodedHeader(null);
-    setDecodedPayload(null);
-    setHashInput("");
-    setHashOutput("");
-    setError(null);
-    jwtRef.current?.focus();
-  }, []);
 
   return (
     <section

@@ -6,7 +6,6 @@ import React, {
   useRef,
   ChangeEvent,
   useCallback,
-  useEffect,
   FC,
 } from "react";
 import { Trash2, ArrowDown } from "lucide-react";

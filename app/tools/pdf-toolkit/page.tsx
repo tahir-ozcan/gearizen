@@ -1,5 +1,4 @@
 // app/tools/pdf-toolkit/page.tsx
-
 import type { Metadata } from "next";
 import BreadcrumbJsonLd from "@/app/components/BreadcrumbJsonLd";
 import Script from "next/script";
@@ -22,7 +21,7 @@ export const metadata: Metadata = {
     "offline PDF tool",
     "free PDF toolkit",
     "privacy-first PDF tool",
-    "Gearizen PDF Toolkit"
+    "Gearizen PDF Toolkit",
   ],
   authors: [{ name: "Gearizen Team", url: "https://gearizen.com/about" }],
   robots: { index: true, follow: true },
@@ -40,9 +39,9 @@ export const metadata: Metadata = {
         url: "https://gearizen.com/og/pdf-toolkit.png",
         width: 1200,
         height: 630,
-        alt: "Gearizen PDF Toolkit Preview"
-      }
-    ]
+        alt: "Gearizen PDF Toolkit Preview",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -50,8 +49,8 @@ export const metadata: Metadata = {
     description:
       "Shrink PDF file sizes without quality loss and extract text into editable Word documents—fully in-browser and offline. 100% client-side, privacy-first, zero signup, lightning-fast.",
     creator: "@gearizen",
-    images: ["https://gearizen.com/og/pdf-toolkit.png"]
-  }
+    images: ["https://gearizen.com/og/pdf-toolkit.png"],
+  },
 };
 
 export default function PdfToolkitPage() {
@@ -70,8 +69,8 @@ export default function PdfToolkitPage() {
           url: "https://gearizen.com",
           logo: {
             "@type": "ImageObject",
-            url: "https://gearizen.com/logo.png"
-          }
+            url: "https://gearizen.com/logo.png",
+          },
         },
         breadcrumb: {
           "@type": "BreadcrumbList",
@@ -80,22 +79,22 @@ export default function PdfToolkitPage() {
               "@type": "ListItem",
               position: 1,
               name: "Home",
-              item: "https://gearizen.com"
+              item: "https://gearizen.com",
             },
             {
               "@type": "ListItem",
               position: 2,
               name: "Tools",
-              item: "https://gearizen.com/tools"
+              item: "https://gearizen.com/tools",
             },
             {
               "@type": "ListItem",
               position: 3,
               name: "PDF Toolkit",
-              item: "https://gearizen.com/tools/pdf-toolkit"
-            }
-          ]
-        }
+              item: "https://gearizen.com/tools/pdf-toolkit",
+            },
+          ],
+        },
       },
       {
         "@type": "SoftwareApplication",
@@ -106,31 +105,28 @@ export default function PdfToolkitPage() {
         offers: {
           "@type": "Offer",
           price: "0",
-          priceCurrency: "USD"
+          priceCurrency: "USD",
         },
         publisher: {
           "@type": "Organization",
           name: "Gearizen",
-          url: "https://gearizen.com"
-        }
-      }
-    ]
+          url: "https://gearizen.com",
+        },
+      },
+    ],
   };
 
   return (
     <>
-      {/* JSON-LD structured data */}
       <Script id="ld-json" type="application/ld+json" strategy="afterInteractive">
         {JSON.stringify(structuredData)}
       </Script>
 
-      {/* Breadcrumb */}
       <BreadcrumbJsonLd
         pageTitle="PDF Toolkit"
         pageUrl="https://gearizen.com/tools/pdf-toolkit"
       />
 
-      {/* Main client component */}
       <main>
         <PdfToolkitWrapper />
       </main>

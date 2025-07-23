@@ -3,18 +3,17 @@
 
 import { useState, useRef, useEffect, ChangeEvent, FormEvent } from "react";
 import { jsPDF } from "jspdf";
-// Core PDF.js API (legacy build)
-import {
-  getDocument,
-  GlobalWorkerOptions,
-  type PDFDocumentProxy,
-  type PDFPageProxy,
-  type TextItem,
-  type TextContent,
-} from "pdfjs-dist/legacy/build/pdf";
-// Worker bundle (URL) — artık .mjs uzantılı
-import workerSrc from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
-// Official DOCX types
+
+// Core PDF.js API (legacy build implementation)
+import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/legacy/build/pdf";
+// Worker entry point (automatically resolves to the correct bundle)
+import workerSrc from "pdfjs-dist/build/pdf.worker.entry";
+
+// Tipler
+import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
+import type { TextContent, TextItem } from "pdfjs-dist/types/src/display/api";
+
+// DOCX oluşturmak için tipler
 import {
   Document as DocxDocument,
   Packer,
@@ -40,31 +39,25 @@ export default function PdfToolkitClient() {
   const [extractionMode, setExtractionMode] = useState<ExtractionMode>("image");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Point PDF.js at its worker
+  // PDF.js worker URL’ini atıyoruz
   useEffect(() => {
     GlobalWorkerOptions.workerSrc = workerSrc;
   }, []);
 
-  function handleSelectClick() {
-    fileInputRef.current?.click();
-  }
+  const handleSelectClick = () => fileInputRef.current?.click();
 
-  function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setErrorMessage(null);
-    const file = event.target.files?.[0] ?? null;
-    if (!file) {
-      setSelectedFile(null);
-      return;
-    }
+    const file = e.target.files?.[0] ?? null;
+    if (!file) return setSelectedFile(null);
     if (file.type !== "application/pdf") {
-      setErrorMessage("❌ Please select a valid PDF file.");
-      setSelectedFile(null);
-      return;
+      setErrorMessage("❌ Lütfen geçerli bir PDF seçin.");
+      return setSelectedFile(null);
     }
     setSelectedFile(file);
-  }
+  };
 
-  async function compressPdfAndDownload() {
+  const compressPdfAndDownload = async () => {
     if (!selectedFile) return;
     setCurrentAction("compress");
     setErrorMessage(null);
@@ -75,7 +68,7 @@ export default function PdfToolkitClient() {
       const pdfWriter = new jsPDF({ unit: "pt", format: "a4" });
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Canvas 2D context not available.");
+      if (!ctx) throw new Error("Canvas 2D context bulunamadı.");
 
       for (let i = 1; i <= pdfDoc.numPages; i++) {
         const page: PDFPageProxy = await pdfDoc.getPage(i);
@@ -86,11 +79,11 @@ export default function PdfToolkitClient() {
 
         const jpeg = canvas.toDataURL("image/jpeg", jpegQuality);
         const props = pdfWriter.getImageProperties(jpeg);
-        const pdfWidth = pdfWriter.internal.pageSize.getWidth();
-        const pdfHeight = (props.height * pdfWidth) / props.width;
+        const width = pdfWriter.internal.pageSize.getWidth();
+        const height = (props.height * width) / props.width;
 
         if (i > 1) pdfWriter.addPage();
-        pdfWriter.addImage(jpeg, "JPEG", 0, 0, pdfWidth, pdfHeight);
+        pdfWriter.addImage(jpeg, "JPEG", 0, 0, width, height);
       }
 
       const blob = pdfWriter.output("blob");
@@ -101,16 +94,13 @@ export default function PdfToolkitClient() {
       a.click();
       URL.revokeObjectURL(url);
     } catch (err: unknown) {
-      console.error(err);
-      setErrorMessage(
-        err instanceof Error ? `❌ Compression error: ${err.message}` : "❌ Compression failed."
-      );
+      setErrorMessage(err instanceof Error ? `❌ Sıkıştırma hatası: ${err.message}` : "❌ Sıkıştırma başarısız.");
     } finally {
       setCurrentAction("idle");
     }
-  }
+  };
 
-  async function extractPdfToWordAndDownload() {
+  const extractPdfToWordAndDownload = async () => {
     if (!selectedFile) return;
     setCurrentAction("extract");
     setErrorMessage(null);
@@ -121,7 +111,7 @@ export default function PdfToolkitClient() {
       const paragraphs: Paragraph[] = [];
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Canvas 2D context not available.");
+      if (!ctx) throw new Error("Canvas 2D context bulunamadı.");
 
       for (let i = 1; i <= pdfDoc.numPages; i++) {
         const page: PDFPageProxy = await pdfDoc.getPage(i);
@@ -134,7 +124,7 @@ export default function PdfToolkitClient() {
 
           const png = canvas.toDataURL("image/png");
           const base64 = png.split(",")[1];
-          const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+          const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
 
           paragraphs.push(
             new Paragraph({
@@ -151,13 +141,13 @@ export default function PdfToolkitClient() {
         } else {
           const textContent: TextContent = await page.getTextContent();
           const rawItems = textContent.items as TextItem[];
-          const pdfTextItems: PDFTextItem[] = rawItems.map((item) => ({
+          const pdfTextItems: PDFTextItem[] = rawItems.map(item => ({
             text: item.str,
             transform: item.transform ?? [],
             fontName: item.fontName,
           }));
 
-          // Group by vertical position to form lines
+          // Satırları grupla
           const lines: string[] = [];
           let lastY: number | null = null;
           let buffer = "";
@@ -174,13 +164,13 @@ export default function PdfToolkitClient() {
           }
           if (buffer) lines.push(buffer);
 
-          // Heading detection (basic)
-          const sample = pdfTextItems.find((t) => t.text.trim());
+          // Basit başlık algılama
+          const sample = pdfTextItems.find(t => t.text.trim());
           const baseFont = sample?.fontName ?? "Times New Roman";
           const fontSizePt = Math.round((sample?.transform[0] ?? 1) * 24);
           const headingThreshold = Math.max(32, fontSizePt + 4);
 
-          for (const line of lines) {
+          lines.forEach(line => {
             const isHeading = fontSizePt >= headingThreshold;
             paragraphs.push(
               new Paragraph({
@@ -197,7 +187,7 @@ export default function PdfToolkitClient() {
                 spacing: { after: 100 },
               })
             );
-          }
+          });
         }
       }
 
@@ -210,25 +200,22 @@ export default function PdfToolkitClient() {
       a.click();
       URL.revokeObjectURL(url);
     } catch (err: unknown) {
-      console.error(err);
-      setErrorMessage(
-        err instanceof Error ? `❌ Conversion error: ${err.message}` : "❌ Conversion failed."
-      );
+      setErrorMessage(err instanceof Error ? `❌ Dönüştürme hatası: ${err.message}` : "❌ Dönüştürme başarısız.");
     } finally {
       setCurrentAction("idle");
     }
-  }
+  };
 
-  function handleModeChange(event: ChangeEvent<HTMLSelectElement>) {
-    setExtractionMode(event.target.value as ExtractionMode);
-  }
+  const handleModeChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setExtractionMode(e.target.value as ExtractionMode);
+  };
 
   return (
     <section id="pdf-toolkit" className="space-y-16 text-gray-900 antialiased">
-      {/* Header */}
-      <div className="text-center space-y-6 sm:px-0">
+      {/* Başlık */}
+      <div className="text-center space-y-6">
         <h1 className="bg-clip-text text-transparent bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
-          PDF Toolkit: Compress &amp; Convert
+          PDF Toolkit: Compress & Convert
         </h1>
         <div className="mx-auto h-1 w-32 rounded-full bg-gradient-to-r from-[#7c3aed] via-[#ec4899] to-[#fbbf24]" />
         <p className="mt-4 text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
@@ -237,98 +224,74 @@ export default function PdfToolkitClient() {
         </p>
       </div>
 
-      <form
-        onSubmit={(e: FormEvent) => e.preventDefault()}
-        className="max-w-3xl mx-auto space-y-8 sm:px-0"
-      >
+      <form onSubmit={e => e.preventDefault()} className="max-w-3xl mx-auto space-y-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left column */}
-          <div className="flex flex-col space-y-6">
-            <div className="flex flex-col items-center">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="application/pdf"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <button
-                type="button"
-                onClick={handleSelectClick}
-                disabled={currentAction !== "idle"}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition font-medium"
-              >
-                {selectedFile ? "Change PDF…" : "Select PDF…"}
-              </button>
-              {selectedFile && (
-                <p className="mt-2 text-sm text-gray-500 font-mono truncate">
-                  {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
-                </p>
-              )}
-            </div>
+          {/* Sol sütun */}
+          <div className="flex flex-col items-center space-y-4">
+            <input ref={fileInputRef} type="file" accept="application/pdf" onChange={handleFileChange} className="hidden" />
+            <button
+              type="button"
+              onClick={handleSelectClick}
+              disabled={currentAction !== "idle"}
+              className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition"
+            >
+              {selectedFile ? "Change PDF…" : "Select PDF…"}
+            </button>
+            {selectedFile && <p className="mt-2 text-sm text-gray-500 font-mono truncate">{selectedFile.name}</p>}
 
             {selectedFile && (
-              <div className="p-6 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+              <div className="w-full p-4 border border-gray-200 rounded-lg bg-gray-50">
                 {extractionMode === "image" && (
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-800">
-                      JPEG Quality ({Math.round(jpegQuality * 100)}%)
-                    </label>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-800">JPEG Quality ({Math.round(jpegQuality * 100)}%)</label>
                     <input
                       type="range"
                       min={10}
                       max={100}
                       step={5}
                       value={jpegQuality * 100}
-                      onChange={(e) => setJpegQuality(Number(e.target.value) / 100)}
-                      disabled={currentAction === "extract"}
-                      className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                      onChange={e => setJpegQuality(Number(e.target.value) / 100)}
+                      disabled={currentAction !== "idle"}
+                      className="w-full disabled:opacity-50"
                     />
                   </div>
                 )}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-800">
-                    Extraction Mode
-                  </label>
-                  <select
-                    value={extractionMode}
-                    onChange={handleModeChange}
-                    disabled={currentAction === "extract"}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <option value="image">Embed pages as images</option>
-                    <option value="text">Extract editable text</option>
-                  </select>
-                </div>
+                <label className="block text-sm font-medium text-gray-800">Extraction Mode</label>
+                <select
+                  value={extractionMode}
+                  onChange={handleModeChange}
+                  disabled={currentAction !== "idle"}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 transition disabled:opacity-50"
+                >
+                  <option value="image">Embed pages as images</option>
+                  <option value="text">Extract editable text</option>
+                </select>
               </div>
             )}
           </div>
 
-          {/* Right column */}
-          <div className="flex flex-col justify-between">
+          {/* Sağ sütun */}
+          <div className="flex flex-col justify-center space-y-4">
             {errorMessage && (
-              <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
-                {errorMessage}
-              </div>
+              <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">{errorMessage}</div>
             )}
             {selectedFile && (
-              <div className="flex flex-wrap items-center gap-4">
+              <div className="flex gap-4">
                 <button
                   type="button"
                   onClick={compressPdfAndDownload}
                   disabled={currentAction !== "idle"}
-                  className="flex items-center px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition font-medium"
+                  className="flex-1 px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition"
                 >
-                  {currentAction === "compress" ? "Compressing…" : "Download Compressed"}
+                  {currentAction === "compress" ? "Compressing…" : "Download Compressed"}  
                 </button>
-
                 <button
                   type="button"
                   onClick={extractPdfToWordAndDownload}
                   disabled={currentAction !== "idle"}
-                  className="flex items-center px-6 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition font-medium"
+                  className="flex-1 px-6 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 transition"
                 >
-                  {currentAction === "extract" ? "Converting…" : "Download as Word"}
+                  {currentAction === "extract" ? "Converting…" : "Download as Word"}  
                 </button>
               </div>
             )}

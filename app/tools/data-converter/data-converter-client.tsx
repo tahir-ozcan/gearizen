@@ -34,17 +34,22 @@ export interface DataConverterClientProps {
   rootClassName?: string;
 }
 
-const xmlToJson = (node: Node): any => {
+/**
+ * Recursively converts an XML Node into a plain JS object.
+ * Returns unknown; consumer must handle expected shape.
+ */
+const xmlToJson = (node: Node): unknown => {
   if (node.nodeType === Node.TEXT_NODE) {
     return node.nodeValue?.trim() || "";
   }
-  const obj: any = {};
+  const obj: Record<string, unknown> = {};
   if (node.nodeType === Node.ELEMENT_NODE) {
     const el = node as Element;
     if (el.attributes.length) {
       obj["@attributes"] = {};
       for (const { name, value } of Array.from(el.attributes)) {
-        obj["@attributes"][name] = value;
+        // @attributes is a nested object
+        (obj["@attributes"] as Record<string, string>)[name] = value;
       }
     }
   }
@@ -52,8 +57,11 @@ const xmlToJson = (node: Node): any => {
     const val = xmlToJson(child);
     if (child.nodeType === Node.TEXT_NODE && val === "") continue;
     const key = child.nodeName;
-    if (obj[key] !== undefined) {
-      obj[key] = Array.isArray(obj[key]) ? [...obj[key], val] : [obj[key], val];
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const existing = obj[key];
+      obj[key] = Array.isArray(existing)
+        ? [...existing, val]
+        : [existing, val];
     } else {
       obj[key] = val;
     }
@@ -61,7 +69,11 @@ const xmlToJson = (node: Node): any => {
   return obj;
 };
 
-const jsonToXml = (val: any, tag = "root"): string => {
+/**
+ * Converts a JS value (unknown) to XML.
+ * If the value isn't an object or array, it's treated as text content.
+ */
+const jsonToXml = (val: unknown, tag = "root"): string => {
   if (val == null || typeof val !== "object") {
     const esc = String(val)
       .replace(/&/g, "&amp;")
@@ -70,10 +82,10 @@ const jsonToXml = (val: any, tag = "root"): string => {
     return `<${tag}>${esc}</${tag}>`;
   }
   if (Array.isArray(val)) {
-    return val.map((v) => jsonToXml(v, tag)).join("");
+    return val.map((item) => jsonToXml(item, tag)).join("");
   }
   let xml = `<${tag}>`;
-  for (const [k, v] of Object.entries(val)) {
+  for (const [k, v] of Object.entries(val as Record<string, unknown>)) {
     if (k === "@attributes") continue;
     xml += jsonToXml(v, k);
   }
@@ -109,7 +121,7 @@ export const DataConverterClient: FC<DataConverterClientProps> = ({
       return;
     }
     try {
-      let data: any;
+      let data: unknown;
       if (from === "json") {
         data = JSON.parse(input);
       } else if (from === "csv") {
@@ -135,7 +147,7 @@ export const DataConverterClient: FC<DataConverterClientProps> = ({
         const arr = Array.isArray(data) ? data : [data];
         result = Papa.unparse(arr);
       } else if (to === "yaml") {
-        result = YAML.dump(data);
+        result = YAML.dump(data as object);
       } else {
         result = jsonToXml(data);
       }

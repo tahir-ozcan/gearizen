@@ -30,7 +30,6 @@ export interface CodeFormatterMinifierProps {
   focusRingClass?: string;
   /** Labels & placeholders */
   inputLabel?: string;
-  languageLabel?: string;
   outputLabel?: string;
   placeholderInput?: string;
   placeholderOutput?: string;
@@ -52,7 +51,6 @@ export default function CodeFormatterMinifierClient({
   gradientClasses = "from-purple-500 via-pink-500 to-yellow-400",
   focusRingClass = "focus:ring-purple-500",
   inputLabel = "Your Code",
-  languageLabel = "Language",
   outputLabel = "Output",
   placeholderInput = "Enter code here…",
   placeholderOutput = "Result appears here…",

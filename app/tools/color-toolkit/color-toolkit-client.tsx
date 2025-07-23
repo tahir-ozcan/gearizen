@@ -23,8 +23,6 @@ export interface ColorToolkitClientProps {
   gradientClasses?: string;
   /** Focus‑ring Tailwind class */
   focusRingClass?: string;
-  /** Label for the color input */
-  inputLabel?: string;
   /** Placeholder for the text input */
   placeholder?: string;
   /** Text for copy buttons */
@@ -221,7 +219,6 @@ export const ColorToolkitClient: FC<ColorToolkitClientProps> = ({
     "Translate colors between HEX, RGB, HSL & CMYK and verify WCAG‑compliant contrast ratios—copy any code or ratio with one click.",
   gradientClasses = "from-purple-500 via-pink-500 to-yellow-400",
   focusRingClass = "focus:ring-purple-500",
-  inputLabel = "Color",
   placeholder = "#rrggbb or rgb(...) or hsl(...)",
   copyButtonLabel = "Copy",
   clearButtonLabel = "Clear All",
