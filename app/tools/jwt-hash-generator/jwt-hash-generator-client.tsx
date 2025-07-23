@@ -323,7 +323,11 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
               <select
                 id="alg-select"
                 value={hashAlg}
-                onChange={(e) => setHashAlg(e.target.value as any)}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                  setHashAlg(
+                    e.target.value as "MD5" | "SHA‑1" | "SHA‑256" | "bcrypt"
+                  )
+                }
                 className={`w-full p-3 border border-gray-300 rounded-md focus:outline-none ${focusRingClass}`}
               >
                 <option value="MD5">MD5</option>
@@ -347,7 +351,9 @@ const JwtHashGeneratorClient: FC<JwtHashGeneratorClientProps> = ({
                   min={4}
                   max={31}
                   value={bcryptRounds}
-                  onChange={(e) => setBcryptRounds(Number(e.target.value))}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setBcryptRounds(Number(e.target.value))
+                  }
                   className={`w-full p-3 border border-gray-300 rounded-md focus:outline-none ${focusRingClass}`}
                 />
               </div>
